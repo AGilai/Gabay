@@ -13,6 +13,7 @@
     "build": "node --disable-warning=ExperimentalWarning scripts/build.ts",
     "serve": "node --disable-warning=ExperimentalWarning scripts/serve.ts",
     "check-import": "node --disable-warning=ExperimentalWarning scripts/check-import.ts",
-    "deploy": "node --disable-warning=ExperimentalWarning scripts/deploy.ts"
+    "deploy": "node --disable-warning=ExperimentalWarning scripts/deploy.ts",
+    "lock": "node --disable-warning=ExperimentalWarning scripts/lock.ts"
   }
 }

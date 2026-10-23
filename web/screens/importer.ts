@@ -1,5 +1,6 @@
 // S8: one-time import of the WhatsApp log. One question card at a time, then a summary.
 import { emptyState } from '../../core/backup.ts';
+import { unlock } from '../../core/lock.ts';
 import { readZipEntry } from '../../core/unzip.ts';
 import { applyDraft, buildDraft, parseChat, type Answer, type Draft, type Question } from '../../core/whatsapp.ts';
 import type { Group } from '../../core/types.ts';
@@ -82,6 +83,7 @@ export function renderImport(ctx: Ctx): HTMLElement {
     takeSharedFile().then((f) => f && load(f.bytes, f.name)).catch(() => {});
     return h('div', { class: 'screen' }, bar(null),
       h('main', { class: 'body', style: 'gap:16px;padding-top:12px' },
+        lockedCard(load),
         h('div', { class: 'card' }, h('h2', {}, 'איך מייצאים'),
           h('p', {}, 'בוואטסאפ: פותחים את הקבוצה ← ⋮ ← עוד ← ייצוא צ׳אט ← בלי מדיה. בתפריט השיתוף בוחרים "גבאי", או שומרים את הקובץ ובוחרים אותו כאן.')),
         h('label', { class: 'btn fill wide' }, 'בחר קובץ ייצוא (zip / txt)',
@@ -128,4 +130,35 @@ export function renderImport(ctx: Ctx): HTMLElement {
       h('div', { class: 'row-btns' },
         total ? h('button', { class: 'btn tonal', onclick: () => { s.at = total - 1; ctx.refresh(); } }, 'הקודם') : null,
         h('button', { class: 'btn tonal', onclick: () => { session = null; ctx.refresh(); } }, 'ביטול'))));
+}
+
+// The gabbai's own export, locked with his passphrase and published with the app (see scripts/lock.ts).
+const LOCKED_URL = 'locked/list.gabay';
+
+function lockedCard(load: (bytes: Uint8Array, name: string) => void): HTMLElement {
+  const card = h('div', { class: 'card', hidden: true });
+  let pass = '';
+  const status = h('p', { class: 'note' });
+  const open = async (e: Event) => {
+    e.preventDefault();
+    status.textContent = 'פותח…';
+    try {
+      const res = await fetch(LOCKED_URL);
+      const bytes = await unlock(new Uint8Array(await res.arrayBuffer()), pass);
+      status.textContent = '';
+      load(bytes, 'list.zip');
+    } catch (err) {
+      status.textContent = (err as Error).message;
+    }
+  };
+  card.append(h('h2', {}, 'הרשימה שלך (נעולה)'),
+    h('p', { class: 'muted' }, 'קובץ הייצוא המקורי, נעול בסיסמה שרק לך יש.'),
+    h('form', { style: 'display:grid;gap:12px', onsubmit: open },
+      h('div', { class: 'field' }, h('label', {}, 'סיסמה'),
+        h('input', { type: 'password', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false', dir: 'ltr',
+          oninput: (e: Event) => { pass = (e.target as HTMLInputElement).value.trim(); } })),
+      h('button', { class: 'btn fill wide', type: 'submit' }, 'פתח וייבא')),
+    status);
+  fetch(LOCKED_URL, { method: 'HEAD' }).then((r) => { card.hidden = !r.ok; }).catch(() => {});
+  return card;
 }
