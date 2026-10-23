@@ -321,6 +321,54 @@ Mockup: `design/mockups/phase2-seat-map.html` (frames P2-1 to P2-3).
 - The layout is stored as data (blocks, rows, columns, bimah) drawn from the chart. No layout editor
   in the app (YAGNI). If the hall changes, the data file is edited.
 
+## 11a. Torah text on the reading page (phase 1.1, draft)
+
+Mockup: `design/mockups/torah-reading.html` (frames T1–T3).
+
+**Why:** the gabbai stands by the reader and follows the text to correct him. Today he needs a
+tikkun or a chumash. The app already knows the day, the slots and who is up now, so it can show
+exactly the verses of the current aliyah.
+
+**Where the content comes from (checked 2026-10-23):**
+| What | Source | Licence |
+|---|---|---|
+| Which verses each aliyah reads, per day | `@hebcal/leyning` 10.1 (Israel schedule): Mon/Thu by parasha, Rosh Chodesh, Chanukah (incl. Rosh Chodesh Tevet, 4 aliyot), Purim, Chol HaMoed (Israel), public fasts and Tisha B'Av | BSD-2 |
+| The text with niqqud and ta'amim, ketiv/qere, {פ} / {ס} breaks | *Miqra according to the Masorah* (Aleppo-based, as Israeli tikkunim), via Sefaria | CC-BY-SA, credit shown in the app |
+| Font with ta'amim | Noto Serif Hebrew (bundled) | OFL |
+
+About **1,800 distinct verses** cover every weekday reading for 10 years (≈ 450 KB, ≈ 150 KB
+compressed). The table "date → aliyot" and the verses are generated once by a script and shipped
+with the app, so it works offline. The fast-day mincha reading is ויחל (the morning reading), which
+the script adds for every fast.
+
+**Entry points:**
+- **T1 · Main page:** an open-book icon in the app bar (next to the calendar). It opens the text at
+  the aliyah of the highlighted slot. The slot sheet (S3) gets "הצג בתורה" for that slot's aliyah.
+  The main page itself doesn't grow: 4 slots must still fit at 360×800.
+
+**T2 · Reading view (S10):**
+- Header: reading name ("וירא · שני וחמישי", "ראש חודש כסלו", "חנוכה יום ו׳ · ראש חודש טבת").
+- **Aliyah tabs** under the header, labelled like the slots (כהן · לוי · שלישי · רביעי; with אין כהן
+  on: ישראל במקום כהן · שני · שלישי). ✓ on aliyot already done; the current one is selected.
+- The whole reading is one continuous text with a small heading per aliyah ("לוי · בראשית י״ח ו–ח"),
+  so the gabbai can just scroll on. A tab jumps to its aliyah.
+- Large serif text (Noto Serif Hebrew), A− / A+ shared with the prayers. Small verse numbers.
+- Qere shown in the text, ketiv after it in small grey brackets, as in a tikkun.
+- A sticky "לעלייה הבאה ←" at the bottom. The screen stays on (wake lock), as on the main page.
+
+**T3 · "כמו בספר" (as in the scroll):** a switch at the top, טעמים | כמו בספר. Letters only:
+no niqqud, no ta'amim, no maqaf, the **ketiv**, and the open / closed breaks as gaps. It helps find
+the place the reader is at in the scroll.
+
+**Not in this step:** haftarot, Shabbat and Yom Tov readings, Megillat Esther, audio.
+
+**Questions for the gabbai:**
+1. Edition: *Miqra according to the Masorah* (recommended, matches Israeli tikkunim) or the Leningrad
+   Codex (public domain, small differences)?
+2. Yom HaAtzma'ut / Yom Yerushalayim: does the shul read from the Torah on those days?
+3. Chol HaMoed Sukkot: Hebcal's Israel schedule has the 4th oleh read both days' passages
+   (שני ימים). Is that the shul's custom?
+
 ## 12. Not in phase 1
 
 Shabbat, several gabbaim / sync, selling aliyot, the "two brothers / father and son not one after
