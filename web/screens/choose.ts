@@ -69,7 +69,11 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
     pressable(h('div', { class: 'row ' + cls, role: 'button' },
       h('div', { class: 'av ' + GROUP_CLASS[p.group] }, p.name.trim()[0] ?? '?'),
       h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, small)),
-      side), () => pick(p), () => ctx.go('#person/' + p.id));
+      side,
+      // A visible way to the person card (holding the row still works too).
+      h('button', { class: 'icon edit', 'aria-label': 'עריכת ' + p.name,
+        onclick: (e: Event) => { e.stopPropagation(); ctx.go('#person/' + p.id); } }, icon('edit', 20))),
+    () => pick(p), () => ctx.go('#person/' + p.id));
   const queueRow = (x: Row, cls = '') => row(x.person, cls,
     x.reason ? h('span', { class: 'hytag' }, x.reason) : x.person.hint || (x.last ? '' : 'חדש'), days(x.person.id));
 

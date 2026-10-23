@@ -58,6 +58,7 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
   return h('div', { class: 'screen' },
     appBar(p.name, sub, { back: 'history' }),
     h('main', { class: 'body', style: 'gap:14px;padding-top:12px' },
+      h('p', { class: 'note', style: 'margin:0' }, 'כל שינוי נשמר מיד.'),
       p.stopped ? h('div', { class: 'paused' }, 'מושהה, נמצא רק בחיפוש') : null,
       field('שם (מוצג במסך הראשי)', p.name, (v) => v && update({ name: v })),
       groupSeg(p.group, (g) => update({ group: g })),
