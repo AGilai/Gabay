@@ -1,9 +1,9 @@
 // S1 (main page) and S3 (slot sheet). Never shows a person's hint.
 import { dayInfo } from '../../core/day.ts';
 import { ROLE_LABEL, clearSlot, focusIndex, groupOf, markDone, newReading, place, relayout, undoDone } from '../../core/slots.ts';
-import type { Reading, SlotRole, State } from '../../core/types.ts';
-import { daysBetween } from '../../core/dates.ts';
-import { aliyotOf, shouldOfferRegular, suggest } from '../../core/queue.ts';
+import type { Person, Reading, SlotRole, State } from '../../core/types.ts';
+import { daysBetween, newId } from '../../core/dates.ts';
+import { aliyotOf, search, shouldOfferRegular, suggest } from '../../core/queue.ts';
 import { GROUP_CLASS, GROUP_WORD, activeKey, currentKey, findReading, keyText, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, nowHHMM, sheet, snackbar } from '../ui.ts';
 import { torahFor } from './torah.ts';
@@ -67,22 +67,32 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
   const aliyot = aliyotOf(state);
   const chooseHash = (g: string, i: number) => `#choose/${g}/${i}` + (isToday ? '' : '/' + keyText(key));
 
+  const torah = torahFor(key);
   const slots = r.slots.map((s, i) => {
     const p = personById(state, s.personId);
     const g = groupOf(s.role);
-    const lab = h('div', { class: 'lab' }, ...tags(r, i, s.role));
+    // The aliyah's verses, right on the slot: a tap opens the Torah text there.
+    const aliyah = torah?.aliyot[i];
+    const lab = h('div', { class: 'lab' }, ...tags(r, i, s.role),
+      aliyah ? h('a', { class: 'vref', href: `#torah/${i}/${keyText(key)}`, onclick: (e: Event) => e.stopPropagation() },
+        icon('open', 16), aliyah.label) : null);
     if (!p) {
       if (s.role === 'K_FOR_L') {
         return h('div', { class: 'slot empty' }, lab, h('div', { class: 'add muted' }, 'יתמלא מהכהן'));
       }
       const sug = firstEmptyOfGroup.has(i) ? suggest(state, g, key.date, r) : null;
       const last = sug ? aliyot.get(sug.id)?.at(-1) : undefined;
-      return h('div', { class: 'slot empty' + (i === focus ? ' next' : ''), onclick: () => ctx.go(chooseHash(g, i)), role: 'button' },
-        lab, h('div', { class: 'add' }, '+ בחר ' + GROUP_WORD[g]), h('div', {}),
+      const card: HTMLElement = h('div', {
+        class: 'slot empty' + (i === focus ? ' next' : ''), role: 'button',
+        onclick: () => { if (!card.classList.contains('typing')) ctx.go(chooseHash(g, i)); },
+      },
+        lab, h('div', { class: 'add' }, '+ בחר ' + GROUP_WORD[g]),
+        h('button', { class: 'typein', 'aria-label': 'הקלד שם', onclick: (e: Event) => { e.stopPropagation(); typeIn(ctx, r, i, card, lab); } }, '✎ הקלד'),
         sug ? h('button', {
           class: 'suggest',
           onclick: (e: Event) => { e.stopPropagation(); placeAt(ctx, r, sug.id, i); },
         }, h('span', {}, 'הבא בתור:'), h('b', {}, sug.name), h('span', {}, last ? daysBetween(last, key.date) + ' יום' : 'עוד לא עלה')) : null);
+      return card;
     }
     if (s.doneAt) {
       return h('div', { class: 'slot done', role: 'button', onclick: () => slotSheet(ctx, r, i, save) },
@@ -179,4 +189,45 @@ function slotSheet(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?: s
     auto ? null : item('clear', 'פנה מקום', () => save(clearSlot(r, i), `${p.name} הוצא מהקריאה`), true),
     h('div', { class: 'divider' }),
     item('user', 'כרטיס אישי', () => ctx.go('#person/' + p.id))));
+}
+
+// Typing a name straight into an empty slot: matching people of the slot's group (names only, never the
+// hint), or a new person with that name as both display name and calling line.
+function typeIn(ctx: Ctx, r: Reading, i: number, card: HTMLElement, lab: HTMLElement): void {
+  const g = groupOf(r.slots[i].role);
+  const state = ctx.store.get();
+  const input = h('input', { class: 'typein-input', placeholder: 'שם (כפי שייקרא)', enterkeyhint: 'done', autocomplete: 'off', 'aria-label': 'שם' }) as HTMLInputElement;
+  const list = h('div', { class: 'typein-list' });
+  const save = (s: State, p: Person, label?: string) => {
+    const res = place(findReading(s, r) ?? r, p, i);
+    if ('error' in res) return snackbar(res.error === 'already' ? `${p.name} כבר בקריאה` : 'לא ניתן להציב כאן');
+    input.blur();
+    ctx.store.set(withReading(s, res.reading), label);
+  };
+  const addNew = (name: string) => {
+    const p: Person = { id: newId(), name, group: g, callLine: name, hint: '', regular: false, stopped: false, seat: '',
+      yahrzeits: [], addedOn: ctx.today, hiyuv: null };
+    save({ ...ctx.store.get(), people: [...ctx.store.get().people, p] }, p, `${name} נוסף כאדם חדש`);
+  };
+  const matches = (q: string) => search(state, q).filter((p) => p.group === g && !r.slots.some((s) => s.personId === p.id)).slice(0, 3);
+  const draw = () => {
+    const q = input.value.trim();
+    list.replaceChildren(...(q ? [
+      ...matches(q).map((p) => h('button', { class: 'chip', onclick: () => save(ctx.store.get(), p) }, p.name)),
+      h('button', { class: 'chip sel', onclick: () => addNew(q) }, `+ חדש: ${q}`),
+    ] : []), h('button', { class: 'chip', onclick: () => { input.blur(); ctx.refresh(); } }, 'ביטול'));
+  };
+  input.addEventListener('input', draw);
+  input.addEventListener('keydown', (e) => {
+    const q = input.value.trim();
+    if (e.key === 'Escape') { input.blur(); ctx.refresh(); }
+    if (e.key !== 'Enter' || !q) return;
+    const exact = matches(q).find((p) => p.name === q || p.callLine === q);
+    if (exact) save(ctx.store.get(), exact); else addNew(q);
+  });
+  card.removeAttribute('role');
+  card.classList.add('typing');
+  card.replaceChildren(lab, input, list);
+  draw();
+  input.focus();
 }

@@ -125,7 +125,8 @@ store.subscribe((label) => {
 });
 render();
 keepAwake();
-loadTorah().catch(() => {});
+// The verse references on the main page appear once the Torah data has loaded.
+loadTorah().then(() => { if (!(document.activeElement instanceof HTMLInputElement)) render(); }, () => {});
 registerWorker().catch((e) => console.warn('service worker', e));
 if (!demo) requestPersist();
 console.debug('gabay', VERSION, demo ? 'demo' : '');

@@ -1,5 +1,5 @@
 // S4: prayer text in large type, names filled in. Olim are named by their calling line.
-import { joinNames, render, sickTemplate } from '../../core/prayers.ts';
+import { DONOR, joinNames, render, sickTemplate } from '../../core/prayers.ts';
 import type { State } from '../../core/types.ts';
 import { currentKey, findReading, personById, type Ctx } from '../ctx.ts';
 import { appBar, h, icon } from '../ui.ts';
@@ -15,6 +15,7 @@ let olehId: string | null = null;
 const sickOff = new Set<string>();
 let typed = '';
 let baby = '';
+let grandfather = false; // yoledet: the oleh is the baby's grandfather
 let female = false;
 
 function readSize(): number {
@@ -27,7 +28,8 @@ function writeSize(n: number): void {
 
 function textOf(state: State, kind: PrayerKind, names: { name?: string; names?: string }): { template: string; vars: Record<string, string> } {
   const p = state.settings.prayers;
-  const vars = { name: names.name ?? '', names: names.names ?? '', baby };
+  const donor = DONOR[grandfather ? 'grandfather' : 'father'][female ? 'bat' : 'ben'];
+  const vars = { name: names.name ?? '', names: names.names ?? '', baby, donor };
   if (kind === 'oleh') return { template: p.oleh, vars };
   if (kind === 'barMitzvah') return { template: p.barMitzvah, vars };
   if (kind === 'yoledet') return { template: female ? p.yoledetBat : p.yoledetBen, vars };
@@ -75,6 +77,11 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
         picks.append(h('div', { class: 'seg', style: 'width:100%' },
           h('button', { class: female ? '' : 'on', onclick: () => { female = false; draw(); } }, a),
           h('button', { class: female ? 'on' : '', onclick: () => { female = true; draw(); } }, b)));
+        if (kind === 'yoledet') {
+          picks.append(h('div', { class: 'seg', style: 'width:100%', role: 'group', 'aria-label': 'מי עולה' },
+            h('button', { class: grandfather ? '' : 'on', onclick: () => { grandfather = false; draw(); } }, 'האבא עולה'),
+            h('button', { class: grandfather ? 'on' : '', onclick: () => { grandfather = true; draw(); } }, 'הסבא עולה')));
+        }
         if (kind === 'yoledet' && female) {
           picks.append(h('div', { class: 'field', style: 'width:100%' }, h('label', {}, 'שם הבת'),
             h('input', { value: baby, placeholder: 'פלונית', oninput: (e: Event) => { baby = (e.target as HTMLInputElement).value.trim(); redraw(); } })));

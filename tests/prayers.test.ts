@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultPrayers, render, joinNames, sickTemplate, upgradePrayers } from '../core/prayers.ts';
+import { DONOR, defaultPrayers, render, joinNames, sickTemplate, upgradePrayers } from '../core/prayers.ts';
 import type { SickEntry } from '../core/types.ts';
 
 const sick = (text: string, gender: 'm' | 'f'): SickEntry => ({ id: text, text, gender, addedOn: '2026-10-01', askedOn: null });
@@ -46,4 +46,22 @@ test('upgradePrayers replaces the old placeholders and keeps texts the gabbai ed
   const up = upgradePrayers(old);
   assert.equal(up.oleh, defaultPrayers().oleh);
   assert.equal(up.sickM, 'הנוסח שלי {name}');
+});
+
+test('the yoledet texts take the donor clause as {donor}; only names are marked', () => {
+  const p = defaultPrayers();
+  assert.ok(p.yoledetBen.includes('{donor}') && p.yoledetBat.includes('{donor}'));
+  const parts = render('בַּעֲבוּר {donor} את {name}', { donor: DONOR.father.ben, name: 'שרה' });
+  assert.deepEqual(parts.map((x) => x.name), [false, false, false, true]);
+  assert.ok(DONOR.grandfather.ben.includes('שֶׁזְּקֵנוֹ שֶׁל הַנּוֹלָד'));
+  assert.ok(DONOR.grandfather.bat.includes('שֶׁזְּקֵנָהּ שֶׁל הַנּוֹלָדָה'));
+});
+
+test('upgradePrayers turns the husband clause of an earlier yoledet text into {donor}, keeping the rest', () => {
+  const earlier = 'הנוסח שלי {name}, בַּעֲבוּר שֶׁבַּעְלָהּ יִתֵּן לִצְדָקָה בַּעֲדָהּ, סוף';
+  assert.equal(upgradePrayers({ ...defaultPrayers(), yoledetBat: earlier }).yoledetBat, 'הנוסח שלי {name}, בַּעֲבוּר {donor}, סוף');
+});
+
+test("an empty baby girl's name shows פלונית", () => {
+  assert.deepEqual(render('{baby}', { baby: '' }), [{ text: 'פלונית', name: true }]);
 });

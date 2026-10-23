@@ -224,3 +224,11 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .tt.bk .gap{display:inline-block;width:3em}
 .nextA{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));height:48px;border-radius:24px;border:0;background:var(--accent);color:var(--on-accent);font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.25);z-index:2}
 .credit{font-size:11px;color:var(--muted);padding:12px 0 0}
+
+/* S1: verse reference on each slot, typing a name in place */
+.vref{margin-inline-start:auto;display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--accent);min-height:32px;margin-block:-5px;padding-inline:6px}
+.typein{height:40px;min-width:48px;padding:0 12px;border-radius:20px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:14px;color:var(--accent)}
+.slot.typing{border-style:solid;border-color:var(--accent);background:var(--surface);grid-template-columns:1fr}
+.typein-input{width:100%;height:48px;border:1px solid var(--muted);border-radius:8px;padding:0 12px;font-size:18px;background:var(--screen);margin-top:4px}
+.typein-input:focus{outline:none;border:2px solid var(--accent);padding:0 11px}
+.typein-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
