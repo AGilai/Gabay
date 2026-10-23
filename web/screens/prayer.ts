@@ -85,7 +85,8 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
             h('button', { class: grandfather ? '' : 'on', onclick: () => { grandfather = false; naming = true; draw(); } }, 'האבא עולה'),
             h('button', { class: grandfather ? 'on' : '', onclick: () => { grandfather = true; naming = false; draw(); } }, 'הסבא עולה')));
         }
-        if (kind === 'yoledet' && female) {
+        // The grandfather never names the baby, so the naming switch is only there when the father is up.
+        if (kind === 'yoledet' && female && !grandfather) {
           picks.append(h('div', { class: 'seg', style: 'width:100%', role: 'group', 'aria-label': 'קריאת שם לבת' },
             h('button', { class: naming ? 'on' : '', onclick: () => { naming = true; draw(); } }, 'קריאת שם עכשיו'),
             h('button', { class: naming ? '' : 'on', onclick: () => { naming = false; draw(); } }, 'בלי שם')));
