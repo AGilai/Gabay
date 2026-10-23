@@ -42,6 +42,8 @@ function textOf(state: State, kind: PrayerKind, names: { name?: string; names?: 
 
 export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
   const kind: PrayerKind = kindArg in TITLE ? (kindArg as PrayerKind) : 'oleh';
+  // The yoledet is named like a sick person, by her mother's name.
+  const blanks: Record<string, string> = kind === 'yoledet' ? { name: 'פלונית בת פלונית' } : {};
   const state = ctx.store.get();
   let size = readSize();
   const para = h('p', { class: 'text' });
@@ -96,14 +98,14 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
       names = { name: typed };
     }
     const { template, vars } = textOf(state, kind, names);
-    para.replaceChildren(...render(template, vars).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
+    para.replaceChildren(...render(template, vars, blanks).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
     const small = document.querySelector('.appbar small');
     if (small) small.textContent = sub;
   };
 
   function nameInput(): HTMLElement {
     return h('div', { class: 'field', style: 'width:100%' }, h('label', {}, kind === 'yoledet' ? 'שם היולדת' : 'שם'),
-      h('input', { value: typed, placeholder: 'פלוני בן פלוני', oninput: (e: Event) => {
+      h('input', { value: typed, placeholder: blanks.name ?? 'פלוני בן פלוני', oninput: (e: Event) => {
         typed = (e.target as HTMLInputElement).value.trim();
         redraw();
       } }));
@@ -112,7 +114,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
   // Redraw only the text, so the field being typed in keeps focus.
   function redraw(): void {
     const { template, vars } = textOf(state, kind, { name: typed });
-    para.replaceChildren(...render(template, vars).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
+    para.replaceChildren(...render(template, vars, blanks).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
   }
 
   const resize = (d: number) => {

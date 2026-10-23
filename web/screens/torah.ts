@@ -92,7 +92,7 @@ export function renderTorah(ctx: Ctx, args: string[]): HTMLElement {
 
   const mode = (m: 'teamim' | 'scroll', text: string) => h('button', {
     class: (m === 'scroll') === scroll ? 'on' : '', 'aria-pressed': String((m === 'scroll') === scroll),
-    onclick: () => { write(MODE_KEY, m); ctx.go(`#torah/${current}/${key.date}.${key.service}`); ctx.refresh(); },
+    onclick: () => { write(MODE_KEY, m); ctx.replace(`#torah/${current}/${key.date}.${key.service}`); ctx.refresh(); },
   }, text);
   const resize = (d: number) => {
     size = Math.min(40, Math.max(18, size + d));

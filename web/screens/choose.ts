@@ -56,7 +56,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
     const replaced = personById(state, res.replaced);
     query = '';
     ctx.store.set(withReading(state, res.reading), replaced ? `הוחלף את ${replaced.name}` : undefined);
-    ctx.go(backTo);
+    ctx.home(backTo);
   };
 
   const days = (personId: string) => {

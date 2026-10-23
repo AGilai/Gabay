@@ -21,7 +21,7 @@ function renderHistoryInner(ctx: Ctx): HTMLElement {
     ctx.go('#day/' + keyText(key));
   };
   return h('div', { class: 'screen' },
-    appBar('היסטוריה', `${readings.length} קריאות`, { back: '#reading' }),
+    appBar('היסטוריה', `${readings.length} קריאות`, { back: 'history' }),
     h('main', { class: 'body' },
       h('form', { class: 'yz', onsubmit: open },
         h('input', { type: 'date', max: ctx.today, 'aria-label': 'תאריך', onchange: (e: Event) => { date = (e.target as HTMLInputElement).value; } }),

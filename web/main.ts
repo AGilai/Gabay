@@ -3,6 +3,7 @@ import { toISODate } from '../core/dates.ts';
 import type { Ctx } from './ctx.ts';
 import { openStore, requestPersist } from './store.ts';
 import { snackbar } from './ui.ts';
+import { nav } from './nav.ts';
 import { renderReading } from './screens/reading.ts';
 import { renderChoose } from './screens/choose.ts';
 import { parseKey } from './ctx.ts';
@@ -26,7 +27,10 @@ const store = await openStore(today, demo);
 
 function render(): void {
   const [route, ...args] = (location.hash.slice(1) || 'reading').split('/');
-  const ctx: Ctx = { store, today, go: (hash) => { location.hash = hash; }, refresh: render };
+  const ctx: Ctx = {
+    store, today, refresh: render,
+    go: (hash) => nav().go(hash), home: (hash) => nav().home(hash), replace: (hash) => nav().replace(hash),
+  };
   let view: HTMLElement;
   switch (route) {
     case 'choose':
@@ -75,7 +79,8 @@ function render(): void {
   if (next) next.scrollTop = keep;
 }
 
-window.addEventListener('hashchange', render);
+nav(); // remember where the app was opened
+window.addEventListener('hashchange', () => { nav().changed(); render(); });
 window.addEventListener('hashchange', keepAwake);
 document.addEventListener('visibilitychange', keepAwake);
 

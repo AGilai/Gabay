@@ -1,4 +1,5 @@
 // Small DOM kit: h() builder, icons, app bar, bottom nav, snackbar, bottom sheet, in-page confirm.
+import { nav } from './nav.ts';
 
 type Child = Node | string | null | undefined | false;
 type Attrs = Record<string, string | number | boolean | EventListener | null | undefined>;
@@ -29,13 +30,13 @@ export function icon(name: string, size = 24): SVGSVGElement {
 }
 
 export function appBar(title: string, sub: string | null, opts: { back?: string; close?: string; end?: Node[] } = {}): HTMLElement {
-  const nav = opts.back ?? opts.close;
+  const target = opts.back ?? opts.close;
   const label = opts.back ? 'חזרה' : 'סגור';
   const ic = icon(opts.back ? 'back' : 'close');
   // 'history' goes back to wherever the screen was opened from.
-  const navEl = !nav ? null : nav === 'history'
-    ? h('button', { class: 'icon', 'aria-label': label, onclick: () => history.length > 1 ? history.back() : (location.hash = '#reading') }, ic)
-    : h('a', { class: 'icon', href: nav, 'aria-label': label }, ic);
+  const navEl = !target ? null : target === 'history'
+    ? h('button', { class: 'icon', 'aria-label': label, onclick: () => nav().back() }, ic)
+    : h('a', { class: 'icon', href: target, 'aria-label': label }, ic);
   return h('header', { class: 'appbar' },
     navEl,
     h('div', { class: 't' }, h('h1', {}, title), sub ? h('small', {}, sub) : null),
@@ -46,7 +47,7 @@ export type Tab = 'reading' | 'choose' | 'sick' | 'more';
 
 export function bottomNav(active: Tab, moreDot = false): HTMLElement {
   const item = (tab: Tab, ic: string, label: string, dot = false) =>
-    h('a', { href: '#' + tab, class: tab === active ? 'on' : '' },
+    h('a', { href: '#' + tab, class: tab === active ? 'on' : '', onclick: (e: Event) => { e.preventDefault(); nav().tab('#' + tab); } },
       h('span', { class: dot ? 'dot' : '' }, icon(ic)), label);
   return h('nav', { class: 'nav' },
     item('reading', 'book', 'קריאה'), item('choose', 'people', 'בחירה'),

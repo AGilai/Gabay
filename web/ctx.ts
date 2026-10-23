@@ -6,7 +6,9 @@ import type { Store } from './store.ts';
 export interface Ctx {
   store: Store;
   today: ISODate;
-  go(hash: string): void;   // navigate
+  go(hash: string): void;   // open a screen
+  home(hash?: string): void; // back to a screen opened earlier (default: the main page)
+  replace(hash: string): void; // swap the current screen (no new history entry)
   refresh(): void;          // re-render the current screen
 }
 

@@ -131,7 +131,8 @@ export function renderNewPerson(ctx: Ctx, args: string[]): HTMLElement {
     }
     ctx.store.set(s);
     if (t === null) snackbar(`${name} נשמר`);
-    ctx.go(t === null ? '#choose/' + group : backTo);
+    if (t === null) ctx.replace('#choose/' + group);
+    else ctx.home(backTo);
   };
 
   const form = h('form', { class: 'body form', onsubmit: submit },

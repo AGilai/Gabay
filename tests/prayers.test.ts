@@ -72,3 +72,8 @@ test('withoutNaming drops "and her name shall be called" from the yoledet-bat te
   assert.ok(t.includes('בְּמַזָּל טוֹב, בַּעֲבוּר {donor}'));
   assert.equal(withoutNaming('א {name} ב'), 'א {name} ב');
 });
+
+test('a screen can set what an empty name shows (the yoledet: פלונית בת פלונית)', () => {
+  assert.deepEqual(render('{name}', { name: '' }, { name: 'פלונית בת פלונית' }), [{ text: 'פלונית בת פלונית', name: true }]);
+  assert.deepEqual(render('{name}', { name: 'שרה בת לאה' }, { name: 'פלונית בת פלונית' }), [{ text: 'שרה בת לאה', name: true }]);
+});
