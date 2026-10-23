@@ -42,7 +42,7 @@ function download(name: string, text: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
-export function renderSettings(ctx: Ctx): HTMLElement {
+function renderSettingsInner(ctx: Ctx): HTMLElement {
   const state = ctx.store.get();
   const set = (patch: Partial<typeof state.settings>) => {
     const s = ctx.store.get();
@@ -95,4 +95,11 @@ export function renderSettings(ctx: Ctx): HTMLElement {
           set({ prayers: { ...ctx.store.get().settings.prayers, [k]: v } });
         } }, state.settings.prayers[k]))),
       h('p', { class: 'note' }, 'גבאי · גרסה __VERSION__ · קוד פתוח (GPL)')));
+}
+
+// A screen reached from the "עוד" menu keeps the bottom bar, so the main page is always one tap away.
+export function renderSettings(ctx: Ctx): HTMLElement {
+  const el = renderSettingsInner(ctx);
+  el.append(bottomNav('more'));
+  return el;
 }

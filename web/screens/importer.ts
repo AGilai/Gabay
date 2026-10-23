@@ -5,7 +5,7 @@ import { readZipEntry } from '../../core/unzip.ts';
 import { applyDraft, buildDraft, parseChat, type Answer, type Draft, type Question } from '../../core/whatsapp.ts';
 import type { Group } from '../../core/types.ts';
 import { GROUP_WORD, type Ctx } from '../ctx.ts';
-import { appBar, confirmSheet, h, snackbar } from '../ui.ts';
+import { appBar, bottomNav, confirmSheet, h, snackbar } from '../ui.ts';
 
 interface Session { draft: Draft; answers: (Answer | null)[]; at: number; skipped: string[] }
 let session: Session | null = null;
@@ -67,7 +67,7 @@ function questionCard(ctx: Ctx, s: Session, q: Question): HTMLElement {
     h('div', { class: 'row-btns' }, btn('drop', 'למחוק'), btn('keep', 'לשמור כרמז', true)));
 }
 
-export function renderImport(ctx: Ctx): HTMLElement {
+function renderImportInner(ctx: Ctx): HTMLElement {
   const bar = (sub: string | null) => appBar('ייבוא מוואטסאפ', sub, { back: 'history' });
   const load = async (bytes: Uint8Array, name: string) => {
     try {
@@ -161,4 +161,11 @@ function lockedCard(load: (bytes: Uint8Array, name: string) => void): HTMLElemen
     status);
   fetch(LOCKED_URL, { method: 'HEAD' }).then((r) => { card.hidden = !r.ok; }).catch(() => {});
   return card;
+}
+
+// A screen reached from the "עוד" menu keeps the bottom bar, so the main page is always one tap away.
+export function renderImport(ctx: Ctx): HTMLElement {
+  const el = renderImportInner(ctx);
+  el.append(bottomNav('more'));
+  return el;
 }

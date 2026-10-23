@@ -38,7 +38,7 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
     ? appBar(ahead ? 'הקריאה הבאה' : 'קריאת התורה', sub, { end: [
       h('a', { class: 'icon', href: `#torah/${r ? Math.max(focusIndex(r), 0) : 0}/${keyText(key)}`, 'aria-label': 'הטקסט בתורה' }, icon('open')),
       h('a', { class: 'icon', href: '#history', 'aria-label': 'היסטוריה' }, icon('cal'))] })
-    : appBar(key.date.split('-').reverse().join('.'), sub, { back: '#history' });
+    : appBar(key.date.split('-').reverse().join('.'), sub, { back: 'history' });
 
   if (!r) {
     return h('div', { class: 'screen' }, bar,

@@ -2,12 +2,12 @@
 import { dayInfo } from '../../core/day.ts';
 import { newReading } from '../../core/slots.ts';
 import { findReading, keyText, personById, withReading, type Ctx } from '../ctx.ts';
-import { appBar, h, snackbar } from '../ui.ts';
+import { appBar, bottomNav, h, snackbar } from '../ui.ts';
 
 const PAGE = 60;
 let shown = PAGE;
 
-export function renderHistory(ctx: Ctx): HTMLElement {
+function renderHistoryInner(ctx: Ctx): HTMLElement {
   const state = ctx.store.get();
   const readings = [...state.readings].sort((a, b) => b.date.localeCompare(a.date) || b.service.localeCompare(a.service));
   let date = '';
@@ -21,7 +21,7 @@ export function renderHistory(ctx: Ctx): HTMLElement {
     ctx.go('#day/' + keyText(key));
   };
   return h('div', { class: 'screen' },
-    appBar('היסטוריה', `${readings.length} קריאות`, { back: 'history' }),
+    appBar('היסטוריה', `${readings.length} קריאות`, { back: '#reading' }),
     h('main', { class: 'body' },
       h('form', { class: 'yz', onsubmit: open },
         h('input', { type: 'date', max: ctx.today, 'aria-label': 'תאריך', onchange: (e: Event) => { date = (e.target as HTMLInputElement).value; } }),
@@ -37,4 +37,11 @@ export function renderHistory(ctx: Ctx): HTMLElement {
           h('span', { class: 'muted mono' }, r.date.slice(8) + '.' + r.date.slice(5, 7) + '.' + r.date.slice(2, 4)));
       }),
       readings.length > shown ? h('button', { class: 'btn tonal wide', onclick: () => { shown += PAGE; ctx.refresh(); } }, 'עוד') : null));
+}
+
+// A screen reached from the "עוד" menu keeps the bottom bar, so the main page is always one tap away.
+export function renderHistory(ctx: Ctx): HTMLElement {
+  const el = renderHistoryInner(ctx);
+  el.append(bottomNav('more'));
+  return el;
 }
