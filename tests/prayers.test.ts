@@ -77,3 +77,9 @@ test('a screen can set what an empty name shows (the yoledet: פלונית בת 
   assert.deepEqual(render('{name}', { name: '' }, { name: 'פלונית בת פלונית' }), [{ text: 'פלונית בת פלונית', name: true }]);
   assert.deepEqual(render('{name}', { name: 'שרה בת לאה' }, { name: 'פלונית בת פלונית' }), [{ text: 'שרה בת לאה', name: true }]);
 });
+
+test('the yoledet-bat text says בִּתָּהּ שֶׁנּוֹלְדָה לָהּ, also in a text saved before the fix', () => {
+  assert.ok(defaultPrayers().yoledetBat.includes('וְאֶת בִּתָּהּ שֶׁנּוֹלְדָה לָהּ'));
+  const saved = 'אֶת הָאִשָּׁה הַיּוֹלֶדֶת {name} וְאֶת בִּתָּהּ הַנּוֹלְדָה לָהּ בְּמַזָּל טוֹב';
+  assert.ok(upgradePrayers({ ...defaultPrayers(), yoledetBat: saved }).yoledetBat.includes('וְאֶת בִּתָּהּ שֶׁנּוֹלְדָה לָהּ'));
+});
