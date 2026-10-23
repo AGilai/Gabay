@@ -1,0 +1,25 @@
+# CLAUDE.md: gabay
+
+A Hebrew, offline web app (PWA) for the gabbai of a synagogue, running the weekday Torah-reading call-ups
+on his Android phone. Spec: `docs/UX-DESIGN.md`. Plan: `docs/plans/2026-10-22-phase1.md`. Mockups:
+`design/mockups/`.
+
+## Run
+- `npm test`: `node --test` over `tests/*.test.ts` (Node ≥ 22.18 type stripping, no build step).
+- `npm run check-import -- <export.zip|_chat.txt>`: run the WhatsApp import on a real export and print a summary.
+- `npm run build` → `dist/` (types stripped, sw.js stamped). `npm run serve` → http://localhost:8090 (never port 3000).
+- `?demo=1` runs on invented example data, in memory only. `?date=YYYY-MM-DD` pretends today is that day.
+- `npm run deploy`: build and force-push `dist/` to the `gh-pages` branch of `origin` (GitHub Pages).
+- Visual QA: `~/tools/qa-browser/act.mjs <url> <out.png> 360 800 [click:<css>] [dark]`.
+- No npm dependencies. The Hebrew calendar is `vendor/hebcal.min.js` (@hebcal/core 5.10.1, GPL-2.0).
+  Fonts (Assistant, Frank Ruhl Libre, OFL) are vendored in `vendor/fonts/` so the app works offline.
+
+## Rules
+- `core/` is pure logic: no DOM, no storage. The UI (`web/`) only calls it.
+- TypeScript that type stripping accepts: no enum / namespace / parameter properties. Imports end in `.ts`.
+- Days are local `YYYY-MM-DD` strings (`core/dates.ts`). Never use `toISOString()` for a day.
+- Hebrew, RTL. The main page never shows a person's `hint`. The calling line is shown exactly as written.
+- `web/` screens get a `Ctx` (`web/ctx.ts`). The hash router is in `web/main.ts`. Readings are keyed by date + service.
+- Before any push, scan for real names (the import's keys and hints) in tracked files. Only invented names in git.
+- Real congregant data (`*.zip`, `Screenshot*.png`, `private/`) is git-ignored. Never commit it, and never
+  paste real names into tests or fixtures (use invented names).

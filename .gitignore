@@ -1,0 +1,7 @@
+node_modules/
+dist/
+private/
+*.zip
+Screenshot*.png
+.superpowers/
+!tests/fixtures/*.zip

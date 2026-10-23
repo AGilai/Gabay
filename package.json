@@ -1,0 +1,18 @@
+{
+  "name": "gabay",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Weekday Torah-reading gabbai app (Hebrew, offline PWA for Android)",
+  "license": "GPL-2.0-or-later",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.ts",
+    "build": "node --disable-warning=ExperimentalWarning scripts/build.ts",
+    "serve": "node --disable-warning=ExperimentalWarning scripts/serve.ts",
+    "check-import": "node --disable-warning=ExperimentalWarning scripts/check-import.ts",
+    "deploy": "node --disable-warning=ExperimentalWarning scripts/deploy.ts"
+  }
+}

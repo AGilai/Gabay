@@ -1,0 +1,108 @@
+// S4: prayer text in large type, names filled in. Olim are named by their calling line.
+import { joinNames, render, sickTemplate } from '../../core/prayers.ts';
+import type { State } from '../../core/types.ts';
+import { currentKey, findReading, personById, type Ctx } from '../ctx.ts';
+import { appBar, h, icon } from '../ui.ts';
+
+export type PrayerKind = 'oleh' | 'sick' | 'barMitzvah' | 'yoledet' | 'azkara';
+const TITLE: Record<PrayerKind, string> = {
+  oleh: 'מי שברך לעולה', sick: 'מי שברך לחולים', barMitzvah: 'מי שברך לבר מצווה', yoledet: 'מי שברך ליולדת', azkara: 'אזכרה',
+};
+const SIZE_KEY = 'gabay.prayerSize';
+
+// Kept while the app is open, so going back and forth keeps the choice.
+let olehId: string | null = null;
+const sickOff = new Set<string>();
+let typed = '';
+let female = false;
+
+function readSize(): number {
+  try { return Number(localStorage.getItem(SIZE_KEY)) || 24; } catch { return 24; }
+}
+
+function writeSize(n: number): void {
+  try { localStorage.setItem(SIZE_KEY, String(n)); } catch { /* private mode: keep for this session only */ }
+}
+
+function textOf(state: State, kind: PrayerKind, names: { name?: string; names?: string }): { template: string; vars: Record<string, string> } {
+  const p = state.settings.prayers;
+  const vars = { name: names.name ?? '', names: names.names ?? '' };
+  if (kind === 'oleh') return { template: p.oleh, vars };
+  if (kind === 'barMitzvah') return { template: p.barMitzvah, vars };
+  if (kind === 'yoledet') return { template: female ? p.yoledetBat : p.yoledetBen, vars };
+  if (kind === 'azkara') return { template: female ? p.azkaraF : p.azkaraM, vars };
+  const chosen = state.sick.filter((s) => !sickOff.has(s.id));
+  return { template: sickTemplate(p, chosen), vars: { ...vars, names: joinNames(chosen.map((s) => s.text)) } };
+}
+
+export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
+  const kind: PrayerKind = kindArg in TITLE ? (kindArg as PrayerKind) : 'oleh';
+  const state = ctx.store.get();
+  let size = readSize();
+  const para = h('p', { class: 'text' });
+  const reader = h('main', { class: 'reader', style: `--prayer-size:${size}px` });
+  const picks = h('div', { class: 'picks' });
+  let sub = 'נוסח ספרד';
+
+  const draw = () => {
+    let names: { name?: string; names?: string } = {};
+    picks.replaceChildren();
+    if (kind === 'oleh') {
+      const r = findReading(state, currentKey(ctx.today));
+      const olim = (r?.slots ?? []).filter((s) => s.personId && s.role !== 'K_FOR_L')
+        .map((s) => ({ slot: s, p: personById(state, s.personId)! })).filter((x) => x.p);
+      const done = olim.filter((x) => x.slot.doneAt).sort((a, b) => a.slot.doneAt!.localeCompare(b.slot.doneAt!));
+      if (!olim.some((x) => x.p.id === olehId)) olehId = (done.at(-1) ?? olim[0])?.p.id ?? null;
+      for (const x of olim) {
+        picks.append(h('button', { class: 'chip' + (x.p.id === olehId ? ' sel' : ''), onclick: () => { olehId = x.p.id; draw(); } }, x.p.name));
+      }
+      if (!olim.length) picks.append(h('span', { class: 'note' }, 'אין עולים בקריאה של היום. אפשר להקליד שם:'), nameInput());
+      names = { name: olim.find((x) => x.p.id === olehId)?.p.callLine ?? typed };
+    } else if (kind === 'sick') {
+      for (const s of state.sick) {
+        const on = !sickOff.has(s.id);
+        picks.append(h('button', { class: 'pk' + (on ? '' : ' off'), 'aria-pressed': String(on),
+          onclick: () => { on ? sickOff.add(s.id) : sickOff.delete(s.id); draw(); } }, h('span', { class: 'cb' }, on ? '✓' : ''), s.text));
+      }
+      picks.append(h('a', { class: 'pk off', href: '#sick' }, h('span', { class: 'cb' }), 'הוסף…'));
+      sub = `${state.sick.filter((s) => !sickOff.has(s.id)).length} שמות · נוסח ספרד`;
+    } else {
+      picks.append(nameInput());
+      if (kind !== 'barMitzvah') {
+        const [a, b] = kind === 'yoledet' ? ['בן', 'בת'] : ['זכר', 'נקבה'];
+        picks.append(h('div', { class: 'seg', style: 'width:100%' },
+          h('button', { class: female ? '' : 'on', onclick: () => { female = false; draw(); } }, a),
+          h('button', { class: female ? 'on' : '', onclick: () => { female = true; draw(); } }, b)));
+      }
+      names = { name: typed };
+    }
+    const { template, vars } = textOf(state, kind, names);
+    para.replaceChildren(...render(template, vars).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
+    const small = document.querySelector('.appbar small');
+    if (small) small.textContent = sub;
+  };
+
+  function nameInput(): HTMLElement {
+    return h('div', { class: 'field', style: 'width:100%' }, h('label', {}, kind === 'yoledet' ? 'שם היולדת' : 'שם'),
+      h('input', { value: typed, placeholder: 'פלוני בן פלוני', oninput: (e: Event) => {
+        typed = (e.target as HTMLInputElement).value.trim();
+        const { template, vars } = textOf(state, kind, { name: typed });
+        para.replaceChildren(...render(template, vars).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
+      } }));
+  }
+
+  const resize = (d: number) => {
+    size = Math.min(36, Math.max(18, size + d));
+    writeSize(size);
+    reader.style.setProperty('--prayer-size', size + 'px');
+  };
+  draw();
+  const temp = textOf(state, kind, {}).template.includes('(נוסח זמני)');
+  reader.append(picks, para, temp ? h('div', { class: 'note' }, 'נוסח לדוגמה בלבד. את נוסח בית הכנסת מזינים בהגדרות.') : null);
+  return h('div', { class: 'screen' },
+    appBar(TITLE[kind], sub, { back: 'history', end: [
+      h('button', { class: 'icon', 'aria-label': 'הקטן', onclick: () => resize(-2) }, 'A−'),
+      h('button', { class: 'icon', 'aria-label': 'הגדל', onclick: () => resize(2) }, icon('text')),
+    ] }),
+    reader);
+}

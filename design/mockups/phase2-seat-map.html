@@ -1,0 +1,394 @@
+<title>Gabbai Seat Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+
+/* Layout: a board of Android phone frames drawn at 1px = 1dp (Material 3 metrics), RTL inside, captions under each frame. */
+:root{
+  --board:#e7ebf1; --screen:#fbfcfe; --surface:#ffffff; --surface2:#eef2f8;
+  --ink:#141c27; --muted:#5a6678; --line:#d5dce6;
+  --accent:#1d4c9f; --on-accent:#ffffff;
+  --kohen:#9a6d07; --kohen-bg:#f7edd4;
+  --levi:#0d7369; --levi-bg:#d7f0ec;
+  --israel:#6141a8; --israel-bg:#ebe3f8;
+  --done:#2a7a40; --done-bg:#dcf0e1;
+  --hiyuv:#b2541a; --hiyuv-bg:#fbe6d8;
+  --scrim:rgba(10,14,20,.45);
+  --f-display:"Frank Ruhl Libre","David","Times New Roman",serif;
+  --f-ui:"Assistant","Segoe UI",Roboto,Arial,sans-serif;
+  --pw:412px; --ph:915px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37;
+  --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33;
+  --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f;
+  --hiyuv:#f2a06a; --hiyuv-bg:#3d2617; --scrim:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37;
+  --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33;
+  --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f;
+  --hiyuv:#f2a06a; --hiyuv-bg:#3d2617; --scrim:rgba(0,0,0,.6); color-scheme:dark}
+:root[data-w="360"]{--pw:360px;--ph:800px}
+:root[data-w="384"]{--pw:384px;--ph:854px}
+
+*{box-sizing:border-box}
+body{background:var(--board);color:var(--ink);font-family:var(--f-ui);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.intro{max-width:70ch;display:grid;gap:8px;margin-bottom:20px}
+.intro h1{font-family:var(--f-display);font-size:28px;margin:0;text-wrap:balance}
+.intro p{margin:0;color:var(--muted);line-height:1.5;font-size:15px}
+.sizes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:14px}
+.sizes button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+.sizes button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.board{display:flex;flex-wrap:wrap;gap:32px 28px;align-items:flex-start}
+figure{margin:0;display:grid;gap:10px;max-width:100%}
+.scroll{overflow-x:auto;max-width:100%;padding-bottom:4px}
+figcaption{max-width:var(--pw);font-size:14px;line-height:1.45;color:var(--muted)}
+figcaption b{color:var(--ink);display:block;font-size:15px}
+
+/* ---------- phone ---------- */
+.phone{width:var(--pw);height:var(--ph);background:var(--screen);border-radius:28px;outline:8px solid #1b1f26;outline-offset:0;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;direction:rtl;margin:8px;font-size:16px}
+.status{height:24px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-size:12px;font-weight:600;color:var(--ink);direction:ltr}
+.status i{width:8px;height:8px;border-radius:50%;background:#1b1f26;display:inline-block;position:absolute;left:50%;top:8px;transform:translateX(-50%)}
+.gesture{height:24px;flex:none;display:grid;place-items:center}
+.gesture::after{content:"";width:108px;height:4px;border-radius:2px;background:var(--ink);opacity:.5}
+.appbar{height:64px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px 0 4px}
+.appbar .t{flex:1;min-width:0;padding:0 12px}
+.appbar .t h2{margin:0;font-size:22px;font-weight:600;line-height:28px}
+.appbar .t small{display:block;font-size:13px;color:var(--muted);line-height:18px}
+.icon{width:48px;height:48px;display:grid;place-items:center;border-radius:24px;color:var(--ink);flex:none}
+.icon svg{width:24px;height:24px}
+.body{flex:1;min-height:0;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.nav{height:80px;flex:none;background:var(--surface2);display:flex;justify-content:space-around;align-items:flex-start;padding-top:12px}
+.nav a{display:grid;justify-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--muted);width:72px}
+.nav a span{width:64px;height:32px;border-radius:16px;display:grid;place-items:center}
+.nav a.on{color:var(--ink)} .nav a.on span{background:var(--accent);color:var(--on-accent)}
+.nav svg{width:24px;height:24px}
+
+/* day chip line */
+.dayline{display:flex;gap:8px;flex-wrap:wrap}
+.pill{height:28px;padding:0 12px;border-radius:14px;display:inline-flex;align-items:center;font-size:13px;font-weight:600;background:var(--surface2);color:var(--ink)}
+.banner{background:var(--accent);color:var(--on-accent);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.banner small{font-weight:400;opacity:.9}
+
+/* slots */
+.slot{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;position:relative}
+.slot .lab{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.tag{height:22px;padding:0 9px;border-radius:11px;display:inline-flex;align-items:center;font-size:12px;font-weight:700}
+.k{color:var(--kohen);background:var(--kohen-bg)} .l{color:var(--levi);background:var(--levi-bg)} .y{color:var(--israel);background:var(--israel-bg)}
+.slot .name{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:30px}
+.slot .hint{font-size:14px;color:var(--muted);line-height:18px}
+.slot .call{grid-column:1/-1;margin-top:6px;background:var(--surface2);border-radius:8px;padding:6px 10px;font-family:var(--f-display);font-size:19px;line-height:26px}
+.btn{height:48px;min-width:48px;padding:0 18px;border-radius:24px;border:0;font:inherit;font-weight:700;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.fill{background:var(--accent);color:var(--on-accent)}
+.btn.tonal{background:var(--surface2);color:var(--ink)}
+.slot.next{border:2px solid var(--accent);padding:11px 13px}
+.slot.done{background:var(--done-bg);border-color:transparent}
+.slot.done .call{display:none}
+.donemark{color:var(--done);font-weight:700;font-size:14px;display:flex;align-items:center;gap:4px}
+.slot.empty{border:2px dashed var(--line);background:transparent;padding:11px 13px}
+.slot.empty .add{font-size:18px;font-weight:700;color:var(--accent)}
+.suggest{grid-column:1/-1;margin-top:8px;height:48px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:15px}
+.suggest b{font-family:var(--f-display);font-size:18px}
+.suggest span{color:var(--muted);font-size:13px}
+.compact .slot{padding-block:8px} .compact .slot.next{padding-block:7px}
+.compact .slot .call{margin-top:4px;font-size:17px;line-height:22px;padding:4px 10px}
+.compact .slot .name{font-size:21px;line-height:26px}
+
+/* prayer chips */
+.chips{display:flex;gap:8px;overflow:hidden;flex-wrap:nowrap;padding-top:4px}
+.chip{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;white-space:nowrap;flex:none;background:var(--surface)}
+.chip.dot::before{content:"";width:6px;height:6px;border-radius:3px;background:var(--hiyuv)}
+.chip.sel{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.sechead{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.02em;padding:6px 0 0}
+
+/* selection sheet */
+.sheet-top{height:24px;display:grid;place-items:center;flex:none}
+.sheet-top::after{content:"";width:32px;height:4px;border-radius:2px;background:var(--muted);opacity:.6}
+.tabs{height:48px;flex:none;display:flex;border-bottom:1px solid var(--line)}
+.tabs a{flex:1;display:grid;place-items:center;font-weight:700;font-size:15px;color:var(--muted);position:relative}
+.tabs a.on{color:var(--kohen)} .tabs a.on::after{content:"";position:absolute;bottom:0;left:20%;right:20%;height:3px;border-radius:3px 3px 0 0;background:var(--kohen)}
+.search{height:48px;border-radius:24px;background:var(--surface2);display:flex;align-items:center;gap:10px;padding:0 16px;color:var(--muted);font-size:16px;flex:none;margin-top:8px}
+.search svg{width:20px;height:20px}
+.row{min-height:72px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:8px 0}
+.av{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;font-weight:700;font-size:16px;flex:none}
+.row .who{flex:1;min-width:0}
+.row .who b{font-family:var(--f-display);font-size:19px;display:block;line-height:24px}
+.row .who small{font-size:13px;color:var(--muted);display:block;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.days{text-align:center;flex:none;width:56px;font-variant-numeric:tabular-nums}
+.days b{display:block;font-size:20px;line-height:22px}
+.days small{font-size:11px;color:var(--muted)}
+.row.hy{background:var(--hiyuv-bg);margin:0 -16px;padding:8px 16px;border-bottom:0;border-radius:0}
+.hytag{color:var(--hiyuv);font-weight:700}
+.row.grey{opacity:.5}
+.collapsed{height:48px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-weight:600;font-size:14px}
+.fab{position:absolute;left:16px;bottom:calc(24px + 16px);height:56px;padding:0 20px;border-radius:16px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.fab svg{width:24px;height:24px}
+
+/* bottom sheet over S1 */
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.bsheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:28px 28px 0 0;padding:0 0 24px;display:flex;flex-direction:column}
+.bsheet .hdr{padding:4px 24px 12px}
+.bsheet .hdr b{font-family:var(--f-display);font-size:22px;display:block}
+.bsheet .hdr small{color:var(--muted);font-size:14px}
+.item{height:56px;display:flex;align-items:center;gap:16px;padding:0 24px;font-size:16px}
+.item svg{width:24px;height:24px;color:var(--muted);flex:none}
+.item.warn{color:var(--kohen)} .item.warn svg{color:var(--kohen)}
+.divider{height:1px;background:var(--line);margin:4px 24px}
+
+/* prayer reader */
+.reader{flex:1;min-height:0;overflow:hidden;padding:4px 20px 0;display:flex;flex-direction:column;gap:12px}
+.picks{display:flex;gap:8px;flex-wrap:wrap}
+.pk{height:32px;padding:0 10px;border-radius:8px;background:var(--surface2);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+.pk .cb{width:18px;height:18px;border-radius:4px;background:var(--accent);display:grid;place-items:center;color:var(--on-accent);font-size:12px}
+.pk.off .cb{background:transparent;border:2px solid var(--muted)}
+.text{font-family:var(--f-display);font-size:24px;line-height:1.75;margin:0;text-align:start}
+.text mark{background:var(--hiyuv-bg);color:var(--ink);border-radius:4px;padding:0 4px;font-weight:700}
+.note{font-size:12px;color:var(--muted)}
+
+/* form */
+.field{height:56px;border:1px solid var(--muted);border-radius:4px;padding:0 16px;display:flex;align-items:center;font-size:16px;position:relative}
+.field label{position:absolute;top:-9px;right:12px;background:var(--screen);padding:0 4px;font-size:12px;color:var(--muted)}
+.field.focus{border:2px solid var(--accent);padding:0 15px} .field.focus label{color:var(--accent)}
+.seg{height:48px;display:flex;border:1px solid var(--muted);border-radius:24px;overflow:hidden}
+.seg span{flex:1;display:grid;place-items:center;font-weight:700;font-size:15px;border-left:1px solid var(--muted)}
+.seg span:last-child{border-left:0}
+.seg span.on{background:var(--israel-bg);color:var(--israel)}
+.more{height:48px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:700}
+.kbd{flex:none;height:260px;background:var(--surface2);display:grid;grid-template-rows:repeat(4,1fr);gap:8px;padding:8px 6px;direction:ltr}
+.kbd div{display:flex;gap:6px;justify-content:center}
+.kbd span{flex:1;max-width:34px;background:var(--surface);border-radius:6px;display:grid;place-items:center;font-size:18px}
+.kbd span.w{max-width:none;flex:4}
+.kbd span.m{max-width:56px;flex:1.5;font-size:13px}
+.dim{color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.sizes button{transition:background .15s}}
+.sizes button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* draft 2 */
+.ctrl{display:flex;gap:8px;align-items:center;flex:none}
+.segc{height:40px;display:flex;border:1px solid var(--muted);border-radius:20px;overflow:hidden;flex:none}
+.segc span{width:48px;display:grid;place-items:center;font-weight:700;font-size:16px;border-left:1px solid var(--muted)}
+.segc span:last-child{border-left:0}
+.segc span.on{background:var(--accent);color:var(--on-accent)}
+.tg{height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;background:var(--surface);white-space:nowrap}
+.tg.on{background:var(--kohen-bg);color:var(--kohen);border-color:transparent}
+.call em{font-style:normal;font-weight:500;color:var(--muted)}
+.tag.x{text-decoration:line-through;opacity:.55}
+.snack{position:absolute;left:16px;right:16px;bottom:calc(24px + 80px + 8px);min-height:48px;border-radius:4px;background:var(--ink);color:var(--screen);display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,.3)}
+.snack b{color:var(--accent);filter:brightness(1.3);padding:0 8px}
+.inread{background:var(--surface2);margin:0 -16px;padding:8px 16px;border-bottom:0}
+.inread .days b{font-size:13px}
+.kv{display:grid;gap:2px;padding:10px 0;border-bottom:1px solid var(--line)}
+.kv small{font-size:12px;color:var(--muted)} .kv span{font-size:16px}
+.kv .serif{font-family:var(--f-display);font-size:19px}
+.swrow{height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font-size:16px}
+.sw{width:52px;height:32px;border-radius:16px;background:var(--accent);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:12px;background:var(--on-accent)}
+.stats{display:flex;gap:16px;padding:10px 0;font-variant-numeric:tabular-nums}
+.stats div{display:grid} .stats b{font-size:22px} .stats small{font-size:12px;color:var(--muted)}
+.hist{font-size:14px;display:grid;gap:6px;padding:6px 0;color:var(--muted);font-variant-numeric:tabular-nums}
+.hist div{display:flex;justify-content:space-between}
+.btn.out{background:transparent;border:1px solid var(--muted);color:var(--ink);width:100%}
+
+/* phase 2: seat map */
+.mini{direction:ltr;display:grid;grid-template-columns:repeat(26,11px);grid-auto-rows:11px;gap:1px;justify-content:center;padding:10px 0;background:var(--surface);border:1px solid var(--line);border-radius:12px;position:relative;flex:none}
+.mini i{border-radius:3px;display:block}
+.mini i.seat{background:var(--line)}
+.mini i.dim{opacity:.35}
+.mini i.empty{background:transparent;box-shadow:inset 0 0 0 1px var(--line)}
+.mini i.bimah{background:var(--hiyuv-bg);border-radius:2px}
+.mini i.pres{box-shadow:0 0 0 2px var(--accent)}
+.mini .sel{position:absolute;border:2px solid var(--accent);border-radius:5px;pointer-events:none}
+.blockhead{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted);flex:none}
+.blockhead b{font-size:15px;color:var(--ink)}
+.blk{direction:ltr;display:grid;gap:4px;flex:none}
+.tile{height:52px;border-radius:8px;display:grid;align-content:center;justify-items:center;gap:1px;font-size:13px;font-weight:700;line-height:16px;position:relative;direction:rtl;text-align:center;padding:0 2px;overflow:hidden}
+.tile small{font-size:11px;font-weight:600;opacity:.85;font-variant-numeric:tabular-nums}
+.tile.empty{border:1.5px dashed var(--line);color:var(--muted);font-weight:400}
+.tile.other{background:var(--surface2);color:var(--muted);opacity:.55}
+.tile.inread::after{content:"✓";position:absolute;top:2px;left:4px;font-size:11px;color:var(--done)}
+.tile.pres{box-shadow:0 0 0 2.5px var(--accent)}
+.tile.pick{box-shadow:0 0 0 3px var(--accent);border-color:transparent}
+.tile.gap{visibility:hidden}
+.legend{display:flex;gap:12px;align-items:center;font-size:12px;color:var(--muted);flex:none;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.viewsw{height:32px;display:flex;border:1px solid var(--muted);border-radius:16px;overflow:hidden;margin-inline-end:12px;flex:none}
+.viewsw span{padding:0 12px;display:grid;place-items:center;font-size:13px;font-weight:700}
+.viewsw span.on{background:var(--accent);color:var(--on-accent)}
+.tabs a.on.ytab{color:var(--israel)} .tabs a.on.ytab::after{background:var(--israel)}
+.fade{position:relative;flex:1;min-height:0;overflow:hidden}
+.fade::after{content:"";position:absolute;left:0;right:0;bottom:0;height:40px;background:linear-gradient(transparent,var(--screen))}
+.res{min-height:64px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:0 24px}
+.res .who{flex:1;min-width:0} .res .who b{font-family:var(--f-display);font-size:18px;display:block}
+.res .who small{font-size:13px;color:var(--muted)}
+.res .btn{height:40px;padding:0 14px;font-size:14px}
+.info{background:var(--surface2);border-radius:12px;padding:10px 12px;font-size:14px;line-height:1.4;flex:none}
+</style>
+
+<header class="intro">
+  <h1>Gabbai app · phase 2, seat map</h1>
+  <p>The hall is redrawn from the Excel chart, layout only: 5 blocks, rows 0–13, the bimah in the middle, about 205 seats. The names in the chart (Shabbat seats) are not used. The whole hall is too wide for 48dp seats on a phone, so the map has two levels: a mini-map of the whole hall, and the chosen block in large tiles. Example names; days and seats are invented.</p>
+  <div class="sizes" role="group" aria-label="Screen width">
+    <span>Width:</span>
+    <button id="w360" data-w="360" aria-pressed="false">360×800 (Galaxy A)</button>
+    <button id="w384" data-w="384" aria-pressed="false">384×854 (Galaxy S)</button>
+    <button id="w412" data-w="412" aria-pressed="true">412×915 (Pixel / S+)</button>
+  </div>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-book" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v16h12V4H6zm2 2h8v2H8V6zm0 4h8v2H8v-2z"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><path fill="currentColor" d="M9 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0 2c3.3 0 7 1.6 7 4v2H2v-2c0-2.4 3.7-4 7-4zm7.5-2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 1 0 7zm1.5 2.2c2.3.5 4 1.7 4 3.8v2h-4v-2c0-1.5-.7-2.8-2-3.8z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21l-1.4-1.3C5.4 15 2 12 2 8.4 2 5.4 4.4 3 7.4 3c1.7 0 3.4.8 4.6 2.1C13.2 3.8 14.9 3 16.6 3 19.6 3 22 5.4 22 8.4c0 3.6-3.4 6.6-8.6 11.3L12 21z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h2v2h6V2h2v2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V2zM5 10v10h14V10H5z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path fill="currentColor" d="M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path fill="currentColor" d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6 10.6 12 5 6.4 6.4 5z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></symbol>
+  <symbol id="i-text" viewBox="0 0 24 24"><path fill="currentColor" d="M9 4v3h5v12h3V7h5V4H9zM3 12h3v7h3v-7h3V9H3v3z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path fill="currentColor" d="m12 4-1.4 1.4 5.6 5.6H4v2h12.2l-5.6 5.6L12 20l8-8-8-8z"/></symbol>
+</svg>
+
+<main class="board">
+<figure>
+  <div class="scroll"><div class="phone">
+    <div class="status"><span>7:41</span><i></i><span>▾ ▴ 80%</span></div>
+    <div class="appbar"><div class="t"><h2>בחירה</h2><small>לשלישי · הקש על מקום</small></div><div class="viewsw"><span>רשימה</span><span class="on">מפה</span></div></div>
+    <div class="tabs"><a>כהנים 9</a><a>לויים 6</a><a class="on ytab">ישראלים 48</a></div>
+    <div class="body" style="padding-top:8px">
+      <div class="mini" data-mini="CR" data-mode="heat"></div>
+      <div class="blockhead"><b>מרכז ימין</b><span>שורות 4–12 · ‹ החלק לגוש הבא ›</span></div>
+      <div class="fade"><div class="blk" data-blk="CR" data-mode="heat"></div></div>
+      <div class="legend"><span><i style="background:color-mix(in srgb,var(--israel) 90%,var(--surface))"></i>מחכה הרבה</span><span><i style="background:color-mix(in srgb,var(--israel) 25%,var(--surface))"></i>עלה לאחרונה</span><span><i style="border:1.5px dashed var(--line)"></i>לא משובץ</span></div>
+    </div>
+    <nav class="nav"><a><span><svg><use href="#i-book"/></svg></span>קריאה</a><a class="on"><span><svg><use href="#i-people"/></svg></span>בחירה</a><a><span><svg><use href="#i-heart"/></svg></span>חולים</a><a><span><svg><use href="#i-more"/></svg></span>עוד</a></nav>
+    <div class="gesture"></div>
+  </div></div>
+  <figcaption><b>P2-1 · Choosing on the map (from the third slot)</b>The group tabs and the slot work as in the list. Seats of the chosen group are shaded by waiting time: dark = waited longest. Other groups are greyed. ✓ = already in today's reading. Tap = he goes straight to his slot, as in the list. Tap a block on the mini-map, or swipe, to change block.</figcaption>
+</figure>
+
+<figure>
+  <div class="scroll"><div class="phone">
+    <div class="status"><span>7:20</span><i></i><span>▾ ▴ 88%</span></div>
+    <div class="appbar"><span class="icon"><svg><use href="#i-back"/></svg></span><div class="t"><h2>מי כאן היום?</h2><small><span data-count-pres></span> נוכחים · הקש על מקום לסימון</small></div></div>
+    <div class="body" style="padding-top:4px">
+      <div class="mini" data-mini="R" data-mode="pres"></div>
+      <div class="blockhead"><b>ימין</b><span>שורות 0–13</span></div>
+      <div class="fade"><div class="blk" data-blk="R" data-mode="pres"></div></div>
+      <div class="info">בתור ובהצעה בעמוד הקריאה, מי שסומן כנוכח מופיע ראשון. הסימון מתאפס בסוף היום.</div>
+    </div>
+    <div class="gesture"></div>
+  </div></div>
+  <figcaption><b>P2-2 · Who is here today (optional, before the reading)</b>Opened from the main page. A few taps on the seats of the people you see. The suggestion and the line then put the people who are here first. Nothing is required: without marks, the order works as in phase 1. The marks reset at the end of the day.</figcaption>
+</figure>
+
+<figure>
+  <div class="scroll"><div class="phone">
+    <div class="status"><span>21:10</span><i></i><span>▾ ▴ 64%</span></div>
+    <div class="appbar"><span class="icon"><svg><use href="#i-back"/></svg></span><div class="t"><h2>סידור מקומות</h2><small><span data-count-all></span> מקומות · <span data-count-assigned></span> משובצים</small></div></div>
+    <div class="body" style="padding-top:4px">
+      <div class="mini" data-mini="L" data-mode="assign"></div>
+      <div class="blockhead"><b>שמאל</b><span>שורות 0–10</span></div>
+      <div class="fade"><div class="blk" data-blk="L" data-mode="assign"></div></div>
+    </div>
+    <div class="scrim"></div>
+    <div class="bsheet">
+      <div class="sheet-top"></div>
+      <div class="hdr"><b>שבץ במקום</b><small>שמאל · שורה 3 · כיסא 2 (מקום פנוי)</small></div>
+      <div class="search" style="margin:0 24px 8px"><svg><use href="#i-search"/></svg>דוד|</div>
+      <div class="res"><div class="av y">ד</div><div class="who"><b>דוד פרץ</b><small>ישראל · בא בשני וחמישי · אין מקום</small></div><button class="btn fill">שבץ</button></div>
+      <div class="res"><div class="av y">ד</div><div class="who"><b>אביתר בן צדוק</b><small>ישראל · מקום: מרכז ימין 6/3</small></div><button class="btn tonal">העבר</button></div>
+      <div class="res"><div class="av l">ד</div><div class="who"><b>דוד אלחנן</b><small>לוי · אין מקום</small></div><button class="btn fill">שבץ</button></div>
+      <div class="gesture"></div>
+    </div>
+  </div></div>
+  <figcaption><b>P2-3 · Assigning seats (one time, after the service)</b>Under עוד → סידור מקומות. Tap a seat, then search for a person. "העבר" (move) when he already has a seat. Only people who have a seat appear on the map. Everyone else stays reachable from the list and search. The person card shows his seat, with "בחר במפה" (pick on the map).</figcaption>
+</figure>
+</main>
+
+<script>
+(function(){
+  // Layout copied from the Shabbat Excel chart (shape only). x = first column of the block, 26 columns in all.
+  var all=function(n){var a=[];for(var i=0;i<n;i++)a.push(i);return a};
+  var B={
+    L:{name:'שמאל',x:0,cols:5,rows:{}},
+    CL:{name:'מרכז שמאל',x:6,cols:4,rows:{}},
+    C:{name:'מרכז',x:11,cols:4,rows:{4:all(4),10:all(4),11:all(4),12:all(4)},bimah:[6,7,8]},
+    CR:{name:'מרכז ימין',x:16,cols:4,rows:{}},
+    R:{name:'ימין',x:21,cols:5,rows:{0:[0,1,2],13:[0,1,2,3]}}
+  };
+  B.L.rows[0]=[1,2];for(var r=1;r<=9;r++)B.L.rows[r]=all(5);B.L.rows[10]=[1,2,3];
+  for(r=4;r<=12;r++){B.CL.rows[r]=all(4);B.CR.rows[r]=all(4)}
+  for(r=1;r<=12;r++)B.R.rows[r]=all(5);
+
+  var names=['דוד','יוסי','אבי','משה','חיים','שמעון','נתנאל','אליהו','בני','רפאל','עזרא','מאיר','יצחק','צבי','דניאל','אהרן','שלמה','יעקב','אריה','נועם','יאיר','רועי','איתי','שמואל','ברוך','גיל','עמית','אורי'];
+  var fam=['כ׳','ל׳','פ׳','ר׳','ש׳','ג׳','מ׳','ב׳','ו׳','ז׳'];
+  var seed=7;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
+  var seats={},nAll=0,nAss=0,nPres=0;
+  Object.keys(B).forEach(function(id){var b=B[id];Object.keys(b.rows).forEach(function(r){b.rows[r].forEach(function(c){
+    nAll++;var s=null;if(rnd()<0.45){var g=rnd();s={name:names[Math.floor(rnd()*names.length)]+' '+fam[Math.floor(rnd()*fam.length)],group:g<0.1?'K':g<0.2?'L':'Y',days:Math.floor(rnd()*70),inread:rnd()<0.03,pres:rnd()<0.35};nAss++;if(s.pres)nPres++}
+    seats[id+':'+r+':'+c]=s;})})});
+  // the one empty seat being assigned in frame 3
+  seats['L:3:2']=null;
+
+  function heat(d){return Math.round(22+Math.min(d,60)/60*70)}
+  function grpVar(g){return g==='K'?'--kohen':g==='L'?'--levi':'--israel'}
+
+  document.querySelectorAll('[data-mini]').forEach(function(el){
+    var sel=el.getAttribute('data-mini'),mode=el.getAttribute('data-mode'),cells=[];
+    for(var r=0;r<14;r++)for(var x=0;x<26;x++){
+      var i=document.createElement('i');i.style.gridRow=(r+1);i.style.gridColumn=(x+1);
+      var found=false;
+      Object.keys(B).forEach(function(id){var b=B[id];if(x<b.x||x>=b.x+b.cols)return;var c=x-b.x;
+        if(b.bimah&&b.bimah.indexOf(r)>=0){i.className='bimah';found=true;return}
+        if(b.rows[r]&&b.rows[r].indexOf(c)>=0){found=true;var s=seats[id+':'+r+':'+c];
+          if(!s){i.className='empty'}else{i.className='seat';
+            if(mode==='heat'){if(s.group==='Y')i.style.background='color-mix(in srgb,var(--israel) '+heat(s.days)+'%,var(--surface))';else i.className='seat dim'}
+            if(mode==='pres'&&s.pres){i.className='seat pres';i.style.background='var(--accent)'}
+            if(mode==='assign')i.style.background='color-mix(in srgb,var('+grpVar(s.group)+') 60%,var(--surface))'}}});
+      if(found)el.appendChild(i);
+    }
+    var b=B[sel],rs=Object.keys(b.rows).map(Number).concat(b.bimah||[]),r0=Math.min.apply(null,rs),r1=Math.max.apply(null,rs);
+    var box=document.createElement('div');box.className='sel';
+    var left=(el.clientWidth-26*12+1)/2;
+    box.style.cssText='left:calc(50% - 155.5px + '+(b.x*12-3)+'px);top:'+(10+r0*12-3)+'px;width:'+(b.cols*12+5)+'px;height:'+((r1-r0+1)*12+5)+'px';
+    el.appendChild(box);
+  });
+
+  document.querySelectorAll('[data-blk]').forEach(function(el){
+    var id=el.getAttribute('data-blk'),mode=el.getAttribute('data-mode'),b=B[id];
+    el.style.gridTemplateColumns='repeat('+b.cols+',1fr)';
+    var rs=Object.keys(b.rows).map(Number),r0=Math.min.apply(null,rs),r1=Math.max.apply(null,rs);
+    for(var r=r0;r<=r1;r++)for(var c=0;c<b.cols;c++){
+      var t=document.createElement('div');t.className='tile';
+      if(!b.rows[r]||b.rows[r].indexOf(c)<0){t.className='tile gap';t.textContent='·';el.appendChild(t);continue}
+      var s=seats[id+':'+r+':'+c];
+      if(!s){t.className='tile empty';t.textContent=mode==='assign'?'פנוי':'';if(mode==='assign'&&id==='L'&&r===3&&c===2)t.className='tile empty pick'}
+      else if(mode==='heat'){
+        if(s.group!=='Y'){t.className='tile other';t.innerHTML=s.name+'<small>'+(s.group==='K'?'כהן':'לוי')+'</small>'}
+        else{var h=heat(s.days);t.style.background='color-mix(in srgb,var(--israel) '+h+'%,var(--surface))';t.style.color=h>55?'var(--on-accent)':'var(--ink)';
+          t.innerHTML=s.name+'<small>'+s.days+' יום</small>';if(s.inread)t.className='tile inread'}}
+      else if(mode==='pres'){t.style.background='var(--surface)';t.style.border='1px solid var(--line)';t.innerHTML=s.name+'<small>'+(s.pres?'כאן':' ')+'</small>';if(s.pres)t.className='tile pres'}
+      else{t.style.background='color-mix(in srgb,var('+grpVar(s.group)+') 22%,var(--surface))';t.style.color='var(--ink)';t.innerHTML=s.name+'<small>'+(s.group==='K'?'כהן':s.group==='L'?'לוי':'ישראל')+'</small>'}
+      el.appendChild(t);
+    }
+  });
+  document.querySelectorAll('[data-count-pres]').forEach(function(e){e.textContent=nPres});
+  document.querySelectorAll('[data-count-all]').forEach(function(e){e.textContent=nAll});
+  document.querySelectorAll('[data-count-assigned]').forEach(function(e){e.textContent=nAss});
+
+  var root=document.documentElement,btns=document.querySelectorAll('.sizes button');
+  function set(w){root.setAttribute('data-w',w);btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.w===w))});try{localStorage.setItem('gabbai-w',w)}catch(e){}}
+  btns.forEach(function(b){b.addEventListener('click',function(){set(b.dataset.w)})});
+  var saved=null;try{saved=localStorage.getItem('gabbai-w')}catch(e){}
+  set(saved||'412');
+})();
+</script>

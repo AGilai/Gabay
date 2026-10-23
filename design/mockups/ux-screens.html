@@ -1,0 +1,283 @@
+<title>Gabbai Screens</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Layout: a board of Android phone frames drawn at 1px = 1dp (Material 3 metrics), RTL inside, captions under each frame. */
+:root{
+  --board:#e7ebf1; --screen:#fbfcfe; --surface:#ffffff; --surface2:#eef2f8;
+  --ink:#141c27; --muted:#5a6678; --line:#d5dce6;
+  --accent:#1d4c9f; --on-accent:#ffffff;
+  --kohen:#9a6d07; --kohen-bg:#f7edd4;
+  --levi:#0d7369; --levi-bg:#d7f0ec;
+  --israel:#6141a8; --israel-bg:#ebe3f8;
+  --done:#2a7a40; --done-bg:#dcf0e1;
+  --hiyuv:#b2541a; --hiyuv-bg:#fbe6d8;
+  --scrim:rgba(10,14,20,.45);
+  --f-display:"Frank Ruhl Libre","David","Times New Roman",serif;
+  --f-ui:"Assistant","Segoe UI",Roboto,Arial,sans-serif;
+  --pw:412px; --ph:915px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37;
+  --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33;
+  --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f;
+  --hiyuv:#f2a06a; --hiyuv-bg:#3d2617; --scrim:rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37;
+  --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33;
+  --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f;
+  --hiyuv:#f2a06a; --hiyuv-bg:#3d2617; --scrim:rgba(0,0,0,.6); color-scheme:dark}
+:root[data-w="360"]{--pw:360px;--ph:800px}
+:root[data-w="384"]{--pw:384px;--ph:854px}
+
+*{box-sizing:border-box}
+body{background:var(--board);color:var(--ink);font-family:var(--f-ui);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.intro{max-width:70ch;display:grid;gap:8px;margin-bottom:20px}
+.intro h1{font-family:var(--f-display);font-size:28px;margin:0;text-wrap:balance}
+.intro p{margin:0;color:var(--muted);line-height:1.5;font-size:15px}
+.sizes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:14px}
+.sizes button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+.sizes button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.board{display:flex;flex-wrap:wrap;gap:32px 28px;align-items:flex-start}
+figure{margin:0;display:grid;gap:10px;max-width:100%}
+.scroll{overflow-x:auto;max-width:100%;padding-bottom:4px}
+figcaption{max-width:var(--pw);font-size:14px;line-height:1.45;color:var(--muted)}
+figcaption b{color:var(--ink);display:block;font-size:15px}
+
+/* ---------- phone ---------- */
+.phone{width:var(--pw);height:var(--ph);background:var(--screen);border-radius:28px;outline:8px solid #1b1f26;outline-offset:0;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;direction:rtl;margin:8px;font-size:16px}
+.status{height:24px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-size:12px;font-weight:600;color:var(--ink);direction:ltr}
+.status i{width:8px;height:8px;border-radius:50%;background:#1b1f26;display:inline-block;position:absolute;left:50%;top:8px;transform:translateX(-50%)}
+.gesture{height:24px;flex:none;display:grid;place-items:center}
+.gesture::after{content:"";width:108px;height:4px;border-radius:2px;background:var(--ink);opacity:.5}
+.appbar{height:64px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px 0 4px}
+.appbar .t{flex:1;min-width:0;padding:0 12px}
+.appbar .t h2{margin:0;font-size:22px;font-weight:600;line-height:28px}
+.appbar .t small{display:block;font-size:13px;color:var(--muted);line-height:18px}
+.icon{width:48px;height:48px;display:grid;place-items:center;border-radius:24px;color:var(--ink);flex:none}
+.icon svg{width:24px;height:24px}
+.body{flex:1;min-height:0;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.nav{height:80px;flex:none;background:var(--surface2);display:flex;justify-content:space-around;align-items:flex-start;padding-top:12px}
+.nav a{display:grid;justify-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--muted);width:72px}
+.nav a span{width:64px;height:32px;border-radius:16px;display:grid;place-items:center}
+.nav a.on{color:var(--ink)} .nav a.on span{background:var(--accent);color:var(--on-accent)}
+.nav svg{width:24px;height:24px}
+
+/* day chip line */
+.dayline{display:flex;gap:8px;flex-wrap:wrap}
+.pill{height:28px;padding:0 12px;border-radius:14px;display:inline-flex;align-items:center;font-size:13px;font-weight:600;background:var(--surface2);color:var(--ink)}
+.banner{background:var(--accent);color:var(--on-accent);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;font-weight:700}
+.banner small{font-weight:400;opacity:.9}
+
+/* slots */
+.slot{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;position:relative}
+.slot .lab{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700}
+.tag{height:22px;padding:0 9px;border-radius:11px;display:inline-flex;align-items:center;font-size:12px;font-weight:700}
+.k{color:var(--kohen);background:var(--kohen-bg)} .l{color:var(--levi);background:var(--levi-bg)} .y{color:var(--israel);background:var(--israel-bg)}
+.slot .name{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:30px}
+.slot .hint{font-size:14px;color:var(--muted);line-height:18px}
+.slot .call{grid-column:1/-1;margin-top:6px;background:var(--surface2);border-radius:8px;padding:6px 10px;font-family:var(--f-display);font-size:19px;line-height:26px}
+.btn{height:48px;min-width:48px;padding:0 18px;border-radius:24px;border:0;font:inherit;font-weight:700;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn.fill{background:var(--accent);color:var(--on-accent)}
+.btn.tonal{background:var(--surface2);color:var(--ink)}
+.slot.next{border:2px solid var(--accent);padding:11px 13px}
+.slot.done{background:var(--done-bg);border-color:transparent}
+.slot.done .call{display:none}
+.donemark{color:var(--done);font-weight:700;font-size:14px;display:flex;align-items:center;gap:4px}
+.slot.empty{border:2px dashed var(--line);background:transparent;padding:11px 13px}
+.slot.empty .add{font-size:18px;font-weight:700;color:var(--accent)}
+.suggest{grid-column:1/-1;margin-top:8px;height:48px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:15px}
+.suggest b{font-family:var(--f-display);font-size:18px}
+.suggest span{color:var(--muted);font-size:13px}
+.compact .slot{padding-block:8px} .compact .slot.next{padding-block:7px}
+.compact .slot .call{margin-top:4px;font-size:17px;line-height:22px;padding:4px 10px}
+.compact .slot .name{font-size:21px;line-height:26px}
+
+/* prayer chips */
+.chips{display:flex;gap:8px;overflow:hidden;flex-wrap:nowrap;padding-top:4px}
+.chip{height:32px;padding:0 12px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;white-space:nowrap;flex:none;background:var(--surface)}
+.chip.dot::before{content:"";width:6px;height:6px;border-radius:3px;background:var(--hiyuv)}
+.chip.sel{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.sechead{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.02em;padding:6px 0 0}
+
+/* selection sheet */
+.sheet-top{height:24px;display:grid;place-items:center;flex:none}
+.sheet-top::after{content:"";width:32px;height:4px;border-radius:2px;background:var(--muted);opacity:.6}
+.tabs{height:48px;flex:none;display:flex;border-bottom:1px solid var(--line)}
+.tabs a{flex:1;display:grid;place-items:center;font-weight:700;font-size:15px;color:var(--muted);position:relative}
+.tabs a.on{color:var(--kohen)} .tabs a.on::after{content:"";position:absolute;bottom:0;left:20%;right:20%;height:3px;border-radius:3px 3px 0 0;background:var(--kohen)}
+.search{height:48px;border-radius:24px;background:var(--surface2);display:flex;align-items:center;gap:10px;padding:0 16px;color:var(--muted);font-size:16px;flex:none;margin-top:8px}
+.search svg{width:20px;height:20px}
+.row{min-height:72px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:8px 0}
+.av{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;font-weight:700;font-size:16px;flex:none}
+.row .who{flex:1;min-width:0}
+.row .who b{font-family:var(--f-display);font-size:19px;display:block;line-height:24px}
+.row .who small{font-size:13px;color:var(--muted);display:block;line-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.days{text-align:center;flex:none;width:56px;font-variant-numeric:tabular-nums}
+.days b{display:block;font-size:20px;line-height:22px}
+.days small{font-size:11px;color:var(--muted)}
+.row.hy{background:var(--hiyuv-bg);margin:0 -16px;padding:8px 16px;border-bottom:0;border-radius:0}
+.hytag{color:var(--hiyuv);font-weight:700}
+.row.grey{opacity:.5}
+.collapsed{height:48px;display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-weight:600;font-size:14px}
+.fab{position:absolute;left:16px;bottom:calc(24px + 16px);height:56px;padding:0 20px;border-radius:16px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.fab svg{width:24px;height:24px}
+
+/* bottom sheet over S1 */
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.bsheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:28px 28px 0 0;padding:0 0 24px;display:flex;flex-direction:column}
+.bsheet .hdr{padding:4px 24px 12px}
+.bsheet .hdr b{font-family:var(--f-display);font-size:22px;display:block}
+.bsheet .hdr small{color:var(--muted);font-size:14px}
+.item{height:56px;display:flex;align-items:center;gap:16px;padding:0 24px;font-size:16px}
+.item svg{width:24px;height:24px;color:var(--muted);flex:none}
+.item.warn{color:var(--kohen)} .item.warn svg{color:var(--kohen)}
+.divider{height:1px;background:var(--line);margin:4px 24px}
+
+/* prayer reader */
+.reader{flex:1;min-height:0;overflow:hidden;padding:4px 20px 0;display:flex;flex-direction:column;gap:12px}
+.picks{display:flex;gap:8px;flex-wrap:wrap}
+.pk{height:32px;padding:0 10px;border-radius:8px;background:var(--surface2);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+.pk .cb{width:18px;height:18px;border-radius:4px;background:var(--accent);display:grid;place-items:center;color:var(--on-accent);font-size:12px}
+.pk.off .cb{background:transparent;border:2px solid var(--muted)}
+.text{font-family:var(--f-display);font-size:24px;line-height:1.75;margin:0;text-align:start}
+.text mark{background:var(--hiyuv-bg);color:var(--ink);border-radius:4px;padding:0 4px;font-weight:700}
+.note{font-size:12px;color:var(--muted)}
+
+/* form */
+.field{height:56px;border:1px solid var(--muted);border-radius:4px;padding:0 16px;display:flex;align-items:center;font-size:16px;position:relative}
+.field label{position:absolute;top:-9px;right:12px;background:var(--screen);padding:0 4px;font-size:12px;color:var(--muted)}
+.field.focus{border:2px solid var(--accent);padding:0 15px} .field.focus label{color:var(--accent)}
+.seg{height:48px;display:flex;border:1px solid var(--muted);border-radius:24px;overflow:hidden}
+.seg span{flex:1;display:grid;place-items:center;font-weight:700;font-size:15px;border-left:1px solid var(--muted)}
+.seg span:last-child{border-left:0}
+.seg span.on{background:var(--israel-bg);color:var(--israel)}
+.more{height:48px;display:flex;align-items:center;gap:8px;color:var(--accent);font-weight:700}
+.kbd{flex:none;height:260px;background:var(--surface2);display:grid;grid-template-rows:repeat(4,1fr);gap:8px;padding:8px 6px;direction:ltr}
+.kbd div{display:flex;gap:6px;justify-content:center}
+.kbd span{flex:1;max-width:34px;background:var(--surface);border-radius:6px;display:grid;place-items:center;font-size:18px}
+.kbd span.w{max-width:none;flex:4}
+.kbd span.m{max-width:56px;flex:1.5;font-size:13px}
+.dim{color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.sizes button{transition:background .15s}}
+.sizes button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* draft 2 */
+.ctrl{display:flex;gap:8px;align-items:center;flex:none}
+.segc{height:40px;display:flex;border:1px solid var(--muted);border-radius:20px;overflow:hidden;flex:none}
+.segc span{width:48px;display:grid;place-items:center;font-weight:700;font-size:16px;border-left:1px solid var(--muted)}
+.segc span:last-child{border-left:0}
+.segc span.on{background:var(--accent);color:var(--on-accent)}
+.tg{height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;background:var(--surface);white-space:nowrap}
+.tg.on{background:var(--kohen-bg);color:var(--kohen);border-color:transparent}
+.call em{font-style:normal;font-weight:500;color:var(--muted)}
+.tag.x{text-decoration:line-through;opacity:.55}
+.snack{position:absolute;left:16px;right:16px;bottom:calc(24px + 80px + 8px);min-height:48px;border-radius:4px;background:var(--ink);color:var(--screen);display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 16px;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,.3)}
+.snack b{color:var(--accent);filter:brightness(1.3);padding:0 8px}
+.inread{background:var(--surface2);margin:0 -16px;padding:8px 16px;border-bottom:0}
+.inread .days b{font-size:13px}
+.kv{display:grid;gap:2px;padding:10px 0;border-bottom:1px solid var(--line)}
+.kv small{font-size:12px;color:var(--muted)} .kv span{font-size:16px}
+.kv .serif{font-family:var(--f-display);font-size:19px}
+.swrow{height:56px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);font-size:16px}
+.sw{width:52px;height:32px;border-radius:16px;background:var(--accent);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:4px;left:4px;width:24px;height:24px;border-radius:12px;background:var(--on-accent)}
+.stats{display:flex;gap:16px;padding:10px 0;font-variant-numeric:tabular-nums}
+.stats div{display:grid} .stats b{font-size:22px} .stats small{font-size:12px;color:var(--muted)}
+.hist{font-size:14px;display:grid;gap:6px;padding:6px 0;color:var(--muted);font-variant-numeric:tabular-nums}
+.hist div{display:flex;justify-content:space-between}
+.btn.out{background:transparent;border:1px solid var(--muted);color:var(--ink);width:100%}
+</style>
+
+<header class="intro">
+  <h1>Gabbai app · phone screens, draft 2</h1>
+  <p>Drawn at 1px = 1dp with Material 3 sizes: 24dp status bar, 64dp top app bar, 80dp navigation bar, 24dp gesture bar, 48dp touch targets, 56dp button for adding a person. Draft 2 after your review: no hints on the main page, a 3 | 4 switch, אין כהן / אין לוי switches, choosing sends a person straight to his slot, no grey-out, a calling line you write in full, and הפסק להציע on the person card. Names are examples. The prayer wording is a placeholder until you supply your shul's nusach Sfard.</p>
+  <div class="sizes" role="group" aria-label="Screen width">
+    <span>Width:</span>
+    <button id="w360" data-w="360" aria-pressed="false">360×800 (Galaxy A)</button>
+    <button id="w384" data-w="384" aria-pressed="false">384×854 (Galaxy S)</button>
+    <button id="w412" data-w="412" aria-pressed="true">412×915 (Pixel / S+)</button>
+  </div>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-book" viewBox="0 0 24 24"><path fill="currentColor" d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v16h12V4H6zm2 2h8v2H8V6zm0 4h8v2H8v-2z"/></symbol>
+  <symbol id="i-people" viewBox="0 0 24 24"><path fill="currentColor" d="M9 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0 2c3.3 0 7 1.6 7 4v2H2v-2c0-2.4 3.7-4 7-4zm7.5-2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 1 0 7zm1.5 2.2c2.3.5 4 1.7 4 3.8v2h-4v-2c0-1.5-.7-2.8-2-3.8z"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path fill="currentColor" d="M12 21l-1.4-1.3C5.4 15 2 12 2 8.4 2 5.4 4.4 3 7.4 3c1.7 0 3.4.8 4.6 2.1C13.2 3.8 14.9 3 16.6 3 19.6 3 22 5.4 22 8.4c0 3.6-3.4 6.6-8.6 11.3L12 21z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path fill="currentColor" d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><path fill="currentColor" d="M7 2h2v2h6V2h2v2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V2zM5 10v10h14V10H5z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path fill="currentColor" d="M10 3a7 7 0 0 1 5.6 11.2l5.1 5.1-1.4 1.4-5.1-5.1A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path fill="currentColor" d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path fill="currentColor" d="M6.4 5 12 10.6 17.6 5 19 6.4 13.4 12l5.6 5.6-1.4 1.4-5.6-5.6L6.4 19 5 17.6 10.6 12 5 6.4 6.4 5z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></symbol>
+  <symbol id="i-text" viewBox="0 0 24 24"><path fill="currentColor" d="M9 4v3h5v12h3V7h5V4H9zM3 12h3v7h3v-7h3V9H3v3z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path fill="currentColor" d="m12 4-1.4 1.4 5.6 5.6H4v2h12.2l-5.6 5.6L12 20l8-8-8-8z"/></symbol>
+</svg>
+
+<main class="board">
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:42</span><i></i><span>▾ ▴ 82%</span></div><div class="appbar"><div class="t"><h2>קריאת התורה</h2><small>יום חמישי · י״א בחשון · לך לך</small></div><span class="icon"><svg><use href="#i-cal"/></svg></span></div><div class="body"><div class="ctrl"><div class="segc"><span class="on">3</span><span>4</span></div><span class="tg">אין כהן</span><span class="tg">אין לוי</span></div>
+<div class="slot done"><div class="lab"><span class="tag k">כהן</span></div><div class="name">משה כ״ץ</div><div class="donemark"><svg width="20" height="20"><use href="#i-check"/></svg>עלה 7:38</div></div>
+<div class="slot next"><div class="lab"><span class="tag l">לוי</span></div><div class="name">יוסי לוי</div><button class="btn fill"><svg width="20" height="20"><use href="#i-check"/></svg>עלה</button><div class="call">יוסף בן יעקב הלוי</div></div>
+<div class="slot empty"><div class="lab"><span class="tag y">שלישי</span></div><div class="add">+ בחר ישראל</div><div></div><div class="suggest"><span>הבא בתור:</span><b>דוד פרץ</b><span>47 יום</span></div></div>
+<div class="sechead">תפילות</div><div class="chips"><span class="chip">מי שברך לעולה</span><span class="chip dot">לחולים (3)</span><span class="chip">בר מצווה</span><span class="chip">יולדת</span><span class="chip">אזכרה</span></div></div><nav class="nav"><a class="on"><span><svg><use href="#i-book"/></svg></span>קריאה</a><a><span><svg><use href="#i-people"/></svg></span>בחירה</a><a><span><svg><use href="#i-heart"/></svg></span>חולים</a><a><span><svg><use href="#i-more"/></svg></span>עוד</a></nav><div class="gesture"></div></div></div><figcaption><b>S1 · Main page, a normal Thursday</b>No hints, only the name and the calling line, exactly as you wrote it (הכהן / הלוי are part of your text). The control row holds the 3 | 4 switch and the אין כהן / אין לוי switches.</figcaption></figure>
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:31</span><i></i><span>▾ ▴ 90%</span></div><div class="appbar"><div class="t"><h2>קריאת התורה</h2><small>יום שני · א׳ בכסלו</small></div><span class="icon"><svg><use href="#i-cal"/></svg></span></div><div class="body compact"><div class="banner">ראש חודש כסלו <small>הלל · יעלה ויבוא</small></div><div class="ctrl"><div class="segc"><span>3</span><span class="on">4</span></div><span class="tg">אין כהן</span><span class="tg">אין לוי</span></div>
+<div class="slot done"><div class="lab"><span class="tag k">כהן</span></div><div class="name">שמעון כהנא</div><div class="donemark"><svg width="20" height="20"><use href="#i-check"/></svg>עלה</div></div>
+<div class="slot next"><div class="lab"><span class="tag l">לוי</span></div><div class="name">יוסי לוי</div><button class="btn fill"><svg width="20" height="20"><use href="#i-check"/></svg>עלה</button><div class="call">יוסף בן יעקב הלוי</div></div>
+<div class="slot"><div class="lab"><span class="tag y">שלישי</span></div><div class="name">אבי רוזן</div><button class="btn tonal">עלה</button><div class="call">אברהם בן שלמה</div></div>
+<div class="slot empty"><div class="lab"><span class="tag y">רביעי</span></div><div class="add">+ בחר ישראל</div><div></div><div class="suggest"><span>הבא בתור:</span><b>נתנאל עזרא</b><span>39 יום</span></div></div>
+<div class="chips"><span class="chip">מי שברך לעולה</span><span class="chip dot">לחולים (3)</span><span class="chip">בר מצווה</span><span class="chip">יולדת</span></div>
+</div><nav class="nav"><a class="on"><span><svg><use href="#i-book"/></svg></span>קריאה</a><a><span><svg><use href="#i-people"/></svg></span>בחירה</a><a><span><svg><use href="#i-heart"/></svg></span>חולים</a><a><span><svg><use href="#i-more"/></svg></span>עוד</a></nav><div class="gesture"></div></div></div><figcaption><b>S1 · Rosh Chodesh, 4 aliyot</b>The calendar shows the banner and turns 4 on. You can always switch back to 3. The cards are compact, so 4 fit at 360×800 with no scrolling. The calling line is whatever you wrote.</figcaption></figure>
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:36</span><i></i><span>▾ ▴ 85%</span></div><div class="appbar"><div class="t"><h2>קריאת התורה</h2><small>יום חמישי · י״א בחשון · לך לך</small></div><span class="icon"><svg><use href="#i-cal"/></svg></span></div><div class="body"><div class="ctrl"><div class="segc"><span class="on">3</span><span>4</span></div><span class="tg on">✓ אין כהן</span><span class="tg">אין לוי</span></div>
+<div class="slot next"><div class="lab"><span class="tag k x">כהן</span><span class="tag y">ישראל במקום כהן</span></div><div class="name">דוד פרץ</div><button class="btn fill"><svg width="20" height="20"><use href="#i-check"/></svg>עלה</button><div class="call">דוד בן מנוח</div></div>
+<div class="slot empty"><div class="lab"><span class="tag l x">לוי</span><span class="tag y">שני</span></div><div class="add">+ בחר ישראל</div><div></div><div class="suggest"><span>הבא בתור:</span><b>אבי רוזן</b><span>44 יום</span></div></div>
+<div class="slot empty"><div class="lab"><span class="tag y">שלישי</span></div><div class="add">+ בחר ישראל</div><div></div></div>
+<div class="sechead">תפילות</div><div class="chips"><span class="chip">מי שברך לעולה</span><span class="chip dot">לחולים (3)</span><span class="chip">בר מצווה</span><span class="chip">יולדת</span><span class="chip">אזכרה</span></div></div><div class="snack"><span>יוסי לוי הוצא מהקריאה</span><b>בטל</b></div><nav class="nav"><a class="on"><span><svg><use href="#i-book"/></svg></span>קריאה</a><a><span><svg><use href="#i-people"/></svg></span>בחירה</a><a><span><svg><use href="#i-heart"/></svg></span>חולים</a><a><span><svg><use href="#i-more"/></svg></span>עוד</a></nav><div class="gesture"></div></div></div><figcaption><b>S1 · אין כהן switched on</b>The כהן and לוי labels are crossed out, and every slot is Israel: ישראל במקום כהן, שני, שלישי. The Levi who was already placed is taken out, with an undo snackbar.</figcaption></figure>
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:43</span><i></i><span>▾ ▴ 82%</span></div><div class="appbar"><div class="t"><h2>בחירה</h2><small>נכנס ישר למקומו בקריאה</small></div></div>
+<div class="tabs"><a class="on">כהנים 9</a><a>לויים 6</a><a>ישראלים 48</a></div>
+<div class="body" style="gap:0"><div class="search"><svg><use href="#i-search"/></svg>חיפוש שם, שם לקריאה, רמז…</div>
+<div class="sechead" style="padding-top:10px">חיוב היום</div><div class="row hy"><div class="av k">א</div><div class="who"><b>אהרן כהן</b><small><span class="hytag">יארצייט לאביו · י״ג בחשון</span></small></div><div class="days"><b>12</b><small>יום</small></div></div><div class="sechead" style="padding-top:10px">בתור</div><div class="row "><div class="av k">י</div><div class="who"><b>יצחק רפפורט</b><small>חדש · שורה אחרונה</small></div><div class="days"><b><span style="font-size:13px">עוד לא</span></b><small>עלה</small></div></div><div class="row "><div class="av k">ש</div><div class="who"><b>שמעון כהנא</b><small>בעל התקיעות · ליד הארון</small></div><div class="days"><b>63</b><small>יום</small></div></div><div class="row "><div class="av k">א</div><div class="who"><b>אליהו כ״ץ</b><small>האח של משה · שורה 2</small></div><div class="days"><b>41</b><small>יום</small></div></div><div class="row "><div class="av k">ב</div><div class="who"><b>בני כהן</b><small>מזדמן · בא עם הבן</small></div><div class="days"><b>28</b><small>יום</small></div></div><div class="row "><div class="av k">ר</div><div class="who"><b>רפאל אזולאי</b><small>שורה 4, ליד העמוד</small></div><div class="days"><b>6</b><small>יום</small></div></div><div class="collapsed"><span>מזדמנים שלא נראו חצי שנה (3)</span><span>▾</span></div></div>
+<div class="fab" style="bottom:calc(24px + 80px + 16px)"><svg><use href="#i-plus"/></svg>אדם חדש</div><nav class="nav"><a><span><svg><use href="#i-book"/></svg></span>קריאה</a><a class="on"><span><svg><use href="#i-people"/></svg></span>בחירה</a><a><span><svg><use href="#i-heart"/></svg></span>חולים</a><a><span><svg><use href="#i-more"/></svg></span>עוד</a></nav><div class="gesture"></div></div></div><figcaption><b>S2 · Choosing page (second main page)</b>Opened from the bottom bar or from an empty slot. Tap = he goes straight into his slot on the main page, and the main page is shown. Order: obligation today, then longest wait. Someone called 6 days ago is just last, not greyed. Occasional people not seen for 6 months are collapsed.</figcaption></figure>
+<figure><div class="scroll"><div class="phone"><div class="status"><span>8:05</span><i></i><span>▾ ▴ 74%</span></div><div class="appbar"><span class="icon"><svg><use href="#i-back"/></svg></span><div class="t"><h2>שמעון כהנא</h2><small>כהן · קבוע</small></div></div>
+<div class="body" style="gap:0">
+<div class="kv"><small>שם לקריאה</small><span class="serif">שמעון בן מאיר</span></div>
+<div class="kv"><small>רמז (פרטי)</small><span>בעל התקיעות · ליד הארון</span></div>
+<div class="swrow"><span>קבוע</span><span class="sw"></span></div>
+<div class="stats"><div><b>63</b><small>ימים מאז שעלה</small></div><div><b>7</b><small>עליות השנה</small></div></div>
+<div class="sechead">עליות אחרונות</div>
+<div class="hist"><div><span>כ׳ באב · כהן</span><span>20.08</span></div><div><span>ו׳ באב · כהן</span><span>06.08</span></div><div><span>כ״ב בתמוז · כהן במקום לוי</span><span>23.07</span></div></div>
+<div style="display:grid;gap:6px;padding-top:12px"><button class="btn out">הפסק להציע</button><span class="note">לא יופיע בתור ולא יוצע. החיפוש עדיין ימצא אותו.</span></div>
+</div><div class="gesture"></div></div></div><figcaption><b>S5 · Person card</b>The calling line and the private hint. Regulars are never dropped automatically. "הפסק להציע" takes him out of the line, and search still finds him.</figcaption></figure>
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:45</span><i></i><span>▾ ▴ 81%</span></div><div class="appbar"><span class="icon"><svg><use href="#i-back"/></svg></span><div class="t"><h2>מי שברך לחולים</h2><small>3 שמות · נוסח ספרד</small></div><span class="icon"><svg><use href="#i-text"/></svg></span></div>
+<div class="reader"><div class="picks"><span class="pk"><span class="cb">✓</span>רפאל בן שרה</span><span class="pk"><span class="cb">✓</span>מרים בת לאה</span><span class="pk"><span class="cb">✓</span>חיים בן אסתר</span><span class="pk off"><span class="cb"></span>הוסף…</span></div>
+<p class="text">מי שברך אבותינו אברהם יצחק ויעקב, משה ואהרן, דוד ושלמה, הוא יברך וירפא את החולים <mark>רפאל בן שרה</mark>, <mark>מרים בת לאה</mark> ו<mark>חיים בן אסתר</mark>. הקדוש ברוך הוא ימלא רחמים עליהם להחלימם ולרפאתם, ולהחזיקם ולהחיותם, וישלח להם מהרה רפואה שלמה מן השמים…</p>
+<div class="note">נוסח לדוגמה בלבד. נוסח ספרד של בית הכנסת יוזן בהגדרות.</div></div><div class="gesture"></div></div></div><figcaption><b>S4 · Prayer text</b>Large serif type, names from the sick list filled in, checkboxes choose who to include. The wording is a placeholder until you supply your nusach Sfard.</figcaption></figure>
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:44</span><i></i><span>▾ ▴ 81%</span></div><div class="appbar"><span class="icon"><svg><use href="#i-close"/></svg></span><div class="t"><h2>אדם חדש</h2></div></div>
+<div class="body" style="gap:18px;padding-top:12px">
+<div class="field focus"><label>שם *</label>דניאל|</div>
+<div class="seg"><span>כהן</span><span>לוי</span><span class="on">ישראל</span></div>
+<div class="field"><label>שם לקריאה</label><span class="dim">דניאל בן …</span></div>
+<div class="field"><label>רמז (פרטי)</label><span class="dim">אורח, חולצה כחולה</span></div>
+<button class="btn fill" style="width:100%">שמור והצב בשלישי</button></div>
+<div class="kbd"><div><span>ק</span><span>ר</span><span>א</span><span>ט</span><span>ו</span><span>ן</span><span>ם</span><span>פ</span></div><div><span>ש</span><span>ד</span><span>ג</span><span>כ</span><span>ע</span><span>י</span><span>ח</span><span>ל</span><span>ך</span></div><div><span>ז</span><span>ס</span><span>ב</span><span>ה</span><span>נ</span><span>מ</span><span>צ</span><span>ת</span><span>ץ</span></div><div><span class="m">?123</span><span class="w">רווח</span><span class="m">↵</span></div></div><div class="gesture"></div></div></div><figcaption><b>S5 · Quick add, keyboard open</b>Name, group (already set from the tab), calling line and hint, all above a 260dp Hebrew keyboard at 360×800. Save puts him straight into his slot.</figcaption></figure>
+</main>
+
+<script>
+(function(){
+  var root=document.documentElement, btns=document.querySelectorAll('.sizes button');
+  function set(w){
+    root.setAttribute('data-w',w);
+    btns.forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.w===w))});
+    try{localStorage.setItem('gabbai-w',w)}catch(e){}
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){set(b.dataset.w)})});
+  var saved=null; try{saved=localStorage.getItem('gabbai-w')}catch(e){}
+  set(saved||'412');
+})();
+</script>
