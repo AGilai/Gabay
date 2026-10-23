@@ -71,3 +71,8 @@ export function sickTemplate(p: Prayers, chosen: SickEntry[]): string {
   if (chosen.length === 1) return chosen[0].gender === 'f' ? p.sickF : p.sickM;
   return p.sickPlural;
 }
+
+// The baby girl is not named this time (the grandfather is called up, or the parents postpone it).
+export function withoutNaming(template: string): string {
+  return template.replace(/וְיִקָּרֵא שְׁמָהּ בְּיִשְׂרָאֵל\s*\{baby\},?\s*/, '');
+}

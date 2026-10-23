@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DONOR, defaultPrayers, render, joinNames, sickTemplate, upgradePrayers } from '../core/prayers.ts';
+import { DONOR, defaultPrayers, render, joinNames, sickTemplate, upgradePrayers, withoutNaming } from '../core/prayers.ts';
 import type { SickEntry } from '../core/types.ts';
 
 const sick = (text: string, gender: 'm' | 'f'): SickEntry => ({ id: text, text, gender, addedOn: '2026-10-01', askedOn: null });
@@ -64,4 +64,11 @@ test('upgradePrayers turns the husband clause of an earlier yoledet text into {d
 
 test("an empty baby girl's name shows פלונית", () => {
   assert.deepEqual(render('{baby}', { baby: '' }), [{ text: 'פלונית', name: true }]);
+});
+
+test('withoutNaming drops "and her name shall be called" from the yoledet-bat text, keeping the rest', () => {
+  const t = withoutNaming(defaultPrayers().yoledetBat);
+  assert.ok(!t.includes('{baby}') && !t.includes('וְיִקָּרֵא'));
+  assert.ok(t.includes('בְּמַזָּל טוֹב, בַּעֲבוּר {donor}'));
+  assert.equal(withoutNaming('א {name} ב'), 'א {name} ב');
 });
