@@ -12,11 +12,11 @@ const OLD_MARK = '(נוסח זמני)';
 // second name use the common wording. The plural sick text and the bar mitzvah blessing are not in that
 // siddur; they follow the usual siddur wording. The gabbai can change any text in settings.
 // Who pledges charity in the yoledet prayer. The siddur has the husband's wording; the grandfather's
-// (for an older congregation, where the oleh is often the grandfather) is ours, not from the siddur.
+// (for an older congregation, where the oleh is often the grandfather) is the gabbai's wording.
 const HUSBAND = 'שֶׁבַּעְלָהּ יִתֵּן לִצְדָקָה בַּעֲדָהּ';
 export const DONOR = {
   father: { ben: HUSBAND, bat: HUSBAND },
-  grandfather: { ben: 'שֶׁזְּקֵנוֹ שֶׁל הַנּוֹלָד יִתֵּן לִצְדָקָה בַּעֲדָם', bat: 'שֶׁזְּקֵנָהּ שֶׁל הַנּוֹלָדָה יִתֵּן לִצְדָקָה בַּעֲדָן' },
+  grandfather: { ben: 'שֶׁהַסַּבָּא יִתֵּן צְדָקָה בַּעֲבוּרָם', bat: 'שֶׁהַסַּבָּא יִתֵּן צְדָקָה בַּעֲבוּרָם' },
 };
 // Placeholders that hold a person's name, highlighted in the reader; others ({donor}) are plain text.
 const NAME_KEYS = new Set(['name', 'names', 'baby']);

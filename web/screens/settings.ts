@@ -88,7 +88,7 @@ function renderSettingsInner(ctx: Ctx): HTMLElement {
       h('div', { class: 'sechead' }, 'ערכת צבעים'),
       h('div', { class: 'seg' }, themeBtn('', 'כמו הטלפון'), themeBtn('light', 'בהיר'), themeBtn('dark', 'כהה')),
       h('div', { class: 'sechead' }, 'נוסח התפילות'),
-      h('p', { class: 'note', style: 'margin:0' }, 'השם נכנס במקום {name}, רשימת החולים במקום {names}, שם הבת שנולדה במקום {baby}, ו״שבעלה / שזקנו יתן לצדקה״ במקום {donor}.'),
+      h('p', { class: 'note', style: 'margin:0' }, 'השם נכנס במקום {name}, רשימת החולים במקום {names}, שם הבת שנולדה במקום {baby}, ו״שבעלה יתן לצדקה / שהסבא יתן צדקה״ במקום {donor}.'),
       ...(Object.keys(PRAYER_LABEL) as (keyof Prayers)[]).map((k) => h('div', { class: 'field' }, h('label', {}, PRAYER_LABEL[k]),
         h('textarea', { rows: 4, onchange: (e: Event) => {
           const v = (e.target as HTMLTextAreaElement).value.trim() || defaults[k];

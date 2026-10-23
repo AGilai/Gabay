@@ -53,8 +53,8 @@ test('the yoledet texts take the donor clause as {donor}; only names are marked'
   assert.ok(p.yoledetBen.includes('{donor}') && p.yoledetBat.includes('{donor}'));
   const parts = render('בַּעֲבוּר {donor} את {name}', { donor: DONOR.father.ben, name: 'שרה' });
   assert.deepEqual(parts.map((x) => x.name), [false, false, false, true]);
-  assert.ok(DONOR.grandfather.ben.includes('שֶׁזְּקֵנוֹ שֶׁל הַנּוֹלָד'));
-  assert.ok(DONOR.grandfather.bat.includes('שֶׁזְּקֵנָהּ שֶׁל הַנּוֹלָדָה'));
+  assert.equal(DONOR.grandfather.ben, 'שֶׁהַסַּבָּא יִתֵּן צְדָקָה בַּעֲבוּרָם');
+  assert.equal(DONOR.grandfather.bat, 'שֶׁהַסַּבָּא יִתֵּן צְדָקָה בַּעֲבוּרָם');
 });
 
 test('upgradePrayers turns the husband clause of an earlier yoledet text into {donor}, keeping the rest', () => {
