@@ -4,7 +4,7 @@ import { ROLE_LABEL, clearSlot, focusIndex, groupOf, markDone, newReading, place
 import type { Reading, SlotRole, State } from '../../core/types.ts';
 import { daysBetween } from '../../core/dates.ts';
 import { aliyotOf, shouldOfferRegular, suggest } from '../../core/queue.ts';
-import { GROUP_CLASS, GROUP_WORD, currentKey, findReading, keyText, personById, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
+import { GROUP_CLASS, GROUP_WORD, activeKey, currentKey, findReading, keyText, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, nowHHMM, sheet, snackbar } from '../ui.ts';
 
 const SERVICE_WORD = { shacharit: 'שחרית', mincha: 'מנחה' };
@@ -18,11 +18,15 @@ function tags(r: Reading, i: number, role: SlotRole): HTMLElement[] {
   return [own];
 }
 
-export function renderReading(ctx: Ctx, key: ReadingKey = currentKey(ctx.today)): HTMLElement {
+export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
   const { store } = ctx;
   const state = store.get();
+  const home = activeKey(state, ctx.today);
+  const key = keyArg ?? home;
   const info = dayInfo(key.date);
-  const isToday = key.date === ctx.today;
+  // The main page: today's reading, or the next one prepared ahead on a day without a reading.
+  const isToday = sameKey(key, home);
+  const ahead = isToday && key.date !== ctx.today;
   const saved = findReading(state, key);
   const r = saved ?? (info.reading ? newReading(key.date, key.service, info.defaultCount) : null);
   const save = (next: Reading, label?: string, base: State = store.get()) => store.set(withReading(base, next), label);
@@ -30,7 +34,7 @@ export function renderReading(ctx: Ctx, key: ReadingKey = currentKey(ctx.today))
   const sub = [info.weekday, info.hebrew, info.parasha, key.service === 'mincha' ? SERVICE_WORD.mincha : null]
     .filter(Boolean).join(' · ');
   const bar = isToday
-    ? appBar('קריאת התורה', sub, { end: [h('a', { class: 'icon', href: '#history', 'aria-label': 'היסטוריה' }, icon('cal'))] })
+    ? appBar(ahead ? 'הקריאה הבאה' : 'קריאת התורה', sub, { end: [h('a', { class: 'icon', href: '#history', 'aria-label': 'היסטוריה' }, icon('cal'))] })
     : appBar(key.date.split('-').reverse().join('.'), sub, { back: '#history' });
 
   if (!r) {
@@ -84,7 +88,7 @@ export function renderReading(ctx: Ctx, key: ReadingKey = currentKey(ctx.today))
     }
     return h('div', { class: 'slot' + (i === focus ? ' next' : ''), role: 'button', onclick: () => slotSheet(ctx, r, i, save) },
       lab, h('div', { class: 'name' }, p.name),
-      h('button', {
+      ahead ? h('div', {}) : h('button', {
         class: 'btn ' + (i === focus ? 'fill' : 'tonal'),
         onclick: (e: Event) => { e.stopPropagation(); done(ctx, r, i, save); },
       }, icon('check', 20), 'עלה'),
@@ -98,9 +102,17 @@ export function renderReading(ctx: Ctx, key: ReadingKey = currentKey(ctx.today))
   const banner = info.banner
     ? h('div', { class: 'banner' }, info.banner, info.banner.includes('ראש חודש') ? h('small', {}, 'הלל · יעלה ויבוא') : null)
     : null;
+  const today = dayInfo(ctx.today);
+  const aheadNote = ahead
+    ? h('div', { class: 'notice ahead' },
+      h('b', {}, 'היום אין קריאה. '), `ההכנה היא ל${info.weekday}, ${info.hebrew}.`,
+      h('button', { class: 'linkish', onclick: () => store.set(withReading(store.get(), newReading(ctx.today, currentKey(ctx.today).service, 3))) },
+        `פתח קריאה היום (${today.weekday})`))
+    : null;
 
   return h('div', { class: 'screen' }, bar,
     h('main', { class: 'body' + (r.slots.length === 4 ? ' compact' : '') },
+      aheadNote,
       banner,
       h('div', { class: 'ctrl' }, h('div', { class: 'segc', role: 'group', 'aria-label': 'מספר עליות' }, seg(3), seg(4)),
         toggle('אין כהן', r.noKohen, { noKohen: !r.noKohen }),

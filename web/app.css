@@ -200,3 +200,5 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .mono{font-variant-numeric:tabular-nums}
 .screen{display:flex;flex-direction:column;flex:1;min-height:0}
 .slot.empty.next{border-color:var(--accent)}
+.notice.ahead{color:var(--ink);background:var(--hiyuv-bg);display:grid;gap:4px}
+.linkish{background:none;border:0;padding:4px 0 0;color:var(--accent);font-weight:700;text-align:start;min-height:32px}

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { defaultPrayers, render, joinNames, sickTemplate } from '../core/prayers.ts';
+import { defaultPrayers, render, joinNames, sickTemplate, upgradePrayers } from '../core/prayers.ts';
 import type { SickEntry } from '../core/types.ts';
 
 const sick = (text: string, gender: 'm' | 'f'): SickEntry => ({ id: text, text, gender, addedOn: '2026-10-01', askedOn: null });
@@ -29,10 +29,21 @@ test('the sick prayer picks the male, female or plural wording', () => {
   assert.equal(sickTemplate(p, [sick('א', 'm'), sick('ב', 'f')]), p.sickPlural);
 });
 
-test('the default texts are marked as placeholders and carry their name slot', () => {
+test('the shipped texts are the Sfard wording (Torat Emet), weekday form, with no placeholder mark', () => {
   const p = defaultPrayers();
-  for (const [k, v] of Object.entries(p)) {
-    assert.ok(v.endsWith(' (נוסח זמני)'), k);
-    assert.ok(v.includes(k.startsWith('sick') ? '{names}' : '{name}'), k);
-  }
+  for (const t of Object.values(p)) assert.ok(!t.includes('נוסח זמני'), t);
+  assert.ok(p.oleh.includes('לִכְבוֹד הַמָּקוֹם וְלִכְבוֹד הַתּוֹרָה'));
+  assert.ok(!p.oleh.includes('הַשַּׁבָּת'));
+  assert.ok(p.sickM.includes('לְרַמַ"ח אֵבָרָיו'));
+  assert.ok(!p.sickM.includes('מִלִזְּעוֹק'));
+  assert.ok(p.yoledetBat.includes('{baby}'));
+  for (const k of ['oleh', 'sickM', 'sickF', 'barMitzvah', 'yoledetBen', 'yoledetBat', 'azkaraM', 'azkaraF'] as const) assert.ok(p[k].includes('{name}'), k);
+  assert.ok(p.sickPlural.includes('{names}'));
+});
+
+test('upgradePrayers replaces the old placeholders and keeps texts the gabbai edited', () => {
+  const old = { ...defaultPrayers(), oleh: 'מי שברך… {name}… (נוסח זמני)', sickM: 'הנוסח שלי {name}' };
+  const up = upgradePrayers(old);
+  assert.equal(up.oleh, defaultPrayers().oleh);
+  assert.equal(up.sickM, 'הנוסח שלי {name}');
 });

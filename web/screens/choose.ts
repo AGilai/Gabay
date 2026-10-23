@@ -5,7 +5,7 @@ import { ROLE_LABEL, groupOf, newReading, place } from '../../core/slots.ts';
 import type { Group, Person, Reading } from '../../core/types.ts';
 import { aliyotOf } from '../../core/queue.ts';
 import { daysBetween } from '../../core/dates.ts';
-import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, currentKey, findReading, keyText, personById, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
+import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, activeKey, findReading, keyText, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, snackbar } from '../ui.ts';
 
 let query = '';
@@ -32,9 +32,9 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   const key: ReadingKey = (() => {
     const k = args.find((a) => a.includes('.'));
     if (k) { const [date, service] = k.split('.'); return { date, service: service as Reading['service'] }; }
-    return currentKey(ctx.today);
+    return activeKey(state, ctx.today);
   })();
-  const isToday = key.date === ctx.today;
+  const isToday = sameKey(key, activeKey(state, ctx.today));
   const info = dayInfo(key.date);
   const r = findReading(state, key) ?? (info.reading ? newReading(key.date, key.service, info.defaultCount) : null);
   const slotArg = args[1] !== undefined && /^\d$/.test(args[1]) ? Number(args[1]) : null;

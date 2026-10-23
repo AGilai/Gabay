@@ -5,7 +5,7 @@ import { aliyotOf } from '../../core/queue.ts';
 import { ROLE_LABEL, groupOf, newReading, place } from '../../core/slots.ts';
 import { dayInfo } from '../../core/day.ts';
 import type { Group, Person, Reading, SlotRole, State } from '../../core/types.ts';
-import { GROUP_WORD, currentKey, findReading, keyText, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
+import { GROUP_WORD, activeKey, findReading, keyText, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, h, snackbar } from '../ui.ts';
 
 const REASONS = ['בר מצווה', 'חתן', 'אבי הבן', 'אבי הבת', 'הגומל', 'יארצייט'];
@@ -92,8 +92,8 @@ export function renderNewPerson(ctx: Ctx, args: string[]): HTMLElement {
   const group0: Group = (['K', 'L', 'Y'] as Group[]).includes(args[0] as Group) ? (args[0] as Group) : 'Y';
   const slot = args[1] && /^\d$/.test(args[1]) ? Number(args[1]) : null;
   const keyArg = args.find((a) => a.includes('.'));
-  const key: ReadingKey = keyArg ? { date: keyArg.split('.')[0], service: keyArg.split('.')[1] as Reading['service'] } : currentKey(ctx.today);
-  const backTo = key.date === ctx.today ? '#reading' : '#day/' + keyText(key);
+  const key: ReadingKey = keyArg ? { date: keyArg.split('.')[0], service: keyArg.split('.')[1] as Reading['service'] } : activeKey(ctx.store.get(), ctx.today);
+  const backTo = sameKey(key, activeKey(ctx.store.get(), ctx.today)) ? '#reading' : '#day/' + keyText(key);
   let group = group0, name = '', callLine = '', hint = '';
 
   const state0 = ctx.store.get();

@@ -1,5 +1,5 @@
 // A backup is the whole State in one JSON file, which the gabbai keeps outside the phone.
-import { defaultPrayers } from './prayers.ts';
+import { defaultPrayers, upgradePrayers } from './prayers.ts';
 import type { ISODate, State } from './types.ts';
 
 const BAD = 'קובץ הגיבוי לא תקין';
@@ -21,5 +21,10 @@ export function parseBackup(text: string): State {
     && Array.isArray(s.people) && Array.isArray(s.readings) && Array.isArray(s.sick)
     && typeof s.settings?.inactiveDays === 'number' && typeof s.settings?.prayers === 'object';
   if (!ok) throw new Error(BAD);
-  return s as State;
+  return upgradeState(s as State);
+}
+
+// Brings a saved state up to the current app version (today: the prayer texts).
+export function upgradeState(s: State): State {
+  return { ...s, settings: { ...s.settings, prayers: upgradePrayers(s.settings.prayers) } };
 }

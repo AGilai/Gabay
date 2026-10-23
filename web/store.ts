@@ -1,6 +1,6 @@
 // The one State object, kept in memory and saved as a single JSON record in IndexedDB
 // ('gabay' / 'kv' / 'state'). Demo mode keeps example data in memory and never saves.
-import { emptyState } from '../core/backup.ts';
+import { emptyState, upgradeState } from '../core/backup.ts';
 import type { ISODate, State } from '../core/types.ts';
 import { demoState } from './demo.ts';
 
@@ -38,7 +38,8 @@ export async function openStore(today: ISODate, demo: boolean): Promise<Store> {
     state = demo ? demoState(today) : emptyState(today);
   } else {
     db = await openDb();
-    state = (await tx<State | undefined>(db, 'readonly', (s) => s.get(KEY))) ?? emptyState(today);
+    const saved = await tx<State | undefined>(db, 'readonly', (s) => s.get(KEY));
+    state = saved ? upgradeState(saved) : emptyState(today);
   }
   let prev: State | null = null;
   const listeners = new Set<(label?: string) => void>();

@@ -14,6 +14,7 @@ const SIZE_KEY = 'gabay.prayerSize';
 let olehId: string | null = null;
 const sickOff = new Set<string>();
 let typed = '';
+let baby = '';
 let female = false;
 
 function readSize(): number {
@@ -26,13 +27,14 @@ function writeSize(n: number): void {
 
 function textOf(state: State, kind: PrayerKind, names: { name?: string; names?: string }): { template: string; vars: Record<string, string> } {
   const p = state.settings.prayers;
-  const vars = { name: names.name ?? '', names: names.names ?? '' };
+  const vars = { name: names.name ?? '', names: names.names ?? '', baby };
   if (kind === 'oleh') return { template: p.oleh, vars };
   if (kind === 'barMitzvah') return { template: p.barMitzvah, vars };
   if (kind === 'yoledet') return { template: female ? p.yoledetBat : p.yoledetBen, vars };
   if (kind === 'azkara') return { template: female ? p.azkaraF : p.azkaraM, vars };
   const chosen = state.sick.filter((s) => !sickOff.has(s.id));
-  return { template: sickTemplate(p, chosen), vars: { ...vars, names: joinNames(chosen.map((s) => s.text)) } };
+  const joined = joinNames(chosen.map((s) => s.text));
+  return { template: sickTemplate(p, chosen), vars: { ...vars, name: joined, names: joined } };
 }
 
 export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
@@ -73,6 +75,10 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
         picks.append(h('div', { class: 'seg', style: 'width:100%' },
           h('button', { class: female ? '' : 'on', onclick: () => { female = false; draw(); } }, a),
           h('button', { class: female ? 'on' : '', onclick: () => { female = true; draw(); } }, b)));
+        if (kind === 'yoledet' && female) {
+          picks.append(h('div', { class: 'field', style: 'width:100%' }, h('label', {}, 'שם הבת'),
+            h('input', { value: baby, placeholder: 'פלונית', oninput: (e: Event) => { baby = (e.target as HTMLInputElement).value.trim(); redraw(); } })));
+        }
       }
       names = { name: typed };
     }
@@ -86,9 +92,14 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
     return h('div', { class: 'field', style: 'width:100%' }, h('label', {}, kind === 'yoledet' ? 'שם היולדת' : 'שם'),
       h('input', { value: typed, placeholder: 'פלוני בן פלוני', oninput: (e: Event) => {
         typed = (e.target as HTMLInputElement).value.trim();
-        const { template, vars } = textOf(state, kind, { name: typed });
-        para.replaceChildren(...render(template, vars).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
+        redraw();
       } }));
+  }
+
+  // Redraw only the text, so the field being typed in keeps focus.
+  function redraw(): void {
+    const { template, vars } = textOf(state, kind, { name: typed });
+    para.replaceChildren(...render(template, vars).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
   }
 
   const resize = (d: number) => {
@@ -97,8 +108,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
     reader.style.setProperty('--prayer-size', size + 'px');
   };
   draw();
-  const temp = textOf(state, kind, {}).template.includes('(נוסח זמני)');
-  reader.append(picks, para, temp ? h('div', { class: 'note' }, 'נוסח לדוגמה בלבד. את נוסח בית הכנסת מזינים בהגדרות.') : null);
+  reader.append(picks, para, h('div', { class: 'note' }, 'נוסח ספרד (סידור תורת אמת). אפשר לשנות בהגדרות.'));
   return h('div', { class: 'screen' },
     appBar(TITLE[kind], sub, { back: 'history', end: [
       h('button', { class: 'icon', 'aria-label': 'הקטן', onclick: () => resize(-2) }, 'A−'),

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { dayInfo, yahrzeitThisWeek } from '../core/day.ts';
+import { dayInfo, yahrzeitThisWeek, nextReadingDate } from '../core/day.ts';
 
 test('an ordinary Thursday: 3 aliyot, parasha of the coming Shabbat', () => {
   const d = dayInfo('2026-10-22');
@@ -72,4 +72,12 @@ test('review: Rosh Chodesh on Shabbat reads only on its weekday, a fast moved by
   assert.equal(dayInfo('2025-12-21').defaultCount, 4);
   const av = dayInfo('2025-08-03');
   assert.deepEqual([av.reading, av.hasMincha], [true, true]);
+});
+
+test('nextReadingDate is today on a reading day, else the next reading day', () => {
+  assert.equal(nextReadingDate('2026-10-22'), '2026-10-22'); // Thursday
+  assert.equal(nextReadingDate('2026-10-23'), '2026-10-26'); // Friday → Monday
+  assert.equal(nextReadingDate('2026-10-24'), '2026-10-26'); // Shabbat → Monday
+  assert.equal(nextReadingDate('2026-11-08'), '2026-11-09'); // Sunday → Monday
+  assert.equal(nextReadingDate('2026-11-10'), '2026-11-10'); // Tuesday, 30 Cheshvan: Rosh Chodesh
 });

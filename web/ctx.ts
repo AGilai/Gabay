@@ -1,5 +1,5 @@
 // What every screen gets, and helpers for "the reading being worked on".
-import { dayInfo } from '../core/day.ts';
+import { dayInfo, nextReadingDate } from '../core/day.ts';
 import type { ISODate, Reading, State } from '../core/types.ts';
 import type { Store } from './store.ts';
 
@@ -15,6 +15,18 @@ export interface ReadingKey { date: ISODate; service: Reading['service'] }
 // On a fast day the afternoon reading is mincha.
 export function currentKey(today: ISODate, hour = new Date().getHours()): ReadingKey {
   return { date: today, service: dayInfo(today).hasMincha && hour >= 12 ? 'mincha' : 'shacharit' };
+}
+
+// The reading the main page works on: today's, or on a day with no reading (and none opened by hand)
+// the next reading day's, so the gabbai can prepare it.
+export function activeKey(state: State, today: ISODate): ReadingKey {
+  const now = currentKey(today);
+  if (dayInfo(today).reading || findReading(state, now)) return now;
+  return { date: nextReadingDate(today), service: 'shacharit' };
+}
+
+export function sameKey(a: ReadingKey, b: ReadingKey): boolean {
+  return a.date === b.date && a.service === b.service;
 }
 
 export function keyText(k: ReadingKey): string {
