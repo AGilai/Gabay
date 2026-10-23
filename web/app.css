@@ -234,3 +234,10 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .typein-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .row .icon.edit{color:var(--muted);margin-inline-start:-8px}
 .row .icon.edit:active{background:var(--surface2);color:var(--accent)}
+
+/* S1: the calling line is the main text; the known name is small underneath */
+.slot .who{min-width:0}
+.slot .callname{font-family:var(--f-display);font-size:23px;font-weight:700;line-height:29px}
+.slot .known{font-size:14px;color:var(--muted);line-height:18px;margin-top:2px}
+.compact .slot .callname{font-size:20px;line-height:25px}
+.compact .slot .known{font-size:13px;margin-top:0}

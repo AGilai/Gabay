@@ -117,8 +117,8 @@ From top to bottom:
 2. **Banner** on special days (Rosh Chodesh etc.).
 3. **Control row:** the **3 | 4** segmented switch, then toggle chips **אין כהן** and **אין לוי**.
 4. **Slots** (3 or 4 cards). A slot shows **only** the slot label (`כהן`, `לוי`, `שלישי`, `רביעי`,
-   `ישראל במקום כהן`…), the display name and the calling line exactly as the gabbai wrote it. No
-   hints. A slot can be:
+   `ישראל במקום כהן`…), the **calling line** exactly as the gabbai wrote it, as the large main text,
+   and the display name (the name he knows him by) small underneath (gabbai, 2026-10-23). No hints. A slot can be:
    - **Empty:** "+ בחר ___" and a one-tap suggestion "הבא בתור: דוד פרץ · 47 יום".
    - **Assigned:** name + calling line + the button "עלה ✓".
    - **Done:** green, with the time. Recorded in history at this moment.

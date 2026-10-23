@@ -94,18 +94,19 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
         }, h('span', {}, 'הבא בתור:'), h('b', {}, sug.name), h('span', {}, last ? daysBetween(last, key.date) + ' יום' : 'עוד לא עלה')) : null);
       return card;
     }
+    // The calling line, as read out, is the big text; the name he is known by is small underneath
+    // (never the hint: the screen may be seen by others).
+    const who = h('div', { class: 'who' }, h('div', { class: 'callname' }, p.callLine), h('div', { class: 'known' }, p.name));
     if (s.doneAt) {
       return h('div', { class: 'slot done', role: 'button', onclick: () => slotSheet(ctx, r, i, save) },
-        lab, h('div', { class: 'name' }, p.name),
-        h('div', { class: 'donemark' }, icon('check', 20), 'עלה ' + s.doneAt));
+        lab, who, h('div', { class: 'donemark' }, icon('check', 20), 'עלה ' + s.doneAt));
     }
     return h('div', { class: 'slot' + (i === focus ? ' next' : ''), role: 'button', onclick: () => slotSheet(ctx, r, i, save) },
-      lab, h('div', { class: 'name' }, p.name),
+      lab, who,
       ahead ? h('div', {}) : h('button', {
         class: 'btn ' + (i === focus ? 'fill' : 'tonal'),
         onclick: (e: Event) => { e.stopPropagation(); done(ctx, r, i, save); },
-      }, icon('check', 20), 'עלה'),
-      h('div', { class: 'call' }, p.callLine));
+      }, icon('check', 20), 'עלה'));
   });
 
   const seg = (n: 3 | 4) => h('button', { class: r.count === n ? 'on' : '', 'aria-pressed': String(r.count === n), onclick: () => change({ count: n }) }, String(n));
@@ -180,7 +181,7 @@ function slotSheet(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?: s
   const chooseHash = `#choose/${g}/${i}` + (r.date === ctx.today ? '' : '/' + keyText(r));
   const torah = torahFor(r)?.aliyot[i];
   const sh = sheet(h('div', {},
-    h('div', { class: 'hdr' }, h('b', {}, p.name), h('small', {}, ROLE_LABEL[s.role] + (s.doneAt ? ' · עלה ' + s.doneAt : ''))),
+    h('div', { class: 'hdr' }, h('b', {}, p.callLine), h('small', {}, [p.name, ROLE_LABEL[s.role], s.doneAt ? 'עלה ' + s.doneAt : ''].filter(Boolean).join(' · '))),
     s.doneAt
       ? item('undo', 'בטל סימון', () => save(undoDone(r, i)))
       : item('check', 'סמן שעלה', () => done(ctx, r, i, save)),
