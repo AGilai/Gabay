@@ -17,4 +17,5 @@ Content licences:
   via [Sefaria](https://www.sefaria.org); the aliyah split is from [Hebcal](https://www.hebcal.com) (`@hebcal/leyning`, BSD-2),
   adjusted to the shul's customs (see `scripts/torah-data.ts`). The data file is shared under CC-BY-SA 4.0.
 - Prayer texts: Siddur Sfard, Torat Emet edition (public domain), via Sefaria.
+- App icon: the logo of בית הכנסת נריה, פתח תקווה (from the shul's YouTube channel), used with the gabbai's consent.
 - Fonts: Assistant, Frank Ruhl Libre, Noto Serif Hebrew (SIL Open Font License).
