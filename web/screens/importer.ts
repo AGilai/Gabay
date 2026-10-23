@@ -1,4 +1,5 @@
 // S8: one-time import of the WhatsApp log. One question card at a time, then a summary.
+import { emptyState } from '../../core/backup.ts';
 import { readZipEntry } from '../../core/unzip.ts';
 import { applyDraft, buildDraft, parseChat, type Answer, type Draft, type Question } from '../../core/whatsapp.ts';
 import type { Group } from '../../core/types.ts';
@@ -106,11 +107,12 @@ export function renderImport(ctx: Ctx): HTMLElement {
           h('button', { class: 'btn tonal', onclick: () => { session = null; ctx.refresh(); } }, 'ביטול'))));
   }
 
-  const merges = s.answers.filter((a) => a === 'merge').length;
+  const answers = s.draft.questions.map((q, i) => s.answers[i] ?? (q.kind === 'same' ? 'separate' : q.kind === 'hint' ? 'keep' : 'Y'));
+  // Count what will really be saved: chained merges (a=b, b=c, a=c) collapse further than the answers suggest.
+  const preview = applyDraft(emptyState(ctx.today), s.draft, answers);
   const aliyot = s.draft.people.reduce((n, p) => n + p.dates.length, 0);
-  const people = s.draft.people.length - merges;
+  const people = preview.people.length;
   const doImport = () => {
-    const answers = s.draft.questions.map((q, i) => s.answers[i] ?? (q.kind === 'same' ? 'separate' : q.kind === 'hint' ? 'keep' : 'Y'));
     ctx.store.set(applyDraft(ctx.store.get(), s.draft, answers));
     session = null;
     snackbar(`יובאו ${people} אנשים`);
@@ -119,7 +121,7 @@ export function renderImport(ctx: Ctx): HTMLElement {
   return h('div', { class: 'screen' }, bar('סיכום'),
     h('main', { class: 'body', style: 'gap:16px;padding-top:12px' },
       h('div', { class: 'card' }, h('h2', {}, `ייבא ${people} אנשים, ${aliyot} עליות`),
-        h('p', { class: 'muted' }, `קבועים: ${s.draft.people.filter((p) => p.regular).length} (3 עליות ומעלה ב־12 חודשים).` +
+        h('p', { class: 'muted' }, `קבועים: ${preview.people.filter((p) => p.regular).length} (3 עליות ומעלה ב־12 חודשים).` +
           (s.skipped.length ? ` ${s.skipped.length} שורות דולגו.` : '')),
         h('button', { class: 'btn fill wide', onclick: doImport }, 'ייבא')),
       s.skipped.length ? h('details', { class: 'note' }, h('summary', {}, 'שורות שדולגו'), ...s.skipped.map((t) => h('div', {}, t))) : null,
