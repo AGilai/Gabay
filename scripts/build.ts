@@ -13,9 +13,12 @@ function files(dir: string): string[] {
     .filter((e) => e.isFile()).map((e) => relative(ROOT, join(e.parentPath, e.name)));
 }
 
-function toJs(code: string): string {
-  return stripTypeScriptTypes(code, { mode: 'strip' })
+// web/ files move up one level in dist/, so their imports of core/ lose one '../'.
+function toJs(code: string, fromWeb: boolean): string {
+  let js = stripTypeScriptTypes(code, { mode: 'strip' })
     .replace(/((?:from|import)\s*\(?\s*['"][^'"]+)\.ts(['"])/g, '$1.js$2');
+  if (fromWeb) js = js.replace(/((?:from|import)\s*\(?\s*['"])((?:\.\.\/)+)core\//g, (_, pre, ups) => pre + (ups.length === 3 ? './' : ups.slice(3)) + 'core/');
+  return js;
 }
 
 export async function build(outDir = 'dist'): Promise<void> {
@@ -25,7 +28,7 @@ export async function build(outDir = 'dist'): Promise<void> {
 
   for (const f of [...files('core'), ...files('web')]) {
     const target = f.startsWith('web/') ? f.slice(4) : f;
-    if (f.endsWith('.ts')) written.set(target.replace(/\.ts$/, '.js'), toJs(readFileSync(join(ROOT, f), 'utf8')));
+    if (f.endsWith('.ts')) written.set(target.replace(/\.ts$/, '.js'), toJs(readFileSync(join(ROOT, f), 'utf8'), f.startsWith('web/')));
     else written.set(target, readFileSync(join(ROOT, f)));
   }
   for (const f of files('vendor')) written.set(f, readFileSync(join(ROOT, f)));

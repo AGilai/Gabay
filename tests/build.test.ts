@@ -36,3 +36,15 @@ test('the service worker precaches the app, the core and the calendar', async ()
   for (const f of ['core/day.js', 'vendor/hebcal.min.js', 'index.html', 'main.js', 'manifest.webmanifest']) assert.ok(sw.includes(`"${f}"`), f);
   assert.ok(!sw.includes('__PRECACHE__'));
 });
+
+test('every relative import resolves to a file inside the build (the app is served from a subfolder)', async () => {
+  await built;
+  for (const f of jsFiles(out)) {
+    if (f.includes('vendor')) continue;
+    const code = readFileSync(f, 'utf8');
+    for (const m of code.matchAll(/(?:from|import)\s*\(?\s*['"](\.[^'"]+)['"]/g)) {
+      const target = join(f, '..', m[1]);
+      assert.ok(target.startsWith(out + '/') && existsSync(target), `${f.slice(out.length)} imports ${m[1]}`);
+    }
+  }
+});
