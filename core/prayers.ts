@@ -60,7 +60,7 @@ export function render(template: string, vars: Record<string, string>): Part[] {
   for (let m = /\{(\w+)\}/.exec(rest); m; m = /\{(\w+)\}/.exec(rest)) {
     if (m.index > 0) parts.push({ text: rest.slice(0, m.index), name: false });
     const isName = NAME_KEYS.has(m[1]);
-    parts.push({ text: vars[m[1]] || (m[1] === 'baby' ? 'פלונית' : isName ? PLACEHOLDER_NAME : ''), name: isName });
+    parts.push({ text: vars[m[1]] || (m[1] === 'baby' ? 'פלונית בת פלוני' : isName ? PLACEHOLDER_NAME : ''), name: isName });
     rest = rest.slice(m.index + m[0].length);
   }
   if (rest) parts.push({ text: rest, name: false });

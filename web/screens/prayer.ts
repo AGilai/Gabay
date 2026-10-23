@@ -90,7 +90,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
         }
         if (kind === 'yoledet' && female && naming) {
           picks.append(h('div', { class: 'field', style: 'width:100%' }, h('label', {}, 'שם הבת'),
-            h('input', { value: baby, placeholder: 'פלונית', oninput: (e: Event) => { baby = (e.target as HTMLInputElement).value.trim(); redraw(); } })));
+            h('input', { value: baby, placeholder: 'פלונית בת פלוני', oninput: (e: Event) => { baby = (e.target as HTMLInputElement).value.trim(); redraw(); } })));
         }
       }
       names = { name: typed };

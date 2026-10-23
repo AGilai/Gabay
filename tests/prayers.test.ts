@@ -62,8 +62,8 @@ test('upgradePrayers turns the husband clause of an earlier yoledet text into {d
   assert.equal(upgradePrayers({ ...defaultPrayers(), yoledetBat: earlier }).yoledetBat, 'הנוסח שלי {name}, בַּעֲבוּר {donor}, סוף');
 });
 
-test("an empty baby girl's name shows פלונית", () => {
-  assert.deepEqual(render('{baby}', { baby: '' }), [{ text: 'פלונית', name: true }]);
+test("an empty baby girl's name shows פלונית בת פלוני", () => {
+  assert.deepEqual(render('{baby}', { baby: '' }), [{ text: 'פלונית בת פלוני', name: true }]);
 });
 
 test('withoutNaming drops "and her name shall be called" from the yoledet-bat text, keeping the rest', () => {
