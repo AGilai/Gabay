@@ -11,3 +11,10 @@ who is called next, prayer texts with names filled in, and a one-time import of 
 - Develop: Node ≥ 22.18, no dependencies. `npm test`, `npm run build`, `npm run serve` (port 8090).
 
 Design: [docs/UX-DESIGN.md](docs/UX-DESIGN.md). License: GPL-2.0-or-later (uses @hebcal/core).
+
+Content licences:
+- `web/data/torah.json`: Torah text from *Miqra according to the Masorah* (מקרא על פי המסורה), CC-BY-SA 4.0,
+  via [Sefaria](https://www.sefaria.org); the aliyah split is from [Hebcal](https://www.hebcal.com) (`@hebcal/leyning`, BSD-2),
+  adjusted to the shul's customs (see `scripts/torah-data.ts`). The data file is shared under CC-BY-SA 4.0.
+- Prayer texts: Siddur Sfard, Torat Emet edition (public domain), via Sefaria.
+- Fonts: Assistant, Frank Ruhl Libre, Noto Serif Hebrew (SIL Open Font License).

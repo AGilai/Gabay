@@ -12,6 +12,7 @@ import { renderSick } from './screens/sick.ts';
 import { renderHistory } from './screens/history.ts';
 import { renderImport } from './screens/importer.ts';
 import { applyTheme, renderMore, renderSettings } from './screens/settings.ts';
+import { loadTorah, renderTorah } from './screens/torah.ts';
 
 const VERSION = '__VERSION__';
 const params = new URLSearchParams(location.search);
@@ -42,6 +43,9 @@ function render(): void {
       break;
     case 'sick':
       view = renderSick(ctx);
+      break;
+    case 'torah':
+      view = renderTorah(ctx, args);
       break;
     case 'history':
       view = renderHistory(ctx);
@@ -78,7 +82,7 @@ document.addEventListener('visibilitychange', keepAwake);
 // The screen stays on while the reading page is open (the gabbai holds the phone at the bimah).
 let wakeLock: { release(): Promise<void> } | null = null;
 async function keepAwake(): Promise<void> {
-  const want = document.visibilityState === 'visible' && (location.hash === '' || location.hash === '#reading');
+  const want = document.visibilityState === 'visible' && /^(#reading|#torah.*)?$/.test(location.hash);
   try {
     if (want && !wakeLock) {
       wakeLock = await (navigator as any).wakeLock?.request('screen') ?? null;
@@ -121,6 +125,7 @@ store.subscribe((label) => {
 });
 render();
 keepAwake();
+loadTorah().catch(() => {});
 registerWorker().catch((e) => console.warn('service worker', e));
 if (!demo) requestPersist();
 console.debug('gabay', VERSION, demo ? 'demo' : '');

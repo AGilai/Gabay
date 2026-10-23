@@ -321,7 +321,7 @@ Mockup: `design/mockups/phase2-seat-map.html` (frames P2-1 to P2-3).
 - The layout is stored as data (blocks, rows, columns, bimah) drawn from the chart. No layout editor
   in the app (YAGNI). If the hall changes, the data file is edited.
 
-## 11a. Torah text on the reading page (phase 1.1, draft)
+## 11a. Torah text on the reading page (phase 1.1, built 2026-10-23)
 
 Mockup: `design/mockups/torah-reading.html` (frames T1–T3).
 
@@ -362,12 +362,14 @@ the place the reader is at in the scroll.
 
 **Not in this step:** haftarot, Shabbat and Yom Tov readings, Megillat Esther, audio.
 
-**Questions for the gabbai:**
-1. Edition: *Miqra according to the Masorah* (recommended, matches Israeli tikkunim) or the Leningrad
-   Codex (public domain, small differences)?
-2. Yom HaAtzma'ut / Yom Yerushalayim: does the shul read from the Torah on those days?
-3. Chol HaMoed Sukkot: Hebcal's Israel schedule has the 4th oleh read both days' passages
-   (שני ימים). Is that the shul's custom?
+**The gabbai's answers (2026-10-23):**
+1. Edition: *Miqra according to the Masorah*.
+2. Yom HaAtzma'ut / Yom Yerushalayim: no special reading; on Mon/Thu the weekly parasha is read.
+3. Chol HaMoed Sukkot and Hoshana Rabba: all four olim read the day's three verses.
+4. Chanukah days 2–7: the third oleh repeats the day's nasi in full.
+
+Footnotes in the text about how **Sfard / Ashkenaz scrolls** are written (e.g. בשמות, בעור, פינחס with a
+small yod, the broken vav) are kept and shown small; Yemenite / Aleppo-only notes are left out.
 
 ## 12. Not in phase 1
 

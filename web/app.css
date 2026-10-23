@@ -202,3 +202,25 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .slot.empty.next{border-color:var(--accent)}
 .notice.ahead{color:var(--ink);background:var(--hiyuv-bg);display:grid;gap:4px}
 .linkish{background:none;border:0;padding:4px 0 0;color:var(--accent);font-weight:700;text-align:start;min-height:32px}
+
+/* S10: Torah text. Noto Serif Hebrew carries the ta'amim. */
+@font-face{font-family:"Noto Serif Hebrew";font-weight:500;font-display:swap;src:url(vendor/fonts/noto-serif-hebrew.woff2) format("woff2");unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
+.tabsA{height:48px;flex:none;display:flex;border-bottom:1px solid var(--line);padding:0 8px;gap:4px}
+.tabsA button{flex:1;border:0;background:none;display:flex;align-items:center;justify-content:center;gap:4px;font-weight:700;font-size:14px;color:var(--muted);position:relative;padding:0 4px;white-space:nowrap}
+.tabsA button.on{color:var(--ink)} .tabsA button.on::after{content:"";position:absolute;bottom:0;left:16%;right:16%;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}
+.tabsA button.dn{color:var(--done)}
+.modes{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 16px 4px;flex:none}
+.modes .segc button{width:auto;padding:0 14px;font-size:14px}
+.tread{position:relative;flex:1;min-height:0;overflow-y:auto;padding:0 18px 96px;--torah-size:24px}
+.ablock{border-radius:12px;margin:0 -10px;padding:0 10px}
+.ablock.cur{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.ahd{font-size:13px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;padding:14px 0 4px}
+.tt{font-family:"Noto Serif Hebrew",var(--f-display);font-weight:500;font-size:var(--torah-size);line-height:2.05;margin:0 0 8px}
+.tt sup{font-family:var(--f-ui);font-size:11px;color:var(--muted);margin-inline-end:3px;vertical-align:.6em}
+.tt .ktiv{font-family:var(--f-ui);font-size:.55em;color:var(--muted)}
+.tt .snote{font-family:var(--f-ui);font-size:.5em;color:var(--hiyuv);font-weight:600}
+.tt .brk{font-family:var(--f-ui);font-size:.5em;color:var(--muted);padding:0 .4em}
+.tt.bk{font-family:var(--f-display);font-weight:700;line-height:1.9;text-align:justify}
+.tt.bk .gap{display:inline-block;width:3em}
+.nextA{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));height:48px;border-radius:24px;border:0;background:var(--accent);color:var(--on-accent);font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.25);z-index:2}
+.credit{font-size:11px;color:var(--muted);padding:12px 0 0}

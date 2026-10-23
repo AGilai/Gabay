@@ -6,6 +6,7 @@ import { daysBetween } from '../../core/dates.ts';
 import { aliyotOf, shouldOfferRegular, suggest } from '../../core/queue.ts';
 import { GROUP_CLASS, GROUP_WORD, activeKey, currentKey, findReading, keyText, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, nowHHMM, sheet, snackbar } from '../ui.ts';
+import { torahFor } from './torah.ts';
 
 const SERVICE_WORD = { shacharit: 'שחרית', mincha: 'מנחה' };
 
@@ -34,7 +35,9 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
   const sub = [info.weekday, info.hebrew, info.parasha, key.service === 'mincha' ? SERVICE_WORD.mincha : null]
     .filter(Boolean).join(' · ');
   const bar = isToday
-    ? appBar(ahead ? 'הקריאה הבאה' : 'קריאת התורה', sub, { end: [h('a', { class: 'icon', href: '#history', 'aria-label': 'היסטוריה' }, icon('cal'))] })
+    ? appBar(ahead ? 'הקריאה הבאה' : 'קריאת התורה', sub, { end: [
+      h('a', { class: 'icon', href: `#torah/${r ? Math.max(focusIndex(r), 0) : 0}/${keyText(key)}`, 'aria-label': 'הטקסט בתורה' }, icon('open')),
+      h('a', { class: 'icon', href: '#history', 'aria-label': 'היסטוריה' }, icon('cal'))] })
     : appBar(key.date.split('-').reverse().join('.'), sub, { back: '#history' });
 
   if (!r) {
@@ -165,11 +168,13 @@ function slotSheet(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?: s
   const item = (ic: string, text: string, fn: () => void, warn = false) =>
     h('button', { class: 'item' + (warn ? ' warn' : ''), onclick: () => { sh.close(); fn(); } }, icon(ic), text);
   const chooseHash = `#choose/${g}/${i}` + (r.date === ctx.today ? '' : '/' + keyText(r));
+  const torah = torahFor(r)?.aliyot[i];
   const sh = sheet(h('div', {},
     h('div', { class: 'hdr' }, h('b', {}, p.name), h('small', {}, ROLE_LABEL[s.role] + (s.doneAt ? ' · עלה ' + s.doneAt : ''))),
     s.doneAt
       ? item('undo', 'בטל סימון', () => save(undoDone(r, i)))
       : item('check', 'סמן שעלה', () => done(ctx, r, i, save)),
+    item('open', 'הצג בתורה' + (torah ? ' · ' + torah.label : ''), () => ctx.go(`#torah/${i}/${keyText(r)}`)),
     auto ? null : item('swap', 'החלף', () => ctx.go(chooseHash)),
     auto ? null : item('clear', 'פנה מקום', () => save(clearSlot(r, i), `${p.name} הוצא מהקריאה`), true),
     h('div', { class: 'divider' }),
