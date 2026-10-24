@@ -14,6 +14,7 @@ import { renderHistory } from './screens/history.ts';
 import { renderImport } from './screens/importer.ts';
 import { applyTheme, renderMore, renderSettings } from './screens/settings.ts';
 import { loadTorah, renderTorah } from './screens/torah.ts';
+import { renderService } from './screens/service.ts';
 
 const VERSION = '__VERSION__';
 const params = new URLSearchParams(location.search);
@@ -51,6 +52,9 @@ function render(): void {
     case 'torah':
       view = renderTorah(ctx, args);
       break;
+    case 'service':
+      view = renderService(ctx, args);
+      break;
     case 'history':
       view = renderHistory(ctx);
       break;
@@ -84,10 +88,10 @@ window.addEventListener('hashchange', () => { nav().changed(); render(); });
 window.addEventListener('hashchange', keepAwake);
 document.addEventListener('visibilitychange', keepAwake);
 
-// The screen stays on while the reading page is open (the gabbai holds the phone at the bimah).
+// The screen stays on while the reading page, the Torah text or reading mode is open (the gabbai holds the phone at the bimah).
 let wakeLock: { release(): Promise<void> } | null = null;
 async function keepAwake(): Promise<void> {
-  const want = document.visibilityState === 'visible' && /^(#reading|#torah.*)?$/.test(location.hash);
+  const want = document.visibilityState === 'visible' && /^(#reading|#torah.*|#service.*)?$/.test(location.hash);
   try {
     if (want && !wakeLock) {
       wakeLock = await (navigator as any).wakeLock?.request('screen') ?? null;

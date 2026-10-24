@@ -17,6 +17,7 @@
   --f-display:"Frank Ruhl Libre","David","Times New Roman",serif;
   --f-ui:"Assistant","Segoe UI",Roboto,Arial,sans-serif;
   --prayer-size:24px;
+  --say:#f6f1e4; --say-edge:#c9a75a;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --screen:#11161e; --surface:#19202b; --surface2:#212a37;
@@ -24,14 +25,14 @@
   --accent:#8fb1f2; --on-accent:#0c1a33;
   --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
   --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f;
-  --hiyuv:#f2a06a; --hiyuv-bg:#3d2617; --scrim:rgba(0,0,0,.6); color-scheme:dark}}
+  --hiyuv:#f2a06a; --hiyuv-bg:#3d2617; --scrim:rgba(0,0,0,.6); --say:#262217; --say-edge:#8a7238; color-scheme:dark}}
 :root[data-theme="dark"]{
   --screen:#11161e; --surface:#19202b; --surface2:#212a37;
   --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
   --accent:#8fb1f2; --on-accent:#0c1a33;
   --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
   --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f;
-  --hiyuv:#f2a06a; --hiyuv-bg:#3d2617; --scrim:rgba(0,0,0,.6); color-scheme:dark}
+  --hiyuv:#f2a06a; --hiyuv-bg:#3d2617; --scrim:rgba(0,0,0,.6); --say:#262217; --say-edge:#8a7238; color-scheme:dark}
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%}
@@ -156,6 +157,8 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .pk .cb{width:18px;height:18px;border-radius:4px;background:var(--accent);display:grid;place-items:center;color:var(--on-accent);font-size:12px}
 .pk.off .cb{background:transparent;border:2px solid var(--muted)}
 .text{font-family:var(--f-display);font-size:var(--prayer-size);line-height:1.75;margin:0;text-align:start;white-space:pre-line}
+.texts{display:grid;gap:20px}
+.who-says{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:-14px}
 .text mark{background:var(--hiyuv-bg);color:var(--ink);border-radius:4px;padding:0 4px;font-weight:700}
 .note{font-size:12px;color:var(--muted)}
 
@@ -241,3 +244,38 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .slot .known{font-size:14px;color:var(--muted);line-height:18px;margin-top:2px}
 .compact .slot .callname{font-size:20px;line-height:25px}
 .compact .slot .known{font-size:13px;margin-top:0}
+
+/* S11 reading mode */
+.rbar{height:56px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px;border-bottom:1px solid var(--line)}
+.rbar .exit{height:40px;padding:0 14px 0 10px;border-radius:20px;border:0;background:var(--surface2);color:var(--ink);display:inline-flex;align-items:center;gap:6px;font:inherit;font-weight:700;font-size:15px;flex:none;margin-inline-start:6px}
+.rbar .t{flex:1;min-width:0;padding:0 8px}
+.rbar .t b{display:block;font-size:17px;line-height:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rbar .t small{display:block;font-size:12px;color:var(--muted);line-height:16px}
+.strip{height:44px;flex:none;display:flex;gap:6px;align-items:center;padding:0 12px;border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.strip button{height:30px;padding:0 10px;border-radius:15px;border:0;background:none;font:inherit;font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;flex:none}
+.strip button.dn{color:var(--done)}
+.strip button.on{background:var(--accent);color:var(--on-accent)}
+.strip button.add{margin-inline-start:auto;border:1px solid var(--line);color:var(--ink)}
+.strip button.add.on{border-color:var(--accent);color:var(--on-accent)}
+.svc{position:relative;flex:1;min-height:0;overflow-y:auto;padding:12px 18px 96px;display:flex;flex-direction:column;gap:14px}
+.sv{display:grid;gap:10px}
+.sv.cur{background:color-mix(in srgb,var(--accent) 9%,transparent);border-radius:14px;margin:0 -10px;padding:8px 10px}
+.say{background:var(--say);border-inline-start:4px solid var(--say-edge);border-radius:4px 12px 12px 4px;padding:10px 14px;display:grid;gap:6px}
+.say .who{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.03em}
+.say p{margin:0;font-family:var(--f-display);font-size:calc(var(--prayer-size) * .875);line-height:1.65}
+.say mark{background:var(--hiyuv-bg);color:var(--ink);border-radius:4px;padding:0 4px;font-weight:700}
+.say .btn{justify-self:start}
+.callrow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.svc .callname{font-family:var(--f-display);font-weight:700;font-size:calc(var(--prayer-size) * 1.25);line-height:1.25}
+.callname .auto{font-weight:500;color:var(--muted);text-decoration:underline dotted;text-underline-offset:6px}
+.swap{height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;gap:4px;font:inherit;font-size:14px;font-weight:700;flex:none}
+.sv .ahd{padding:2px 0 0}
+.sv .tt{margin:0}
+.sv.dn .tt,.sv.dn .say{opacity:.6}
+.doneline{display:flex;align-items:center;gap:6px;color:var(--done);font-weight:700;font-size:14px}
+.sv .sec{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em;border-top:1px solid var(--line);padding-top:12px}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
+.nextA{display:flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-weight:700;font-size:16px}
+.nextA.tonal{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.ctrl .go{height:40px;padding:0 14px;border-radius:20px;background:var(--accent);color:var(--on-accent);display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:700;white-space:nowrap;margin-inline-start:auto;text-decoration:none}
+.texts .text + .text{border-top:1px solid var(--line);padding-top:16px}

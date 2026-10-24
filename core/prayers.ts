@@ -71,9 +71,11 @@ export function render(template: string, vars: Record<string, string>, blanks: R
   return parts;
 }
 
-export function sickTemplate(p: Prayers, chosen: SickEntry[]): string {
-  if (chosen.length === 1) return chosen[0].gender === 'f' ? p.sickF : p.sickM;
-  return p.sickPlural;
+// The sick: one blessing per person (a man's or a woman's wording), or all together in the plural.
+export function sickBlessings(p: Prayers, chosen: SickEntry[], together: boolean): { template: string; name: string }[] {
+  if (!chosen.length) return [{ template: p.sickM, name: '' }];
+  if (together && chosen.length > 1) return [{ template: p.sickPlural, name: joinNames(chosen.map((s) => s.text)) }];
+  return chosen.map((s) => ({ template: s.gender === 'f' ? p.sickF : p.sickM, name: s.text }));
 }
 
 // The baby girl is not named this time (the grandfather is called up, or the parents postpone it).

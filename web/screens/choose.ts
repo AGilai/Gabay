@@ -42,7 +42,8 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   const fallbackGroup: Group = nextEmpty ? groupOf(nextEmpty.role) : 'Y';
   const group: Group = (['K', 'L', 'Y'] as Group[]).includes(args[0] as Group) ? (args[0] as Group) : fallbackGroup;
   const slot = slotArg !== null && r?.slots[slotArg] && groupOf(r.slots[slotArg].role) === group ? slotArg : null;
-  const backTo = isToday ? '#reading' : '#day/' + keyText(key);
+  // From reading mode (…/svc), a pick goes back there.
+  const backTo = args.includes('svc') ? '#service/' + keyText(key) : isToday ? '#reading' : '#day/' + keyText(key);
   const aliyot = aliyotOf(state);
 
   const pick = (p: Person) => {
@@ -118,7 +119,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   fillList();
 
   const counts = (g: Group) => { const q = buildQueue(state, g, key.date, r); return q.line.length + q.hiyuv.length; };
-  const tail = (slot !== null ? '/' + slot : '') + (isToday ? '' : '/' + keyText(key));
+  const tail = (slot !== null ? '/' + slot : '') + (isToday && !args.includes('svc') ? '' : '/' + keyText(key)) + (args.includes('svc') ? '/svc' : '');
   const tabs = h('nav', { class: 'tabs' }, ...(['K', 'L', 'Y'] as Group[]).map((g) =>
     h('a', { href: `#choose/${g}` + (g === group ? tail : isToday ? '' : '//' + keyText(key)), class: g + (g === group ? ' on' : '') },
       `${GROUP_PLURAL[g]} ${counts(g)}`)));

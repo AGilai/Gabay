@@ -22,7 +22,8 @@ on his Android phone. Spec: `docs/UX-DESIGN.md`. Plan: `docs/plans/2026-10-22-ph
 - `core/` is pure logic: no DOM, no storage. The UI (`web/`) only calls it.
 - TypeScript that type stripping accepts: no enum / namespace / parameter properties. Imports end in `.ts`.
 - Days are local `YYYY-MM-DD` strings (`core/dates.ts`). Never use `toISOString()` for a day.
-- Hebrew, RTL. The main page never shows a person's `hint`. The calling line is shown exactly as written.
+- Hebrew, RTL. The main page never shows a person's `hint`. The calling line is shown exactly as written
+  (reading mode, S11, may add הכהן / הלוי / the aliyah word after it, in grey; the saved line never changes).
 - `web/` screens get a `Ctx` (`web/ctx.ts`). The hash router is in `web/main.ts`. Readings are keyed by date + service.
 - Before any push, scan for real names (the import's keys and hints) in tracked files. Only invented names in git.
 - Real congregant data (`*.zip`, `Screenshot*.png`, `private/`) is git-ignored. Never commit it, and never

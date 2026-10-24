@@ -1,0 +1,240 @@
+<title>Reading Mode Screens</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&family=Noto+Serif+Hebrew:wght@500&display=swap">
+<style>
+/* A board of Android phone frames drawn at 1px = 1dp. Each frame is the same long page (reading mode), scrolled to a different place. */
+:root{
+  --board:#e7ebf1; --screen:#fbfcfe; --surface:#ffffff; --surface2:#eef2f8;
+  --ink:#141c27; --muted:#5a6678; --line:#d5dce6;
+  --accent:#1d4c9f; --on-accent:#ffffff;
+  --kohen:#9a6d07; --kohen-bg:#f7edd4; --levi:#0d7369; --levi-bg:#d7f0ec; --israel:#6141a8; --israel-bg:#ebe3f8;
+  --done:#2a7a40; --done-bg:#dcf0e1; --hiyuv:#b2541a; --hiyuv-bg:#fbe6d8;
+  --say:#f6f1e4; --say-edge:#c9a75a;
+  --f-display:"Frank Ruhl Libre","David","Times New Roman",serif;
+  --f-ui:"Assistant","Segoe UI",Roboto,Arial,sans-serif;
+  --f-torah:"Noto Serif Hebrew","Frank Ruhl Libre",serif;
+  --pw:412px; --ph:915px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37; --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33; --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f; --hiyuv:#f2a06a; --hiyuv-bg:#3d2617;
+  --say:#262217; --say-edge:#8a7238; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37; --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33; --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f; --hiyuv:#f2a06a; --hiyuv-bg:#3d2617;
+  --say:#262217; --say-edge:#8a7238; color-scheme:dark}
+:root[data-w="360"]{--pw:360px;--ph:800px}
+
+*{box-sizing:border-box}
+body{background:var(--board);color:var(--ink);font-family:var(--f-ui);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.intro{max-width:72ch;display:grid;gap:8px;margin-bottom:20px}
+.intro h1{font-family:var(--f-display);font-size:28px;margin:0;text-wrap:balance}
+.intro p{margin:0;color:var(--muted);line-height:1.5;font-size:15px}
+.sizes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:14px}
+.sizes button{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:6px 12px;cursor:pointer}
+.sizes button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.board{display:flex;flex-wrap:wrap;gap:32px 28px;align-items:flex-start}
+figure{margin:0;display:grid;gap:10px;max-width:100%}
+.scroll{overflow-x:auto;max-width:100%;padding-bottom:4px}
+figcaption{max-width:var(--pw);font-size:14px;line-height:1.45;color:var(--muted)}
+figcaption b{color:var(--ink);display:block;font-size:15px}
+
+.phone{width:var(--pw);height:var(--ph);background:var(--screen);border-radius:28px;outline:8px solid #1b1f26;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;direction:rtl;margin:8px;font-size:16px}
+.status{height:24px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-size:12px;font-weight:600;direction:ltr}
+.gesture{height:24px;flex:none;display:grid;place-items:center;position:absolute;bottom:0;left:0;right:0}
+.gesture::after{content:"";width:108px;height:4px;border-radius:2px;background:var(--ink);opacity:.5}
+.icon{width:48px;height:48px;display:grid;place-items:center;border-radius:24px;flex:none;font-weight:700}
+.icon svg{width:24px;height:24px}
+
+/* reading-mode bar: exit, title, text size; then the progress strip that also jumps */
+.rbar{height:56px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px;border-bottom:1px solid var(--line)}
+.exit{height:40px;padding:0 14px 0 10px;border-radius:20px;background:var(--surface2);display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:15px;flex:none;margin-inline-start:6px}
+.exit svg{width:20px;height:20px}
+.rbar .t{flex:1;min-width:0;padding:0 8px}
+.rbar .t b{display:block;font-size:17px;line-height:22px}
+.rbar .t small{display:block;font-size:12px;color:var(--muted);line-height:16px}
+.strip{height:44px;flex:none;display:flex;gap:6px;align-items:center;padding:0 12px;border-bottom:1px solid var(--line);overflow:hidden}
+.st{height:30px;padding:0 10px;border-radius:15px;display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;flex:none}
+.st.dn{color:var(--done)} .st.on{background:var(--accent);color:var(--on-accent)}
+.st.add{margin-inline-start:auto;border:1px solid var(--line);color:var(--ink)}
+
+.page{flex:1;min-height:0;overflow:hidden;padding:0 18px 90px;display:flex;flex-direction:column;gap:10px;position:relative}
+.top{padding-top:12px}
+
+/* the gabbai's own words: full text, warm paper, edge mark */
+.say{background:var(--say);border-inline-start:4px solid var(--say-edge);border-radius:4px 12px 12px 4px;padding:10px 14px;display:grid;gap:6px}
+.who{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.03em}
+.say p{margin:0;font-family:var(--f-display);font-size:21px;line-height:1.65}
+.callname{font-family:var(--f-display);font-weight:700;font-size:30px;line-height:1.25;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 8px}
+.auto{font-weight:500;color:var(--muted);border-bottom:2px dotted var(--muted)}
+.callrow{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.swap{height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--line);background:var(--surface);display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:700;flex:none;color:var(--ink)}
+.swap svg{width:18px;height:18px}
+
+/* other people's parts: one folded line */
+.fold{min-height:44px;display:flex;align-items:center;gap:10px;padding:6px 12px;border-radius:10px;background:var(--surface2);font-size:15px}
+.fold .who{flex:none;width:44px}
+.fold span{flex:1;min-width:0;font-family:var(--f-display);font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fold i{font-style:normal;color:var(--muted);flex:none}
+
+.ahd{font-size:13px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;padding-top:2px}
+.tag{height:22px;padding:0 9px;border-radius:11px;display:inline-flex;align-items:center;font-size:12px;font-weight:700}
+.k{color:var(--kohen);background:var(--kohen-bg)} .l{color:var(--levi);background:var(--levi-bg)} .y{color:var(--israel);background:var(--israel-bg)}
+.tt{font-family:var(--f-torah);font-size:22px;line-height:2;margin:0}
+.tt sup{font-family:var(--f-ui);font-size:11px;color:var(--muted);margin-inline-end:3px;vertical-align:6px}
+.cur{background:color-mix(in srgb,var(--accent) 9%,transparent);border-radius:14px;margin:0 -10px;padding:8px 10px;display:grid;gap:10px}
+.doneline{display:flex;align-items:center;gap:6px;color:var(--done);font-weight:700;font-size:14px;padding:2px 0}
+.doneline svg{width:18px;height:18px}
+.sec{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em;border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+.dim{opacity:.55}
+
+.fab{position:absolute;left:16px;right:16px;bottom:36px;height:52px;border-radius:26px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:16px;box-shadow:0 3px 10px rgba(0,0,0,.25)}
+.fab svg{width:22px;height:22px}
+.fab.tonal{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+
+/* additions at the bottom */
+.addcard{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+.addhead{min-height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;font-weight:700;font-size:16px}
+.addhead small{color:var(--muted);font-weight:600;font-size:13px}
+.addhead i{font-style:normal;margin-inline-start:auto;color:var(--muted)}
+.addbody{padding:0 14px 12px;display:grid;gap:10px}
+.addbody p{margin:0;font-family:var(--f-display);font-size:20px;line-height:1.65}
+mark{background:var(--hiyuv-bg);color:var(--ink);border-radius:4px;padding:0 4px;font-weight:700}
+.picks{display:flex;gap:6px;flex-wrap:wrap}
+.pk{height:30px;padding:0 10px;border-radius:8px;background:var(--surface2);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+.pk.off{opacity:.55}
+.pk.off::before{content:"";background:transparent;border:2px solid var(--muted)}
+.pk::before{content:"✓";width:18px;height:18px;border-radius:4px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font-size:12px}
+.offnote{font-size:13px;color:var(--muted);padding:2px 4px}
+
+/* main page bits (M0) */
+.appbar{height:64px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px}
+.appbar .t{flex:1;padding:0 12px} .appbar h2{margin:0;font-size:22px;font-weight:600;line-height:28px}
+.appbar small{display:block;font-size:13px;color:var(--muted)}
+.body{flex:1;min-height:0;overflow:hidden;padding:0 16px;display:flex;flex-direction:column;gap:8px}
+.slot{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 14px;display:grid;gap:2px}
+.slot .lab{display:flex;align-items:center;gap:8px}
+.slot .cl{font-family:var(--f-display);font-size:24px;font-weight:700;line-height:30px}
+.slot .kn{font-size:14px;color:var(--muted)}
+.nav{height:80px;flex:none;background:var(--surface2);display:flex;justify-content:space-around;padding-top:14px;font-size:12px;font-weight:600;color:var(--muted);margin-top:auto}
+.nav span.on{color:var(--ink)}
+.ctrl{display:flex;gap:8px;align-items:center}
+.segc{height:40px;display:flex;border:1px solid var(--muted);border-radius:20px;overflow:hidden;flex:none}
+.segc span{width:48px;display:grid;place-items:center;font-weight:700;border-left:1px solid var(--muted)}
+.segc span:last-child{border-left:0} .segc span.on{background:var(--accent);color:var(--on-accent)}
+.tg{height:40px;padding:0 12px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;font-size:14px;font-weight:700;background:var(--surface);white-space:nowrap}
+.go{height:40px;padding:0 14px;border-radius:20px;background:var(--accent);color:var(--on-accent);display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:700;white-space:nowrap;margin-inline-start:auto}
+.go svg{width:18px;height:18px}
+.vref{margin-inline-start:auto;font-size:13px;font-weight:700;color:var(--accent)}
+.sechead{font-size:13px;font-weight:700;color:var(--muted);padding-top:6px}
+.chips{display:flex;gap:8px;overflow:hidden}
+.chips.wrap{flex-wrap:wrap;overflow:visible}
+.chip.dot::before{content:"";width:6px;height:6px;border-radius:3px;background:var(--hiyuv);margin-inline-end:6px}
+.chip{height:40px;padding:0 12px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;font-size:14px;font-weight:600;white-space:nowrap;flex:none;background:var(--surface)}
+</style>
+<header class="intro">
+  <h1>Gabbai app · reading mode (draft)</h1>
+  <p>One page for the call-ups only: from "ויעזור… כהן קרב, יעמוד" to "יעמדו המגביה והגולל". It has the gabbai's words in full (warm boxes) and the Torah text of each aliyah. Nothing for the ציבור or the ש״ץ. The oleh's blessings (printed at the bimah), Mi Sheberach and the other rare texts are chips in "תוספות" at the end, each opening its own screen, so the page reads call, reading, call, reading. Real text: Monday of וירא, 26.10.2026 (Miqra according to the Masorah, CC-BY-SA). Names are invented.</p>
+  <div class="sizes" role="group" aria-label="Screen width"><span>Width:</span>
+    <button data-w="360" aria-pressed="false">360×800</button>
+    <button data-w="412" aria-pressed="true">412×915</button></div>
+</header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path fill="currentColor" d="m12 4-1.4 1.4 5.6 5.6H4v2h12.2l-5.6 5.6L12 20l8-8-8-8z"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path fill="currentColor" d="M7 7h11l-3.5-3.5L16 2l6 6-6 6-1.5-1.5L18 9H7V7zm10 10H6l3.5 3.5L8 22l-6-6 6-6 1.5 1.5L6 15h11v2z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7L8 5z"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path fill="currentColor" d="M12 4l-8 8 1.4 1.4 5.6-5.6V20h2V7.8l5.6 5.6L20 12l-8-8z"/></symbol>
+</svg>
+<main class="board">
+
+<!-- M0 -->
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:28</span><span>▾ ▴ 82%</span></div>
+<div class="appbar"><div class="t"><h2>קריאת התורה</h2><small>יום שני · ט״ו בחשון · וירא</small></div><span class="icon">📖</span><span class="icon">📅</span></div>
+<div class="body">
+<div class="ctrl"><div class="segc"><span class="on">3</span><span>4</span></div><span class="tg">אין כהן</span><span class="tg">אין לוי</span><span class="go"><svg><use href="#i-play"/></svg>התחל קריאה</span></div>
+<div class="slot"><div class="lab"><span class="tag k">כהן</span><span class="vref">📖 בראשית י״ח א–ה</span></div><div class="cl">גמליאל בן נריה הכהן</div><div class="kn">אבי כהן</div></div>
+<div class="slot"><div class="lab"><span class="tag l">לוי</span><span class="vref">📖 בראשית י״ח ו–ח</span></div><div class="cl">משה בן עמרם</div><div class="kn">מוישי לוינסון</div></div>
+<div class="slot"><div class="lab"><span class="tag y">שלישי</span><span class="vref">📖 בראשית י״ח ט–יד</span></div><div class="cl">דוד בן ישי</div><div class="kn">דודי</div></div>
+<div class="sechead">תפילות</div>
+<div class="chips"><span class="chip">מי שברך לעולה</span><span class="chip">לחולים (3)</span><span class="chip">בר מצווה</span><span class="chip">יולדת</span></div>
+</div>
+<div class="nav"><span class="on">קריאה</span><span>בחירה</span><span>חולים</span><span>עוד</span></div>
+<div class="gesture"></div></div></div>
+<figcaption><b>M0 · The way in</b>Today's main page, with one change: "▶ התחל קריאה" goes in the row of 3|4 · אין כהן · אין לוי, on the other side, at the same height. The Levi's line here was written without "הלוי". The main page shows it as written; reading mode adds the word (see M2).</figcaption></figure>
+
+<!-- M1 -->
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:30</span><span>▾ ▴ 82%</span></div>
+<div class="rbar"><span class="exit"><svg><use href="#i-back"/></svg>ראשי</span><div class="t"><b>קריאה · וירא</b><small>בראשית י״ח א–יד</small></div><span class="icon">A−</span><span class="icon">A+</span></div>
+<div class="strip"><span class="st on">כהן</span><span class="st">לוי</span><span class="st">שלישי</span><span class="st">סיום</span><span class="st add">תוספות ↓</span></div>
+<div class="page top">
+<div class="say"><div class="who">גבאי</div>
+<p>וְיַעֲזֹר וְיָגֵן וְיוֹשִׁיעַ לְכֹל הַחוֹסִים בּוֹ, וְנֹאמַר אָמֵן. הַכֹּל הָבוּ גֹדֶל לֵאלֹהֵינוּ וּתְנוּ כָבוֹד לַתּוֹרָה. כֹּהֵן קְרָב, יַעֲמֹד</p>
+<div class="callrow"><div class="callname">גמליאל בן נריה הכהן</div><span class="swap"><svg><use href="#i-swap"/></svg>החלף</span></div>
+<p>בָּרוּךְ שֶׁנָּתַן תּוֹרָה לְעַמּוֹ יִשְׂרָאֵל בִּקְדֻשָּׁתוֹ.</p></div>
+<div class="ahd"><span class="tag k">כהן</span> בראשית י״ח א–ה</div>
+<p class="tt"><sup>א</sup>וַיֵּרָ֤א אֵלָיו֙ יְהֹוָ֔ה בְּאֵלֹנֵ֖י מַמְרֵ֑א וְה֛וּא יֹשֵׁ֥ב פֶּֽתַח־הָאֹ֖הֶל כְּחֹ֥ם הַיּֽוֹם׃ <sup>ב</sup>וַיִּשָּׂ֤א עֵינָיו֙ וַיַּ֔רְא וְהִנֵּה֙ שְׁלֹשָׁ֣ה אֲנָשִׁ֔ים נִצָּבִ֖ים עָלָ֑יו וַיַּ֗רְא וַיָּ֤רׇץ לִקְרָאתָם֙ מִפֶּ֣תַח הָאֹ֔הֶל וַיִּשְׁתַּ֖חוּ אָֽרְצָה׃ <sup>ג</sup>וַיֹּאמַ֑ר אֲדֹנָ֗י אִם־נָ֨א מָצָ֤אתִי חֵן֙ בְּעֵינֶ֔יךָ אַל־נָ֥א תַעֲבֹ֖ר מֵעַ֥ל עַבְדֶּֽךָ׃ <sup>ד</sup>יֻקַּֽח־נָ֣א מְעַט־מַ֔יִם וְרַחֲצ֖וּ רַגְלֵיכֶ֑ם וְהִֽשָּׁעֲנ֖וּ תַּ֥חַת הָעֵֽץ׃ <sup>ה</sup>וְאֶקְחָ֨ה פַת־לֶ֜חֶם וְסַעֲד֤וּ לִבְּכֶם֙ אַחַ֣ר תַּעֲבֹ֔רוּ</p>
+</div>
+<div class="fab"><svg><use href="#i-check"/></svg>עלה · הכהן</div>
+<div class="gesture"></div></div></div>
+<figcaption><b>M1 · The top: the first call</b>Reading mode opens on "ויעזור… כהן קרב, יעמוד" in full, with the Kohen's calling line large after it, then straight into the Kohen's text. The whole ceremony is one scroll: גבאי, קריאה, גבאי, קריאה… You only need to scroll; the strip (כהן · לוי · שלישי · סיום · תוספות) only jumps within the same page. "החלף" on the call opens the choosing page for this slot and comes back here. "ראשי" goes to the main page, and the app keeps your place. The screen stays on.</figcaption></figure>
+
+<!-- M2 -->
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:34</span><span>▾ ▴ 81%</span></div>
+<div class="rbar"><span class="exit"><svg><use href="#i-back"/></svg>ראשי</span><div class="t"><b>קריאה · וירא</b><small>בראשית י״ח א–יד</small></div><span class="icon">A−</span><span class="icon">A+</span></div>
+<div class="strip"><span class="st dn">✓ כהן</span><span class="st on">לוי</span><span class="st">שלישי</span><span class="st">סיום</span><span class="st add">תוספות ↓</span></div>
+<div class="page top">
+<p class="tt dim"><sup>ה</sup>וְאֶקְחָ֨ה פַת־לֶ֜חֶם וְסַעֲד֤וּ לִבְּכֶם֙ אַחַ֣ר תַּעֲבֹ֔רוּ כִּֽי־עַל־כֵּ֥ן עֲבַרְתֶּ֖ם עַֽל־עַבְדְּכֶ֑ם וַיֹּ֣אמְר֔וּ כֵּ֥ן תַּעֲשֶׂ֖ה כַּאֲשֶׁ֥ר דִּבַּֽרְתָּ׃</p>
+<div class="doneline"><svg><use href="#i-check"/></svg>גמליאל בן נריה הכהן עלה · 7:31</div>
+<div class="cur">
+<div class="say"><div class="who">גבאי</div>
+<p>יַעֲמֹד</p>
+<div class="callrow"><div class="callname">משה בן עמרם <span class="auto">הלוי</span></div><span class="swap"><svg><use href="#i-swap"/></svg>החלף</span></div></div>
+<div class="ahd"><span class="tag l">לוי</span> בראשית י״ח ו–ח</div>
+<p class="tt"><sup>ו</sup>וַיְמַהֵ֧ר אַבְרָהָ֛ם הָאֹ֖הֱלָה אֶל־שָׂרָ֑ה וַיֹּ֗אמֶר מַהֲרִ֞י שְׁלֹ֤שׁ סְאִים֙ קֶ֣מַח סֹ֔לֶת ל֖וּשִׁי וַעֲשִׂ֥י עֻגֽוֹת׃ <sup>ז</sup>וְאֶל־הַבָּקָ֖ר רָ֣ץ אַבְרָהָ֑ם וַיִּקַּ֨ח בֶּן־בָּקָ֜ר רַ֤ךְ וָטוֹב֙ וַיִּתֵּ֣ן אֶל־הַנַּ֔עַר וַיְמַהֵ֖ר לַעֲשׂ֥וֹת אֹתֽוֹ׃ <sup>ח</sup>וַיִּקַּ֨ח חֶמְאָ֜ה וְחָלָ֗ב וּבֶן־הַבָּקָר֙ אֲשֶׁ֣ר עָשָׂ֔ה וַיִּתֵּ֖ן לִפְנֵיהֶ֑ם וְהֽוּא־עֹמֵ֧ד עֲלֵיהֶ֛ם תַּ֥חַת הָעֵ֖ץ וַיֹּאכֵֽלוּ׃</p>
+</div>
+</div>
+<div class="fab"><svg><use href="#i-check"/></svg>עלה · הלוי ← לשלישי</div>
+<div class="gesture"></div></div></div>
+<figcaption><b>M2 · In the middle: done, call, current</b>"עלה ✓" marks the Kohen (time saved, as on the main page) and scrolls to the next call. The current aliyah is tinted. <b style="display:inline">Automatic הלוי:</b> this Levi's line was written as "משה בן עמרם", so reading mode adds "הלוי" in grey with a dotted line. A Kohen without "הכהן" gets it the same way. The saved line is not changed.</figcaption></figure>
+
+<!-- M3 -->
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:38</span><span>▾ ▴ 80%</span></div>
+<div class="rbar"><span class="exit"><svg><use href="#i-back"/></svg>ראשי</span><div class="t"><b>קריאה · וירא</b><small>בראשית י״ח א–יד</small></div><span class="icon">A−</span><span class="icon">A+</span></div>
+<div class="strip"><span class="st dn">✓ כהן</span><span class="st dn">✓ לוי</span><span class="st dn">✓ שלישי</span><span class="st on">סיום</span><span class="st add">תוספות ↓</span></div>
+<div class="page top">
+<div class="say dim"><div class="who">גבאי</div><p>יַעֲמֹד</p><div class="callname">דוד בן ישי <span class="auto">שלישי</span></div></div>
+<p class="tt dim" style="max-height:132px;overflow:hidden"><sup>יד</sup>הֲיִפָּלֵ֥א מֵיְהֹוָ֖ה דָּבָ֑ר לַמּוֹעֵ֞ד אָשׁ֥וּב אֵלֶ֛יךָ כָּעֵ֥ת חַיָּ֖ה וּלְשָׂרָ֥ה בֵֽן׃</p>
+<div class="doneline"><svg><use href="#i-check"/></svg>דוד בן ישי עלה · 7:37</div>
+<div class="sec">סיום</div>
+<div class="cur"><div class="say"><div class="who">גבאי</div>
+<div class="callname">יַעַמְדוּ הַמַּגְבִּיהַּ וְהַגּוֹלֵל</div></div></div>
+<div class="sec">תוספות</div>
+<div class="chips wrap"><span class="chip">מי שברך לעולה</span><span class="chip dot">לחולים (3)</span><span class="chip">יולדת</span><span class="chip">בר מצווה</span><span class="chip dot">אזכרה (1)</span><span class="chip">הגומל</span><span class="chip">ברכות התורה</span></div>
+</div>
+<div class="fab tonal">סיום הקריאה · חזרה לראשי</div>
+<div class="gesture"></div></div></div>
+<figcaption><b>M3 · The end, and the additions</b>The third call adds "שלישי" in the same grey (a fourth oleh gets "רביעי"). After the last aliyah: "יעמדו המגביה והגולל", large, with no picking of people. Under it is one row of chips, the same chips as the main page plus הגומל and the oleh's blessings. "תוספות ↓" on the strip jumps here from anywhere in the page. The button at the bottom goes back to the main page.</figcaption></figure>
+
+<!-- M4 -->
+<figure><div class="scroll"><div class="phone"><div class="status"><span>7:35</span><span>▾ ▴ 81%</span></div>
+<div class="rbar"><span class="exit"><svg><use href="#i-back"/></svg>לקריאה</span><div class="t"><b>מי שברך לחולים</b><small>3 ברשימה · נבחרו 2</small></div><span class="icon">A−</span><span class="icon">A+</span></div>
+<div class="page top">
+<div class="picks"><span class="pk">רפאל בן שרה</span><span class="pk">חנה בת רבקה</span><span class="pk off">יעקב בן לאה</span></div>
+<div class="addbody" style="padding:0"><p>מִי שֶׁבֵּרַךְ אֲבוֹתֵינוּ אַבְרָהָם יִצְחָק וְיַעֲקֹב משֶׁה וְאַהֲרֹן דָּוִד וּשְׁלֹמֹה הוּא יְבָרֵךְ אֶת הַחוֹלִים <mark>רְפָאֵל בֶּן שָׂרָה</mark> וְ<mark>חַנָּה בַּת רִבְקָה</mark> בַּעֲבוּר שֶׁכָּל הַקָּהָל מִתְפַּלְּלִים בַּעֲבוּרָם, בִּשְׂכַר זֶה הַקָּדוֹשׁ בָּרוּךְ הוּא יְמַלֵּא רַחֲמִים עֲלֵיהֶם לְהַחֲלִימָם וּלְרַפְּאֹתָם וּלְהַחֲזִיקָם וּלְהַחֲיוֹתָם, וְיִשְׁלַח לָהֶם מְהֵרָה רְפוּאָה שְׁלֵמָה מִן הַשָּׁמַיִם לְכָל אֵבְרֵיהֶם וּלְכָל גִּידֵיהֶם בְּתוֹךְ שְׁאָר חוֹלֵי יִשְׂרָאֵל, רְפוּאַת הַנֶּפֶשׁ וּרְפוּאַת הַגּוּף, הַשְׁתָּא בַּעֲגָלָא וּבִזְמַן קָרִיב. וְנֹאמַר אָמֵן.</p></div>
+</div>
+<div class="fab tonal"><svg><use href="#i-up"/></svg>חזרה לקריאה · לוי</div>
+<div class="gesture"></div></div></div>
+<figcaption><b>M4 · A chip opens the screen the app already has</b>"לחולים" opens the existing sick-list prayer screen, full page, as it does from the main page. "לקריאה" at the top, the button at the bottom, or the phone's back button all return to reading mode at the same place (here: the Levi).</figcaption></figure>
+
+</main>
+<script>
+document.querySelectorAll('.sizes button').forEach(function(b){b.addEventListener('click',function(){
+  document.documentElement.setAttribute('data-w',b.dataset.w);
+  document.querySelectorAll('.sizes button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});});});
+</script>

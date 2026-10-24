@@ -109,7 +109,6 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
       }, icon('check', 20), 'עלה'));
   });
 
-  const seg = (n: 3 | 4) => h('button', { class: r.count === n ? 'on' : '', 'aria-pressed': String(r.count === n), onclick: () => change({ count: n }) }, String(n));
   const toggle = (label: string, on: boolean, c: { noKohen?: boolean; noLevi?: boolean }) =>
     h('button', { class: 'tg' + (on ? ' on' : ''), 'aria-pressed': String(on), onclick: () => change(c) }, (on ? '✓ ' : '') + label);
 
@@ -128,9 +127,10 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
     h('main', { class: 'body' + (r.slots.length === 4 ? ' compact' : '') },
       aheadNote,
       banner,
-      h('div', { class: 'ctrl' }, h('div', { class: 'segc', role: 'group', 'aria-label': 'מספר עליות' }, seg(3), seg(4)),
+      h('div', { class: 'ctrl' },
         toggle('אין כהן', r.noKohen, { noKohen: !r.noKohen }),
-        r.noKohen ? null : toggle('אין לוי', r.noLevi, { noLevi: !r.noLevi })),
+        r.noKohen ? null : toggle('אין לוי', r.noLevi, { noLevi: !r.noLevi }),
+        h('a', { class: 'go', href: '#service/' + keyText(key) }, icon('play', 18), 'התחל קריאה')),
       ...slots,
       r.slots.length === 4 ? null : h('div', { class: 'sechead' }, 'תפילות'),
       prayerChips(state)),
@@ -158,7 +158,7 @@ function placeAt(ctx: Ctx, r: Reading, personId: string, i: number): void {
   ctx.store.set(withReading(state, res.reading));
 }
 
-function done(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?: string) => void): void {
+export function done(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?: string) => void): void {
   save(markDone(r, i, nowHHMM()));
   const id = r.slots[i].personId!;
   const state = ctx.store.get();

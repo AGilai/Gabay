@@ -40,6 +40,9 @@ export interface Prayers {
   yoledetBen: string; yoledetBat: string; azkaraM: string; azkaraF: string;
 }
 
-export interface Settings { inactiveDays: number; prayers: Prayers; lastBackupOn: ISODate | null }
+export interface Settings {
+  inactiveDays: number; prayers: Prayers; lastBackupOn: ISODate | null;
+  olehInService?: boolean; // reading mode shows Mi Sheberach after each aliyah (default off)
+}
 
 export interface State { version: 1; people: Person[]; readings: Reading[]; sick: SickEntry[]; settings: Settings }

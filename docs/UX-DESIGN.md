@@ -78,8 +78,8 @@ Quick add needs only the fields marked \*.
 
 ## 5. Day types and number of aliyot (Israel calendar)
 
-The calendar sets the **default** number of aliyot and a banner. The 3 / 4 switch on the main page
-always wins, and the choice is kept for that day only.
+The calendar sets the number of aliyot and a banner. There is no manual 3 / 4 switch (removed at the
+gabbai's request, 2026-10-24: the calendar already knows).
 
 | Day | Default | Banner |
 |---|---|---|
@@ -115,7 +115,8 @@ From top to bottom:
 
 1. **App bar:** "קריאת התורה" + weekday · Hebrew date · parasha.
 2. **Banner** on special days (Rosh Chodesh etc.).
-3. **Control row:** the **3 | 4** segmented switch, then toggle chips **אין כהן** and **אין לוי**.
+3. **Control row:** toggle chips **אין כהן** and **אין לוי**, and on the other side, at the same height,
+   **▶ התחל קריאה**, which opens reading mode (S11).
 4. **Slots** (3 or 4 cards). A slot shows **only** the slot label (`כהן`, `לוי`, `שלישי`, `רביעי`,
    `ישראל במקום כהן`…), the **calling line** exactly as the gabbai wrote it, as the large main text,
    and the display name (the name he knows him by) small underneath (gabbai, 2026-10-23). No hints. A slot can be:
@@ -162,8 +163,10 @@ only, no hint.
 - Full-screen reading view in large serif type, with A− / A+.
 - **Mi Sheberach for the oleh:** today's olim to pick from (the default is the last one marked
   done). His **calling line** is inserted.
-- **Sick:** names from the sick list (each one free text, e.g. "רפאל בן שרה"). Male, female and plural
-  wording are picked from the list. Checkboxes choose who to include this time.
+- **Sick:** names from the sick list (each one free text, e.g. "רפאל בן שרה"). Checkboxes choose who to
+  include this time. With several names, a switch: **לכל אחד בנפרד** (the default: one blessing per person,
+  a man's or a woman's wording, as in the siddur) or **כולם יחד** (one plural blessing).
+- **ברכות התורה / ברכת הגומל:** fixed texts (Siddur Sfard, Metsudah, CC-BY), for the rare oleh who needs them.
 - **Bar mitzvah / new mother / memorial:** type or pick the name at the top.
 - The texts are the shul's own nusach Sfard wording, entered once in settings. The app ships with
   placeholders only.
@@ -252,8 +255,6 @@ here → bottom bar "בחירה" → tab לויים → tap someone → back on 
 the suggestion. "עלה ✓" after each aliyah.
 
 **No Kohen.** S1 → "אין כהן" → all slots are Israel → fill as usual.
-
-**Rosh Chodesh came up 3 instead of 4 (or the reverse).** Tap 3 / 4.
 
 **A new face.** בחירה → ישראלים → "+ אדם חדש" → name, hint → "שמור והצב".
 
@@ -370,6 +371,27 @@ the place the reader is at in the scroll.
 
 Footnotes in the text about how **Sfard / Ashkenaz scrolls** are written (e.g. בשמות, בעור, פינחס with a
 small yod, the broken vav) are kept and shown small; Yemenite / Aleppo-only notes are left out.
+
+## 11b. S11 · Reading mode (מצב קריאה), built 2026-10-24
+
+The whole call-up as one scroll, for the bimah. Mockup: `design/mockups/reading-mode.html`.
+
+- **Way in:** "▶ התחל קריאה" on the main page. **Way out:** "ראשי" at the top (the place is kept).
+- **One page:** for each aliyah, the gabbai's words in full (warm box), then that aliyah's Torah text. The first
+  box starts with "וְיַעֲזֹר וְיָגֵן… הַכֹּל הָבוּ גֹדֶל… כֹּהֵן קְרָב, יַעֲמֹד", the calling line, and "בָּרוּךְ
+  שֶׁנָּתַן תּוֹרָה…". Then "יַעֲמֹד" + line for each oleh, and at the end "יַעַמְדוּ הַמַּגְבִּיהַּ וְהַגּוֹלֵל"
+  (no picking of people). Nothing for the ציבור or the ש״ץ, and no oleh blessings (printed at the bimah).
+- **Added to the call, in grey with a dotted underline** (the saved calling line never changes): הכהן / הלוי
+  when the line lacks it; שני / שלישי / רביעי; "אֵין כָּאן כֹּהֵן, יַעֲמֹד … בִּמְקוֹם כֹּהֵן"; the Kohen again
+  "… בִּמְקוֹם לֵוִי". Wording confirmed by the gabbai, 2026-10-24.
+- **Moving:** scroll alone is enough. A strip (כהן · לוי · שלישי · סיום · תוספות ↓) jumps within the page.
+  "עלה ✓" (fixed at the bottom) marks the current oleh and scrolls to the next call. The current aliyah is tinted.
+- **Emergency change:** "החלף" on a call (or "+ בחר" on an empty one) opens the choosing page for that slot and
+  a pick returns to reading mode.
+- **Additions:** a row of chips at the end (מי שברך לעולה, לחולים, יולדת, בר מצווה, אזכרה, הגומל, ברכות
+  התורה); each opens its S4 screen, and back returns to the same place. Mi Sheberach for the oleh after each
+  aliyah is a setting (S9), off by default.
+- The screen stays on. Text size is shared with S4 and S10.
 
 ## 12. Not in phase 1
 

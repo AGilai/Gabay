@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Reading mode (מצב קריאה): the whole call-up as one scroll, from "ויעזור… כהן קרב, יעמוד" to "יעמדו המגביה
+  והגולל", with each aliyah's Torah text after its call. Adds הכהן / הלוי when a line lacks it, and
+  שני / שלישי / רביעי / במקום כהן. "החלף" swaps an oleh and comes back. Additions as chips at the end.
+- Main page: "▶ התחל קריאה"; the 3 | 4 switch is gone (the calendar decides).
+- Sick: one blessing per person (man's or woman's wording) by default, or all together.
+- New texts: ברכות התורה and ברכת הגומל (Siddur Sfard, Metsudah, CC-BY).
+- Setting: Mi Sheberach for the oleh after each aliyah in reading mode (off by default).
+
 ## 0.1.0 (2026-10-23), alpha
 
 First version for the gabbai's own phone.

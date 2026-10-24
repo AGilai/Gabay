@@ -24,7 +24,7 @@ const write = (k: string, v: string) => { try { localStorage.setItem(k, v); } ca
 
 const DEFAULT_LABELS = ['כהן', 'לוי', 'שלישי', 'רביעי'];
 
-function verseNodes(text: string, scroll: boolean): (Node | string)[] {
+export function verseNodes(text: string, scroll: boolean): (Node | string)[] {
   if (scroll) {
     const brk = /\{([פס])\}\s*$/.exec(text)?.[1];
     return [scrollText(text), brk === 'פ' ? h('br') : brk === 'ס' ? h('span', { class: 'gap' }) : ' '];

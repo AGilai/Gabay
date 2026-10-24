@@ -1,12 +1,14 @@
 // S4: prayer text in large type, names filled in. Olim are named by their calling line.
-import { DONOR, joinNames, render, sickTemplate, withoutNaming } from '../../core/prayers.ts';
+import { DONOR, render, sickBlessings, withoutNaming } from '../../core/prayers.ts';
+import { GOMEL, SIDDUR_CREDIT, TORAH_BLESSINGS, type Said } from '../../core/service.ts';
 import type { State } from '../../core/types.ts';
 import { currentKey, findReading, personById, type Ctx } from '../ctx.ts';
 import { appBar, h, icon } from '../ui.ts';
 
-export type PrayerKind = 'oleh' | 'sick' | 'barMitzvah' | 'yoledet' | 'azkara';
+export type PrayerKind = 'oleh' | 'sick' | 'barMitzvah' | 'yoledet' | 'azkara' | 'brachot' | 'gomel';
 const TITLE: Record<PrayerKind, string> = {
   oleh: 'מי שברך לעולה', sick: 'מי שברך לחולים', barMitzvah: 'מי שברך לבר מצווה', yoledet: 'מי שברך ליולדת', azkara: 'אזכרה',
+  brachot: 'ברכות התורה', gomel: 'ברכת הגומל',
 };
 const SIZE_KEY = 'gabay.prayerSize';
 
@@ -18,6 +20,8 @@ let baby = '';
 let grandfather = false; // yoledet: the oleh is the baby's grandfather
 let naming = true; // yoledet bat: the girl is named now (off: grandfather, or the parents postpone)
 let female = false;
+let sickTogether = false; // several sick: one plural blessing instead of one per person
+const FIXED: Partial<Record<PrayerKind, Said[]>> = { brachot: TORAH_BLESSINGS, gomel: GOMEL };
 
 function readSize(): number {
   try { return Number(localStorage.getItem(SIZE_KEY)) || 24; } catch { return 24; }
@@ -27,17 +31,17 @@ function writeSize(n: number): void {
   try { localStorage.setItem(SIZE_KEY, String(n)); } catch { /* private mode: keep for this session only */ }
 }
 
-function textOf(state: State, kind: PrayerKind, names: { name?: string; names?: string }): { template: string; vars: Record<string, string> } {
+type Text = { template: string; vars: Record<string, string> };
+function textOf(state: State, kind: PrayerKind, names: { name?: string; names?: string }): Text[] {
   const p = state.settings.prayers;
   const donor = DONOR[grandfather ? 'grandfather' : 'father'][female ? 'bat' : 'ben'];
   const vars = { name: names.name ?? '', names: names.names ?? '', baby, donor };
-  if (kind === 'oleh') return { template: p.oleh, vars };
-  if (kind === 'barMitzvah') return { template: p.barMitzvah, vars };
-  if (kind === 'yoledet') return { template: female ? (naming ? p.yoledetBat : withoutNaming(p.yoledetBat)) : p.yoledetBen, vars };
-  if (kind === 'azkara') return { template: female ? p.azkaraF : p.azkaraM, vars };
+  if (kind === 'oleh') return [{ template: p.oleh, vars }];
+  if (kind === 'barMitzvah') return [{ template: p.barMitzvah, vars }];
+  if (kind === 'yoledet') return [{ template: female ? (naming ? p.yoledetBat : withoutNaming(p.yoledetBat)) : p.yoledetBen, vars }];
+  if (kind === 'azkara') return [{ template: female ? p.azkaraF : p.azkaraM, vars }];
   const chosen = state.sick.filter((s) => !sickOff.has(s.id));
-  const joined = joinNames(chosen.map((s) => s.text));
-  return { template: sickTemplate(p, chosen), vars: { ...vars, name: joined, names: joined } };
+  return sickBlessings(p, chosen, sickTogether).map((b) => ({ template: b.template, vars: { ...vars, name: b.name, names: b.name } }));
 }
 
 export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
@@ -46,7 +50,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
   const blanks: Record<string, string> = kind === 'yoledet' ? { name: 'פלונית בת פלונית' } : {};
   const state = ctx.store.get();
   let size = readSize();
-  const para = h('p', { class: 'text' });
+  const para = h('div', { class: 'texts' });
   const reader = h('main', { class: 'reader', style: `--prayer-size:${size}px` });
   const picks = h('div', { class: 'picks' });
   let sub = 'נוסח ספרד';
@@ -72,7 +76,14 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
           onclick: () => { on ? sickOff.add(s.id) : sickOff.delete(s.id); draw(); } }, h('span', { class: 'cb' }, on ? '✓' : ''), s.text));
       }
       picks.append(h('a', { class: 'pk off', href: '#sick' }, h('span', { class: 'cb' }), 'הוסף…'));
+      if (state.sick.filter((s) => !sickOff.has(s.id)).length > 1) {
+        picks.append(h('div', { class: 'seg', style: 'width:100%', role: 'group', 'aria-label': 'נוסח' },
+          h('button', { class: sickTogether ? '' : 'on', onclick: () => { sickTogether = false; draw(); } }, 'לכל אחד בנפרד'),
+          h('button', { class: sickTogether ? 'on' : '', onclick: () => { sickTogether = true; draw(); } }, 'כולם יחד')));
+      }
       sub = `${state.sick.filter((s) => !sickOff.has(s.id)).length} שמות · נוסח ספרד`;
+    } else if (FIXED[kind]) {
+      sub = 'נוסח ספרד';
     } else {
       picks.append(nameInput());
       if (kind !== 'barMitzvah') {
@@ -98,8 +109,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
       }
       names = { name: typed };
     }
-    const { template, vars } = textOf(state, kind, names);
-    para.replaceChildren(...render(template, vars, blanks).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
+    paint(names);
     const small = document.querySelector('.appbar small');
     if (small) small.textContent = sub;
   };
@@ -114,8 +124,17 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
 
   // Redraw only the text, so the field being typed in keeps focus.
   function redraw(): void {
-    const { template, vars } = textOf(state, kind, { name: typed });
-    para.replaceChildren(...render(template, vars, blanks).map((part) => (part.name ? h('mark', {}, part.text) : part.text)));
+    paint({ name: typed });
+  }
+
+  function paint(names: { name?: string; names?: string }): void {
+    const fixed = FIXED[kind];
+    if (fixed) {
+      para.replaceChildren(...fixed.flatMap((x) => [h('div', { class: 'who-says' }, x.who), h('p', { class: 'text' }, x.text)]));
+      return;
+    }
+    para.replaceChildren(...textOf(state, kind, names).map(({ template, vars }) =>
+      h('p', { class: 'text' }, ...render(template, vars, blanks).map((part) => (part.name ? h('mark', {}, part.text) : part.text)))));
   }
 
   const resize = (d: number) => {
@@ -124,7 +143,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
     reader.style.setProperty('--prayer-size', size + 'px');
   };
   draw();
-  reader.append(picks, para, h('div', { class: 'note' }, 'נוסח ספרד (סידור תורת אמת). אפשר לשנות בהגדרות.'));
+  reader.append(picks, para, h('div', { class: 'note' }, FIXED[kind] ? SIDDUR_CREDIT : 'נוסח ספרד (סידור תורת אמת). אפשר לשנות בהגדרות.'));
   return h('div', { class: 'screen' },
     appBar(TITLE[kind], sub, { back: 'history', end: [
       h('button', { class: 'icon', 'aria-label': 'הקטן', onclick: () => resize(-2) }, 'A−'),
