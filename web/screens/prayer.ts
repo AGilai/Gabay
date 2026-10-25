@@ -47,9 +47,10 @@ function textOf(state: State, kind: PrayerKind, names: { name?: string; names?: 
 
 export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
   const kind: PrayerKind = kindArg in TITLE ? (kindArg as PrayerKind) : 'oleh';
-  // The yoledet is named like a sick person, by her mother's name.
+  // The yoledet and the sick are named by the mother: פלוני בן פלונית.
   const blanks: Record<string, string> = kind === 'yoledet' || (kind === 'sick' && sickBlank === 'f') ? { name: 'פלונית בת פלונית' }
-    : kind === 'sick' && sickBlank === 'many' ? { names: 'פלוני בן פלוני ופלונית בת פלונית' } : {};
+    : kind === 'sick' && sickBlank === 'many' ? { names: 'פלוני בן פלונית ופלונית בת פלונית' }
+    : kind === 'sick' ? { name: 'פלוני בן פלונית' } : {};
   const state = ctx.store.get();
   let size = readSize();
   const para = h('div', { class: 'texts' });

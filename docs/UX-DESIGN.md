@@ -181,7 +181,7 @@ only, no hint.
   include this time. With several names, a switch: **לכל אחד בנפרד** (the default: one blessing per person,
   a man's or a woman's wording, as in the siddur) or **כולם יחד** (one plural blessing). With no name
   chosen (someone asks out loud and the gabbai says the names himself), a switch **גבר · אישה · כמה חולים**
-  picks the wording, with פלוני / פלונית as the blank.
+  picks the wording. The blank is named by the mother: "פלוני בן פלונית" / "פלונית בת פלונית".
 - **ברכות התורה / ברכת הגומל:** fixed texts (Siddur Sfard, Metsudah, CC-BY), for the rare oleh who needs them.
 - **Bar mitzvah / new mother / memorial:** type or pick the name at the top.
 - The texts are the shul's own nusach Sfard wording, entered once in settings. The app ships with
