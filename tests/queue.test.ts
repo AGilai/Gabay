@@ -131,3 +131,9 @@ test('search filters by group and by the oleh\'s or the father\'s name, from the
   assert.deepEqual(search(s, 'החלון', { field: 'own' }).map((p) => p.id), []);
   assert.deepEqual(search(s, 'החלון').map((p) => p.id), ['Y1']);
 });
+
+test('an empty search lists everyone in the chosen group, by name', () => {
+  const s = st([mk('B', { group: 'Y', name: 'שמעון' }), mk('K1', { group: 'K', name: 'אהרן' }), mk('A', { group: 'Y', name: 'בועז' })], []);
+  assert.deepEqual(search(s, '', { group: 'Y' }).map((p) => p.id), ['A', 'B']);
+  assert.deepEqual(search(s, '  ').map((p) => p.id), ['K1', 'A', 'B']);
+});

@@ -165,7 +165,7 @@ Opened by the search button on S2 (`#choose/…/find`). Back or ✕ returns to S
   first word: before it is his own name (can be two names, "בן ציון" stays whole), after it the father's,
   without הכהן / הלוי. A line with no "בן" is all his own name.
 
-A tap picks, exactly as on S2. Nothing shows before the first letter.
+A tap picks, exactly as on S2. Before the first letter it lists everyone in the chosen group, by name.
 
 ### S3 · Slot actions (bottom sheet when a filled slot is tapped)
 

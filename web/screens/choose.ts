@@ -92,7 +92,6 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   const fillList = () => {
     list.replaceChildren();
     if (finding) {
-      if (!query.trim()) return;
       const found = search(state, query, { group: findGroup, field: findField });
       if (!found.length) list.append(h('div', { class: 'notice' }, 'לא נמצא. אפשר להוסיף אדם חדש.'));
       for (const p of found) {

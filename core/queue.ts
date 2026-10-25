@@ -88,9 +88,14 @@ export function splitCallLine(line: string): { own: string; father: string } {
 export type SearchField = 'all' | 'own' | 'father';
 
 // 'all' matches anywhere in the name, calling line or hint; 'own' and 'father' match from the start of a word.
+// No text: everyone in the group, by name.
 export function search(state: State, q: string, opts: { group?: Group | null; field?: SearchField } = {}): Person[] {
   const needle = normalize(q);
-  if (!needle) return [];
+  if (!needle) {
+    const order: Group[] = ['K', 'L', 'Y'];
+    return state.people.filter((p) => !opts.group || p.group === opts.group)
+      .sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group) || a.name.localeCompare(b.name, 'he'));
+  }
   const field = opts.field ?? 'all';
   return state.people.filter((p) => {
     if (opts.group && p.group !== opts.group) return false;
