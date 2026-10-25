@@ -76,10 +76,27 @@ export function normalize(s: string): string {
     .split(/\s+/).filter((w) => w && w !== 'הרב' && w !== 'ר').join(' ');
 }
 
-export function search(state: State, q: string): Person[] {
+// "יוסף חיים בן אליהו הכהן" → own "יוסף חיים", father "אליהו". The first "בן" (or "בר") that is not the
+// line's first word splits it, so "בן ציון בן משה" keeps "בן ציון". No "בן": the whole line is his own name.
+export function splitCallLine(line: string): { own: string; father: string } {
+  const words = normalize(line).split(' ').filter(Boolean);
+  while (words.length > 1 && /^ה?(כהן|לוי)$/.test(words[words.length - 1])) words.pop();
+  const i = words.findIndex((w, k) => k > 0 && k < words.length - 1 && (w === 'בן' || w === 'בר'));
+  return i < 0 ? { own: words.join(' '), father: '' } : { own: words.slice(0, i).join(' '), father: words.slice(i + 1).join(' ') };
+}
+
+export type SearchField = 'all' | 'own' | 'father';
+
+// 'all' matches anywhere in the name, calling line or hint; 'own' and 'father' match from the start of a word.
+export function search(state: State, q: string, opts: { group?: Group | null; field?: SearchField } = {}): Person[] {
   const needle = normalize(q);
   if (!needle) return [];
-  return state.people.filter((p) => [p.name, p.callLine, p.hint].some((f) => normalize(f).includes(needle)));
+  const field = opts.field ?? 'all';
+  return state.people.filter((p) => {
+    if (opts.group && p.group !== opts.group) return false;
+    if (field === 'all') return [p.name, p.callLine, p.hint].some((f) => normalize(f).includes(needle));
+    return (' ' + splitCallLine(p.callLine)[field]).includes(' ' + needle);
+  });
 }
 
 export function shouldOfferRegular(state: State, personId: string, today: ISODate): boolean {

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Search is its own screen with filters: כהנים / לויים / ישראל (the tab you came from is already picked),
+  and שם העולה / שם האב (split at "בן").
+- The choosing page keeps the days number for people already in the reading and marks them instead.
 - Reading mode (מצב קריאה): the whole call-up as one scroll, from "ויעזור… כהן קרב, יעמוד" to "יעמדו המגביה
   והגולל", with each aliyah's Torah text after its call. Adds הכהן / הלוי when a line lacks it, and
   שני / שלישי / רביעי / במקום כהן. "החלף" swaps an oleh and comes back. Additions as chips at the end.

@@ -139,7 +139,8 @@ Reached from the bottom bar (opens on the tab of the next empty slot) or by tapp
 
 - **Tabs:** כהנים · לויים · ישראלים, with counts. When "אין כהן" is on, the כהנים and לויים tabs are
   not offered for picking (they can still be browsed by search).
-- **Search** (sticky): name, calling line, hint. Finds stopped and inactive people too.
+- **Search** (sticky button): opens the search screen (S2b) with the cursor in the field. It finds stopped
+  and inactive people too.
 - **List order** (§8): חיוב היום → the line, longest wait first. Each row shows the name · the hint
   · the days since his last aliyah. Someone called recently is just at the end. No grey-out.
 - **Tap a row → he goes straight to his place on S1** and S1 is shown:
@@ -148,10 +149,23 @@ Reached from the bottom bar (opens on the tab of the next empty slot) or by tapp
   - the slot is taken → he replaces the person in it if that person isn't marked done yet, with a
     snackbar "הוחלף את ___ · בטל" (replaced ___ · undo). If every Israel slot is done, a snackbar
     says so and nothing changes.
-- People already placed today are marked "בקריאה" (in the reading) at the top of the list and can't
-  be picked twice.
+- People already placed today are at the top of the list, under "בקריאה" (in the reading). They can't be
+  picked twice. Their row keeps the days number and is marked by an accent edge and "✓ בקריאה · <slot>" (or
+  "✓ עלה · <slot>"). Search marks them the same way.
 - **Long-press a row** → person card. **"+ אדם חדש"** → quick add.
 - The collapsed section "מזדמנים שלא נראו חצי שנה (n)" sits at the bottom.
+
+### S2b · חיפוש (search, built 2026-10-25)
+
+Opened by the search button on S2 (`#choose/…/find`). Back or ✕ returns to S2. Two rows of filter chips:
+- **Who:** הכל · כהנים · לויים · ישראל. The tab the gabbai came from is already picked (opened from the
+  כהנים tab, only Kohanim show); "הכל" searches everyone. On an "אין כהן" day it starts on הכל.
+- **Where:** הכל (name, calling line, hint, anywhere in the text) · שם העולה · שם האב. These last two
+  match from the start of a word. The calling line splits at the first "בן" (or "בר") that is not its
+  first word: before it is his own name (can be two names, "בן ציון" stays whole), after it the father's,
+  without הכהן / הלוי. A line with no "בן" is all his own name.
+
+A tap picks, exactly as on S2. Nothing shows before the first letter.
 
 ### S3 · Slot actions (bottom sheet when a filled slot is tapped)
 

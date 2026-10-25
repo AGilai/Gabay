@@ -279,3 +279,8 @@ input,textarea,select{font:inherit;color:var(--ink)}
 .nextA.tonal{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
 .ctrl .go{height:40px;padding:0 14px;border-radius:20px;background:var(--accent);color:var(--on-accent);display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:700;white-space:nowrap;margin-inline-start:auto;text-decoration:none}
 .texts .text + .text{border-top:1px solid var(--line);padding-top:16px}
+button.search{width:100%;border:0;font:inherit;font-size:16px;text-align:start;cursor:text}
+.filters{display:flex;flex-direction:column;gap:4px;padding:8px 0 4px}
+.filters .chip{height:36px}
+.intag{display:inline-flex;align-items:center;gap:4px;color:var(--accent);font-weight:700}
+.row.inread{box-shadow:inset -4px 0 0 var(--accent)}

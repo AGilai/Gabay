@@ -1,6 +1,7 @@
 // S2: the choosing page. A tap puts the person straight into his slot; a long press opens his card.
+// …/find opens the search over it (S2b), with the tab's group already picked as the filter.
 import { dayInfo } from '../../core/day.ts';
-import { buildQueue, search, type Row } from '../../core/queue.ts';
+import { buildQueue, search, type Row, type SearchField } from '../../core/queue.ts';
 import { ROLE_LABEL, groupOf, newReading, place } from '../../core/slots.ts';
 import type { Group, Person, Reading } from '../../core/types.ts';
 import { aliyotOf } from '../../core/queue.ts';
@@ -9,6 +10,8 @@ import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, activeKey, findReading, keyText,
 import { appBar, bottomNav, h, icon, snackbar } from '../ui.ts';
 
 let query = '';
+let findGroup: Group | null = null;
+let findField: SearchField = 'all';
 let showInactive = false;
 
 const LONG_PRESS_MS = 500;
@@ -45,6 +48,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   // From reading mode (…/svc), a pick goes back there.
   const backTo = args.includes('svc') ? '#service/' + keyText(key) : isToday ? '#reading' : '#day/' + keyText(key);
   const aliyot = aliyotOf(state);
+  const finding = args.includes('find');
 
   const pick = (p: Person) => {
     if (!r) return snackbar('אין קריאה היום. אפשר לפתוח קריאה במסך הראשי');
@@ -75,18 +79,25 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
       h('button', { class: 'icon edit', 'aria-label': 'עריכת ' + p.name,
         onclick: (e: Event) => { e.stopPropagation(); ctx.go('#person/' + p.id); } }, icon('edit', 20))),
     () => pick(p), () => ctx.go('#person/' + p.id));
+  // Someone already in this reading keeps his days number; the row is marked instead.
+  const inSlot = (id: string) => r?.slots.find((s) => s.personId === id) ?? null;
+  const inTag = (id: string) => {
+    const s = inSlot(id)!;
+    return h('span', { class: 'intag' }, icon('check', 14), (s.doneAt ? 'עלה · ' : 'בקריאה · ') + ROLE_LABEL[s.role]);
+  };
   const queueRow = (x: Row, cls = '') => row(x.person, cls,
     x.reason ? h('span', { class: 'hytag' }, x.reason) : x.person.hint || (x.last ? '' : 'חדש'), days(x.person.id));
 
   const list = h('div', { class: 'list' });
   const fillList = () => {
     list.replaceChildren();
-    if (query.trim()) {
-      const found = search(state, query);
+    if (finding) {
+      if (!query.trim()) return;
+      const found = search(state, query, { group: findGroup, field: findField });
       if (!found.length) list.append(h('div', { class: 'notice' }, 'לא נמצא. אפשר להוסיף אדם חדש.'));
       for (const p of found) {
         const note = [GROUP_WORD[p.group], p.stopped ? 'מושהה' : '', p.hint].filter(Boolean).join(' · ');
-        list.append(row(p, '', note, days(p.id)));
+        list.append(inSlot(p.id) ? row(p, 'inread', inTag(p.id), days(p.id)) : row(p, '', note, days(p.id)));
       }
       return;
     }
@@ -97,11 +108,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
     const q = buildQueue(state, group, key.date, r);
     if (q.inReading.length) {
       list.append(h('div', { class: 'sechead' }, 'בקריאה'));
-      for (const x of q.inReading) {
-        const i = r!.slots.findIndex((s) => s.personId === x.person.id);
-        list.append(row(x.person, 'inread', ROLE_LABEL[r!.slots[i].role],
-          h('div', { class: 'days' }, h('b', { class: 'sm' }, r!.slots[i].doneAt ? 'עלה' : 'בקריאה'))));
-      }
+      for (const x of q.inReading) list.append(row(x.person, 'inread', inTag(x.person.id), days(x.person.id)));
     }
     if (q.hiyuv.length) {
       list.append(h('div', { class: 'sechead' }, 'חיוב היום'));
@@ -116,7 +123,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
       if (showInactive) for (const x of q.inactive) list.append(queueRow(x));
     }
   };
-  fillList();
+  if (!finding) fillList();
 
   const counts = (g: Group) => { const q = buildQueue(state, g, key.date, r); return q.line.length + q.hiyuv.length; };
   const tail = (slot !== null ? '/' + slot : '') + (isToday && !args.includes('svc') ? '' : '/' + keyText(key)) + (args.includes('svc') ? '/svc' : '');
@@ -124,15 +131,38 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
     h('a', { href: `#choose/${g}` + (g === group ? tail : isToday ? '' : '//' + keyText(key)), class: g + (g === group ? ' on' : '') },
       `${GROUP_PLURAL[g]} ${counts(g)}`)));
 
-  const input = h('input', {
-    type: 'search', placeholder: 'חיפוש שם, שם לקריאה, רמז…', value: query, 'aria-label': 'חיפוש', enterkeyhint: 'search',
-    oninput: (e: Event) => { query = (e.target as HTMLInputElement).value; fillList(); },
-  });
   const sub = slot !== null && r ? 'ל' + ROLE_LABEL[r.slots[slot].role] : 'נכנס ישר למקומו בקריאה';
+  if (finding) {
+    const input = h('input', {
+      type: 'search', placeholder: 'חיפוש שם, שם לקריאה, רמז…', value: query, 'aria-label': 'חיפוש', enterkeyhint: 'search',
+      oninput: (e: Event) => { query = (e.target as HTMLInputElement).value; fillList(); },
+    }) as HTMLInputElement;
+    const seg = <T,>(items: [T, string][], get: () => T, set: (v: T) => void) => {
+      const bar = h('div', { class: 'chips' });
+      const paint = () => bar.replaceChildren(...items.map(([v, text]) =>
+        h('button', { class: 'chip' + (get() === v ? ' sel' : ''), 'aria-pressed': String(get() === v),
+          onclick: () => { set(v); paint(); fillList(); input.focus(); } }, text)));
+      paint();
+      return bar;
+    };
+    const filters = h('div', { class: 'filters' },
+      seg<Group | null>([[null, 'הכל'], ['K', 'כהנים'], ['L', 'לויים'], ['Y', 'ישראל']], () => findGroup, (v) => { findGroup = v; }),
+      seg<SearchField>([['all', 'הכל'], ['own', 'שם העולה'], ['father', 'שם האב']], () => findField, (v) => { findField = v; }));
+    fillList();
+    requestAnimationFrame(() => { input.focus(); input.setSelectionRange(input.value.length, input.value.length); });
+    return h('div', { class: 'screen' },
+      appBar('חיפוש', sub, { close: 'history' }),
+      h('main', { class: 'body', style: 'gap:0' }, h('label', { class: 'search' }, icon('search', 20), input), filters, list, h('div', { class: 'pad-fab' })),
+      h('a', { class: 'fab', href: `#new/${group}` + tail }, icon('plus'), 'אדם חדש'));
+  }
+  const openFind = () => {
+    query = ''; findGroup = r?.noKohen && group !== 'Y' ? null : group; findField = 'all';
+    ctx.go(location.hash + '/find');
+  };
   return h('div', { class: 'screen' },
     appBar('בחירה', sub, isToday && slot === null ? {} : { back: backTo }),
     tabs,
-    h('main', { class: 'body', style: 'gap:0' }, h('label', { class: 'search' }, icon('search', 20), input), list, h('div', { class: 'pad-fab' })),
+    h('main', { class: 'body', style: 'gap:0' }, h('button', { class: 'search', onclick: openFind }, icon('search', 20), h('span', {}, 'חיפוש שם, שם לקריאה, רמז…')), list, h('div', { class: 'pad-fab' })),
     h('a', { class: 'fab', href: `#new/${group}` + tail }, icon('plus'), 'אדם חדש'),
     isToday ? bottomNav('choose') : null);
 }

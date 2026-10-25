@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aliyotOf, buildQueue, suggest, search, shouldOfferRegular, normalize } from '../core/queue.ts';
+import { aliyotOf, buildQueue, suggest, search, shouldOfferRegular, normalize, splitCallLine } from '../core/queue.ts';
 import type { Person, Reading, SlotRole, State, Group } from '../core/types.ts';
 
 const TODAY = '2026-10-22';
@@ -107,4 +107,27 @@ test('offer "regular" after 3 aliyot in 90 days, only to occasional people', () 
   assert.equal(shouldOfferRegular(st([mk('O', { group: 'Y', regular: false })], r), 'O', TODAY), true);
   assert.equal(shouldOfferRegular(st([mk('O', { group: 'Y', regular: true })], r), 'O', TODAY), false);
   assert.equal(shouldOfferRegular(st([mk('O', { group: 'Y', regular: false })], r.slice(1)), 'O', TODAY), false);
+});
+
+test('the calling line splits at the first "בן": the oleh\'s own name before it, the father\'s after', () => {
+  assert.deepEqual(splitCallLine('יוסף חיים בן אליהו הכהן'), { own: 'יוסף חיים', father: 'אליהו' });
+  assert.deepEqual(splitCallLine("הרב דוד בר' אלקנה"), { own: 'דוד', father: 'אלקנה' });
+  assert.deepEqual(splitCallLine('בן ציון בן משה הלוי'), { own: 'בן ציון', father: 'משה' });
+  assert.deepEqual(splitCallLine('בנימין בן עמרם'), { own: 'בנימין', father: 'עמרם' });
+  assert.deepEqual(splitCallLine('יוסי מהמכולת'), { own: 'יוסי מהמכולת', father: '' });
+});
+
+test('search filters by group and by the oleh\'s or the father\'s name, from the start of a word', () => {
+  const s = st([
+    mk('K1', { group: 'K', callLine: 'אברהם בן יעקב הכהן' }),
+    mk('Y1', { group: 'Y', callLine: 'יעקב בן אברהם', hint: 'ליד החלון' }),
+    mk('Y2', { group: 'Y', callLine: 'משה בן אביגדור' }),
+  ], []);
+  assert.deepEqual(search(s, 'אברהם').map((p) => p.id), ['K1', 'Y1']);
+  assert.deepEqual(search(s, 'אברהם', { group: 'K' }).map((p) => p.id), ['K1']);
+  assert.deepEqual(search(s, 'אברהם', { field: 'own' }).map((p) => p.id), ['K1']);
+  assert.deepEqual(search(s, 'אב', { field: 'father' }).map((p) => p.id), ['Y1', 'Y2']);
+  assert.deepEqual(search(s, 'קב', { field: 'father' }).map((p) => p.id), []);
+  assert.deepEqual(search(s, 'החלון', { field: 'own' }).map((p) => p.id), []);
+  assert.deepEqual(search(s, 'החלון').map((p) => p.id), ['Y1']);
 });
