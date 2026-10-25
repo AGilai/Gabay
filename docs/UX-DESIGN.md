@@ -179,7 +179,9 @@ only, no hint.
   done). His **calling line** is inserted.
 - **Sick:** names from the sick list (each one free text, e.g. "רפאל בן שרה"). Checkboxes choose who to
   include this time. With several names, a switch: **לכל אחד בנפרד** (the default: one blessing per person,
-  a man's or a woman's wording, as in the siddur) or **כולם יחד** (one plural blessing).
+  a man's or a woman's wording, as in the siddur) or **כולם יחד** (one plural blessing). With no name
+  chosen (someone asks out loud and the gabbai says the names himself), a switch **גבר · אישה · כמה חולים**
+  picks the wording, with פלוני / פלונית as the blank.
 - **ברכות התורה / ברכת הגומל:** fixed texts (Siddur Sfard, Metsudah, CC-BY), for the rare oleh who needs them.
 - **Bar mitzvah / new mother / memorial:** type or pick the name at the top.
 - The texts are the shul's own nusach Sfard wording, entered once in settings. The app ships with

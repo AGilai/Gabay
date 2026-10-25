@@ -20,6 +20,7 @@ let baby = '';
 let grandfather = false; // yoledet: the oleh is the baby's grandfather
 let naming = true; // yoledet bat: the girl is named now (off: grandfather, or the parents postpone)
 let female = false;
+let sickBlank: 'm' | 'f' | 'many' = 'm'; // sick, no names chosen: whose wording
 let sickTogether = false; // several sick: one plural blessing instead of one per person
 const FIXED: Partial<Record<PrayerKind, Said[]>> = { brachot: TORAH_BLESSINGS, gomel: GOMEL };
 
@@ -41,13 +42,14 @@ function textOf(state: State, kind: PrayerKind, names: { name?: string; names?: 
   if (kind === 'yoledet') return [{ template: female ? (naming ? p.yoledetBat : withoutNaming(p.yoledetBat)) : p.yoledetBen, vars }];
   if (kind === 'azkara') return [{ template: female ? p.azkaraF : p.azkaraM, vars }];
   const chosen = state.sick.filter((s) => !sickOff.has(s.id));
-  return sickBlessings(p, chosen, sickTogether).map((b) => ({ template: b.template, vars: { ...vars, name: b.name, names: b.name } }));
+  return sickBlessings(p, chosen, sickTogether, sickBlank).map((b) => ({ template: b.template, vars: { ...vars, name: b.name, names: b.name } }));
 }
 
 export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
   const kind: PrayerKind = kindArg in TITLE ? (kindArg as PrayerKind) : 'oleh';
   // The yoledet is named like a sick person, by her mother's name.
-  const blanks: Record<string, string> = kind === 'yoledet' ? { name: 'פלונית בת פלונית' } : {};
+  const blanks: Record<string, string> = kind === 'yoledet' || (kind === 'sick' && sickBlank === 'f') ? { name: 'פלונית בת פלונית' }
+    : kind === 'sick' && sickBlank === 'many' ? { names: 'פלוני בן פלוני ופלונית בת פלונית' } : {};
   const state = ctx.store.get();
   let size = readSize();
   const para = h('div', { class: 'texts' });
@@ -76,6 +78,13 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
           onclick: () => { on ? sickOff.add(s.id) : sickOff.delete(s.id); draw(); } }, h('span', { class: 'cb' }, on ? '✓' : ''), s.text));
       }
       picks.append(h('a', { class: 'pk off', href: '#sick' }, h('span', { class: 'cb' }), 'הוסף…'));
+      // No one chosen (asked for out loud): the gabbai says the names himself and picks the wording.
+      if (!state.sick.some((s) => !sickOff.has(s.id))) {
+        const opt = (v: typeof sickBlank, text: string) =>
+          h('button', { class: sickBlank === v ? 'on' : '', onclick: () => { sickBlank = v; ctx.refresh(); } }, text);
+        picks.append(h('div', { class: 'seg', style: 'width:100%', role: 'group', 'aria-label': 'נוסח' },
+          opt('m', 'גבר'), opt('f', 'אישה'), opt('many', 'כמה חולים')));
+      }
       if (state.sick.filter((s) => !sickOff.has(s.id)).length > 1) {
         picks.append(h('div', { class: 'seg', style: 'width:100%', role: 'group', 'aria-label': 'נוסח' },
           h('button', { class: sickTogether ? '' : 'on', onclick: () => { sickTogether = false; draw(); } }, 'לכל אחד בנפרד'),

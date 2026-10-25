@@ -85,8 +85,9 @@ export const genderOf = (s: SickEntry): 'm' | 'f' => {
 };
 
 // The sick: one blessing per person (a man's or a woman's wording), or all together in the plural.
-export function sickBlessings(p: Prayers, chosen: SickEntry[], together: boolean): { template: string; name: string }[] {
-  if (!chosen.length) return [{ template: p.sickM, name: '' }];
+// No names chosen (asked for out loud): `blank` says whose wording to show, a man's, a woman's or several people's.
+export function sickBlessings(p: Prayers, chosen: SickEntry[], together: boolean, blank: 'm' | 'f' | 'many' = 'm'): { template: string; name: string }[] {
+  if (!chosen.length) return [{ template: blank === 'many' ? p.sickPlural : blank === 'f' ? p.sickF : p.sickM, name: '' }];
   if (together && chosen.length > 1) return [{ template: p.sickPlural, name: joinNames(chosen.map((s) => s.text)) }];
   return chosen.map((s) => ({ template: genderOf(s) === 'f' ? p.sickF : p.sickM, name: s.text }));
 }

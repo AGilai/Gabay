@@ -58,3 +58,14 @@ test('the blessing follows בן / בת in the name, even when the saved switch s
   assert.deepEqual(sickBlessings(p, [sick('חנה בת רבקה', 'm'), sick('רפאל בן שרה', 'f'), sick('יוסי', 'f')], false).map((b) => b.template),
     [p.sickF, p.sickM, p.sickF]);
 });
+
+test('with no names chosen, the switch picks the man\'s or the woman\'s blessing', () => {
+  const p = defaultPrayers();
+  assert.deepEqual(sickBlessings(p, [], false, 'f'), [{ template: p.sickF, name: '' }]);
+  assert.deepEqual(sickBlessings(p, [], false, 'm'), [{ template: p.sickM, name: '' }]);
+});
+
+test('with no names chosen, several people asking at once get the plural blessing', () => {
+  const p = defaultPrayers();
+  assert.deepEqual(sickBlessings(p, [], false, 'many'), [{ template: p.sickPlural, name: '' }]);
+});
