@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DONOR, defaultPrayers, render, joinNames, upgradePrayers, withoutNaming } from '../core/prayers.ts';
+import { DONOR, defaultPrayers, render, joinNames, sickName, upgradePrayers, withoutNaming } from '../core/prayers.ts';
 
 
 
@@ -74,4 +74,18 @@ test('the yoledet-bat text says בִּתָּהּ שֶׁנּוֹלְדָה לָה
   assert.ok(defaultPrayers().yoledetBat.includes('וְאֶת בִּתָּהּ שֶׁנּוֹלְדָה לָהּ'));
   const saved = 'אֶת הָאִשָּׁה הַיּוֹלֶדֶת {name} וְאֶת בִּתָּהּ הַנּוֹלְדָה לָהּ בְּמַזָּל טוֹב';
   assert.ok(upgradePrayers({ ...defaultPrayers(), yoledetBat: saved }).yoledetBat.includes('וְאֶת בִּתָּהּ שֶׁנּוֹלְדָה לָהּ'));
+});
+
+test('the yoledet-ben text says בְּנָהּ שֶׁנּוֹלַד לָהּ, also in a text saved before the fix', () => {
+  assert.ok(defaultPrayers().yoledetBen.includes('וְאֶת בְּנָהּ שֶׁנּוֹלַד לָהּ'));
+  const saved = defaultPrayers().yoledetBen.replace('בְּנָהּ שֶׁנּוֹלַד לָהּ', 'בְּנָהּ הַנּוֹלָד לָהּ');
+  assert.ok(upgradePrayers({ ...defaultPrayers(), yoledetBen: saved }).yoledetBen.includes('וְאֶת בְּנָהּ שֶׁנּוֹלַד לָהּ'));
+});
+
+test('a sick person is named by his mother: בן for a man, בת for a woman', () => {
+  assert.equal(sickName('רפאל', 'שרה', 'm'), 'רפאל בן שרה');
+  assert.equal(sickName(' חנה ', 'רבקה', 'f'), 'חנה בת רבקה');
+  assert.equal(sickName('חנה', 'בת רבקה', 'f'), 'חנה בת רבקה');
+  assert.equal(sickName('חנה', 'בן רבקה', 'f'), 'חנה בת רבקה');
+  assert.equal(sickName('רפאל', '', 'm'), 'רפאל');
 });

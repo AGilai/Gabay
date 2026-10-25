@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Sick list: add with name · בן / בת · mother's name; the word בן / בת picks the man's or the woman's blessing.
+- Yoledet (son): "וְאֶת בְּנָהּ שֶׁנּוֹלַד לָהּ".
 - Search is its own screen with filters: כהנים / לויים / ישראל (the tab you came from is already picked),
   and שם העולה / שם האב (split at "בן").
 - The choosing page keeps the days number for people already in the reading and marks them instead.

@@ -195,7 +195,10 @@ only, no hint.
 
 ### S6 · חולים (sick list)
 
-Each entry is one free-text line plus male / female and the date added. Add, remove ("הבריא"). After 30 days the
+Added as three parts: his name, a בן (גבר) | בת (אישה) switch, his mother's name. They are saved as one line
+("רפאל בן שרה"), with a preview before adding. The switch also picks the man's or the woman's wording. For a
+saved line, the word בן / בת in it decides the wording, so lines from before the switch existed come out
+right. Each entry shows its wording and the date added. Add, remove ("הבריא"). After 30 days the
 app asks once whether to keep praying for him or her.
 
 ### S7 · היסטוריה
