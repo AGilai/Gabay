@@ -8,10 +8,13 @@ import { aliyotOf } from '../../core/queue.ts';
 import { daysBetween } from '../../core/dates.ts';
 import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, activeKey, findReading, keyText, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, snackbar } from '../ui.ts';
+import { ANYWHERE, filterText, isAnywhere, type AreaFilter } from '../../core/area.ts';
+import { areaBadge, filterAreaSheet } from '../area.ts';
 
 let query = '';
 let findGroup: Group | null = null;
 let findField: SearchField = 'all';
+let findArea: AreaFilter = ANYWHERE;
 let showInactive = false;
 
 const LONG_PRESS_MS = 500;
@@ -73,7 +76,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   const row = (p: Person, cls: string, small: Node | string, side: HTMLElement) =>
     pressable(h('div', { class: 'row ' + cls, role: 'button' },
       h('div', { class: 'av ' + GROUP_CLASS[p.group] }, p.name.trim()[0] ?? '?'),
-      h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, small)),
+      h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, areaBadge(p.area), small)),
       side,
       // A visible way to the person card (holding the row still works too).
       h('button', { class: 'icon edit', 'aria-label': 'עריכת ' + p.name,
@@ -92,7 +95,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   const fillList = () => {
     list.replaceChildren();
     if (finding) {
-      const found = search(state, query, { group: findGroup, field: findField });
+      const found = search(state, query, { group: findGroup, field: findField, area: findArea });
       if (!found.length) list.append(h('div', { class: 'notice' }, 'לא נמצא. אפשר להוסיף אדם חדש.'));
       for (const p of found) {
         const note = [GROUP_WORD[p.group], p.stopped ? 'מושהה' : '', p.hint].filter(Boolean).join(' · ');
@@ -144,9 +147,21 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
       paint();
       return bar;
     };
+    // The place filter is one button; the 5 x 2 grid opens from below only when it is needed.
+    const placeBtn = h('button', { type: 'button' });
+    const paintPlace = () => {
+      const any = isAnywhere(findArea);
+      placeBtn.className = 'chip' + (any ? '' : ' sel');
+      placeBtn.replaceChildren('מקום: ' + filterText(findArea), any ? ' ▾' : h('span', { class: 'x', role: 'button', 'aria-label': 'נקה מקום',
+        onclick: (e: Event) => { e.stopPropagation(); findArea = ANYWHERE; paintPlace(); fillList(); } }, '✕'));
+    };
+    placeBtn.addEventListener('click', () => filterAreaSheet(findArea, (f) => { findArea = f; paintPlace(); fillList(); }));
+    paintPlace();
+    const fieldRow = seg<SearchField>([['all', 'הכל'], ['own', 'שם העולה'], ['father', 'שם האב']], () => findField, (v) => { findField = v; });
+    fieldRow.style.display = 'contents'; // its chips repaint; the place button sits beside them
     const filters = h('div', { class: 'filters' },
       seg<Group | null>([[null, 'הכל'], ['K', 'כהנים'], ['L', 'לויים'], ['Y', 'ישראל']], () => findGroup, (v) => { findGroup = v; }),
-      seg<SearchField>([['all', 'הכל'], ['own', 'שם העולה'], ['father', 'שם האב']], () => findField, (v) => { findField = v; }));
+      h('div', { class: 'chips wrap' }, fieldRow, placeBtn));
     fillList();
     requestAnimationFrame(() => { input.focus(); input.setSelectionRange(input.value.length, input.value.length); });
     return h('div', { class: 'screen' },
@@ -155,7 +170,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
       h('a', { class: 'fab', href: `#new/${group}` + tail }, icon('plus'), 'אדם חדש'));
   }
   const openFind = () => {
-    query = ''; findGroup = r?.noKohen && group !== 'Y' ? null : group; findField = 'all';
+    query = ''; findGroup = r?.noKohen && group !== 'Y' ? null : group; findField = 'all'; findArea = ANYWHERE;
     ctx.go(location.hash + '/find');
   };
   return h('div', { class: 'screen' },

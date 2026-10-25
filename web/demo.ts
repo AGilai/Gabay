@@ -34,6 +34,8 @@ export function demoState(today: ISODate): State {
   const s = emptyState(today);
   s.people = PEOPLE.map(([group, name, callLine, hint], i): Person => ({
     id: 'd' + i, name, group, callLine, hint, regular: i % 5 !== 4, stopped: false, seat: '',
+    // Most have a seat area; every fourth has none yet.
+    area: i % 4 === 3 ? null : { col: (i * 2) % 5 + 1, half: i % 3 === 0 ? 'R' : 'F' },
     yahrzeits: [], addedOn: addDays(today, -400), hiyuv: null,
   }));
   // A newcomer who has not been called yet, and a yahrzeit two days from now.

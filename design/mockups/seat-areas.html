@@ -1,0 +1,366 @@
+<title>Seat Areas Screens</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* A board of Android phone frames at 1px = 1dp, after a terminology sheet. The hall is 5 columns x 2 halves = 10 areas. */
+:root{
+  --board:#e7ebf1; --screen:#fbfcfe; --surface:#ffffff; --surface2:#eef2f8;
+  --ink:#141c27; --muted:#5a6678; --line:#d5dce6;
+  --accent:#1d4c9f; --on-accent:#ffffff; --accent-bg:#dfe8f8;
+  --kohen:#9a6d07; --kohen-bg:#f7edd4; --levi:#0d7369; --levi-bg:#d7f0ec; --israel:#6141a8; --israel-bg:#ebe3f8;
+  --ark:#7a5a1e; --ark-bg:#f3ead6;
+  --f-display:"Frank Ruhl Libre","David","Times New Roman",serif;
+  --f-ui:"Assistant","Segoe UI",Roboto,Arial,sans-serif;
+  --pw:412px; --ph:860px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37; --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33; --accent-bg:#1c2b47; --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --ark:#e0c07a; --ark-bg:#2f2817; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37; --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33; --accent-bg:#1c2b47; --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --ark:#e0c07a; --ark-bg:#2f2817; color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--board);color:var(--ink);font-family:var(--f-ui);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.intro{max-width:72ch;display:grid;gap:8px;margin-bottom:20px;direction:rtl}
+.intro h1{font-family:var(--f-display);font-size:28px;margin:0;text-wrap:balance}
+.intro p{margin:0;color:var(--muted);line-height:1.55;font-size:15px}
+
+/* terminology sheet */
+.terms{direction:rtl;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;max-width:900px;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px;margin-bottom:32px}
+@media (max-width:760px){.terms{grid-template-columns:minmax(0,1fr)}}
+.terms h2{font-family:var(--f-display);font-size:22px;margin:0 0 10px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:start;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em}
+td b{font-family:var(--f-display);font-size:17px}
+code{font-family:var(--f-ui);font-weight:700;background:var(--accent-bg);color:var(--accent);padding:1px 7px;border-radius:6px}
+
+/* the hall: ark on top, columns 1..5 left to right whatever the text direction */
+.hall{display:grid;gap:6px}
+.ark{background:var(--ark-bg);color:var(--ark);border-radius:10px 10px 4px 4px;text-align:center;font-family:var(--f-display);font-weight:700;padding:6px;font-size:15px}
+.grid{direction:ltr;display:grid;grid-template-columns:28px repeat(5,minmax(0,1fr));gap:6px;align-items:stretch}
+.grid .ch,.grid .rh{font-size:12px;font-weight:700;color:var(--muted);display:grid;place-items:center;border-radius:8px;border:0;background:none;padding:0}
+.grid .rh{writing-mode:vertical-rl;transform:rotate(180deg);direction:rtl}
+.grid button.ch,.grid button.rh{border:1px dashed var(--line);min-height:28px}
+.grid button.ch.on,.grid button.rh.on{background:var(--accent);color:var(--on-accent);border-style:solid;border-color:var(--accent)}
+.cell{min-height:54px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);display:grid;place-items:center;
+  font-weight:700;font-size:15px;direction:rtl;padding:2px;line-height:1.15;text-align:center}
+.cell small{display:block;font-size:11px;font-weight:600;color:var(--muted)}
+.cell.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.cell.on small{color:var(--on-accent);opacity:.85}
+.cell.dim{opacity:.45}
+.big .cell{min-height:72px;font-size:17px}
+.door{text-align:center;font-size:12px;color:var(--muted)}
+
+/* phones */
+.board{display:flex;flex-wrap:wrap;gap:32px 28px;align-items:flex-start}
+figure{margin:0;display:grid;gap:10px;max-width:100%}
+.scroll{overflow-x:auto;max-width:100%;padding-bottom:4px}
+figcaption{max-width:var(--pw);font-size:14px;line-height:1.5;color:var(--muted);direction:rtl}
+figcaption b{color:var(--ink);display:block;font-size:15px}
+.phone{width:var(--pw);height:var(--ph);background:var(--screen);border-radius:28px;outline:8px solid #1b1f26;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;direction:rtl;margin:8px;font-size:16px}
+.status{height:24px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-size:12px;font-weight:600;direction:ltr}
+.appbar{height:60px;flex:none;display:flex;align-items:center;gap:6px;padding:0 6px}
+.appbar .t{flex:1;min-width:0}
+.appbar h3{margin:0;font-family:var(--f-display);font-size:22px;line-height:26px}
+.appbar small{font-size:12px;color:var(--muted)}
+.ib{width:44px;height:44px;border-radius:22px;display:grid;place-items:center;font-size:22px;flex:none}
+.body{flex:1;min-height:0;overflow:hidden;padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.field{border:1px solid var(--line);border-radius:8px;padding:16px 12px 10px;position:relative;font-size:16px;background:var(--screen)}
+.field label{position:absolute;top:-9px;right:10px;background:var(--screen);padding:0 4px;font-size:12px;color:var(--muted)}
+.sec{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.03em;display:flex;justify-content:space-between;align-items:center}
+.sec .val{color:var(--accent);font-size:15px}
+.link{color:var(--accent);font-weight:700;font-size:14px;background:none;border:0;padding:4px}
+.search{height:48px;border-radius:24px;background:var(--surface2);display:flex;align-items:center;gap:10px;padding:0 16px;color:var(--ink);flex:none}
+.search .caret{width:2px;height:22px;background:var(--accent)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;font-size:14px;font-weight:600;background:var(--surface)}
+.chip.sel{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.flabel{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:-6px}
+.mini .cell{min-height:36px;font-size:13px}
+.row{min-height:64px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:6px 0}
+.av{width:40px;height:40px;border-radius:20px;display:grid;place-items:center;font-weight:700;flex:none}
+.av.k{background:var(--kohen-bg);color:var(--kohen)} .av.l{background:var(--levi-bg);color:var(--levi)} .av.y{background:var(--israel-bg);color:var(--israel)}
+.who{flex:1;min-width:0}
+.who b{display:block;font-family:var(--f-display);font-size:18px;line-height:22px}
+.who small{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.area{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:22px;padding:0 6px;border-radius:11px;
+  background:var(--accent-bg);color:var(--accent);font-size:12px;font-weight:700;margin-inline-end:6px;vertical-align:1px}
+.days{width:52px;text-align:center;flex:none;font-variant-numeric:tabular-nums}
+.days b{display:block;font-size:19px;line-height:21px} .days small{font-size:11px;color:var(--muted)}
+.tabs{display:flex;border-bottom:1px solid var(--line);flex:none}
+.tabs span{flex:1;text-align:center;padding:12px 0;font-weight:700;font-size:15px;color:var(--muted)}
+.tabs span.on{color:var(--kohen);box-shadow:inset 0 -3px 0 var(--kohen)}
+.cb{width:22px;height:22px;border-radius:6px;border:2px solid var(--muted);display:grid;place-items:center;flex:none;font-size:14px;font-weight:700}
+.cb.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn{height:44px;border-radius:22px;border:0;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:15px;padding:0 18px}
+.note{font-size:13px;color:var(--muted);line-height:1.45}
+/* compact area field: one line, tap opens the grid in a sheet */
+.pickf{border:1px solid var(--line);border-radius:8px;padding:14px 12px 10px;position:relative;background:var(--screen);
+  display:flex;align-items:center;gap:10px;width:100%;text-align:start}
+.pickf label{position:absolute;top:-9px;right:10px;background:var(--screen);padding:0 4px;font-size:12px;color:var(--muted)}
+.pickf .v{flex:1;font-size:16px;font-weight:700}
+.pickf .v.none{font-weight:400;color:var(--muted)}
+.pickf .open{color:var(--accent);font-weight:700;font-size:14px}
+.fchip{height:34px;padding:0 10px 0 12px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;background:var(--surface)}
+.fchip.sel{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.fchip .x{font-weight:700;opacity:.8}
+.scrim{position:absolute;inset:0;background:rgba(10,14,20,.45);display:flex;align-items:flex-end}
+.sheet{background:var(--surface);width:100%;border-radius:20px 20px 0 0;padding:10px 16px 20px;display:grid;gap:12px}
+.sheet .grab{width:36px;height:4px;border-radius:2px;background:var(--line);justify-self:center}
+.sheet h4{margin:0;font-family:var(--f-display);font-size:20px}
+.sheet .row-btns{display:flex;gap:8px;justify-content:space-between;align-items:center}
+.btn.tonal{background:var(--surface2);color:var(--ink)}
+.faded{opacity:.5}
+</style>
+
+<div class="intro">
+  <h1>מקום בבית הכנסת: 10 אזורים</h1>
+  <p>ההצעה: לא מקום מדויק אלא אזור. 5 טורים משמאל לימין (כשמסתכלים לכיוון ארון הקודש) ושני חצאים, קדימה (ליד הארון) ואחורה. כל אדם מקבל אזור אחד, לא חובה. האזור מופיע בכרטיס, ברשימת הבחירה ובחיפוש. אפשר ללחוץ על הרשתות כאן כדי לנסות.</p>
+</div>
+
+<section class="terms" aria-label="מונחים">
+  <div>
+    <h2>האולם</h2>
+    <div class="hall big">
+      <div class="ark">ארון הקודש</div>
+      <div class="grid" id="g-terms"></div>
+      <div class="door">כניסה</div>
+    </div>
+  </div>
+  <div>
+    <h2>מונחים</h2>
+    <table>
+      <thead><tr><th>מונח</th><th>מה זה</th><th>קיצור</th></tr></thead>
+      <tbody>
+        <tr><td><b>טור</b></td><td>1–5, משמאל לימין כשפונים לארון. טור 1 הוא השמאלי ביותר.</td><td style="white-space:nowrap"><code>1</code>…<code>5</code></td></tr>
+        <tr><td><b>קדימה</b></td><td>החצי הקרוב לארון הקודש.</td><td><code>ק</code></td></tr>
+        <tr><td><b>אחורה</b></td><td>החצי הקרוב לכניסה.</td><td><code>א</code></td></tr>
+        <tr><td><b>אזור</b></td><td>טור וחצי ביחד, אחד מ־10. נכתב "טור 3 · קדימה".</td><td><code>3-ק</code></td></tr>
+        <tr><td><b>מקום</b></td><td>השם של השדה בכרטיס: "מקום בבית הכנסת". לא חובה.</td><td></td></tr>
+      </tbody>
+    </table>
+    <p class="note">הקיצור <code>3-ק</code> מופיע ליד השם ברשימת הבחירה ובתוצאות החיפוש. במסך הראשי אין אזור, כמו שאין רמז.</p>
+  </div>
+</section>
+
+<div class="board">
+  <figure>
+    <div class="scroll"><div class="phone">
+      <div class="status"><span>7:02</span><span>●●● 82%</span></div>
+      <div class="appbar"><span class="ib" aria-hidden="true">→</span><div class="t"><h3>שמעון כהנא</h3><small>כהן · קבוע</small></div></div>
+      <div class="body">
+        <div class="field"><label>שם לקריאה</label>שמעון בן מאיר הכהן</div>
+        <div class="field"><label>רמז (רק לגבאי)</label>בעל התקיעות</div>
+        <button class="pickf" type="button" data-open="person"><label>מקום בבית הכנסת</label><span class="v" id="p-val"></span><span class="open">בחר ▾</span></button>
+        <div class="field"><label>יארצייט</label><span class="note">+ הוסף</span></div>
+        <div class="field"><label>הערות</label><span class="note">&nbsp;</span></div>
+      </div>
+      <div class="scrim" id="sheet-person">
+        <div class="sheet">
+          <div class="grab"></div>
+          <h4>מקום בבית הכנסת</h4>
+          <div class="hall"><div class="ark">ארון הקודש</div><div class="grid" id="g-person"></div></div>
+          <div class="row-btns"><button class="link" id="p-clear" type="button">בלי מקום</button><span class="note">לחיצה על אזור שומרת וסוגרת</span></div>
+        </div>
+      </div>
+    </div></div>
+    <figcaption><b>A1 · כרטיס אישי</b>שורה אחת, כמו השדה "מקום ישיבה" היום: "3-ק" או "לא נבחר". לחיצה על השורה פותחת את הרשת מלמטה. לחיצה על אזור שומרת וסוגרת. "בלי מקום" מנקה. (כאן אפשר ללחוץ על השורה כדי לראות.)</figcaption>
+  </figure>
+
+  <figure>
+    <div class="scroll"><div class="phone">
+      <div class="status"><span>7:04</span><span>●●● 81%</span></div>
+      <div class="appbar"><span class="ib" aria-hidden="true">✕</span><div class="t"><h3>חיפוש</h3><small>לכהן</small></div></div>
+      <div class="body" style="gap:10px">
+        <div class="search"><span aria-hidden="true">⌕</span><span class="caret"></span><span class="note">חיפוש שם, שם לקריאה, רמז…</span></div>
+        <div class="chips"><span class="chip">הכל</span><span class="chip sel">כהנים</span><span class="chip">לויים</span><span class="chip">ישראל</span></div>
+        <div class="chips"><span class="chip sel">הכל</span><span class="chip">שם העולה</span><span class="chip">שם האב</span>
+          <button class="fchip" type="button" data-open="search" id="s-chip"></button></div>
+        <div class="note" id="s-summary"></div>
+        <div id="s-list"></div>
+      </div>
+      <div class="scrim" id="sheet-search">
+        <div class="sheet">
+          <div class="grab"></div>
+          <h4>איפה יושב?</h4>
+          <div class="hall"><div class="ark">ארון הקודש</div><div class="grid" id="g-search"></div></div>
+          <div class="row-btns"><button class="link" id="s-any" type="button">בכל מקום</button><button class="btn" id="s-done" type="button">הצג</button></div>
+          <div class="note">תא = אזור אחד. "טור 3" = כל הטור. "קדימה" / "אחורה" = כל החצי.</div>
+        </div>
+      </div>
+    </div></div>
+    <figcaption><b>A2 · חיפוש לפי מקום</b>המסנן הוא כפתור אחד בסוף שורת המסננים: "מקום: הכל ▾", ואחרי בחירה "מקום: 3-א ✕". לחיצה פותחת את הרשת מלמטה; ✕ מנקה בלי לפתוח. כך הרשימה מקבלת כמעט את כל המסך.</figcaption>
+  </figure>
+
+  <figure>
+    <div class="scroll"><div class="phone">
+      <div class="status"><span>7:05</span><span>●●● 81%</span></div>
+      <div class="appbar"><div class="t" style="padding-inline-start:10px"><h3>בחירה</h3><small>נכנס ישר למקומו בקריאה</small></div></div>
+      <div class="tabs"><span class="on">כהנים 6</span><span>לויים 4</span><span>ישראלים 11</span></div>
+      <div class="body" style="gap:0">
+        <div class="search" style="margin:8px 0"><span aria-hidden="true">⌕</span><span class="note">חיפוש שם, שם לקריאה, רמז…</span></div>
+        <div class="row"><span class="av k">א</span><div class="who"><b>אליהו כ״ץ</b><small><span class="area">2-א</span>האח של משה</small></div><div class="days"><b>18</b><small>יום</small></div></div>
+        <div class="row"><span class="av k">ר</span><div class="who"><b>רפאל אזולאי</b><small><span class="area">5-ק</span>ליד העמוד</small></div><div class="days"><b>14</b><small>יום</small></div></div>
+        <div class="row"><span class="av k">מ</span><div class="who"><b>משה כ״ץ</b><small><span class="area">1-ק</span>ליד החלון</small></div><div class="days"><b>7</b><small>יום</small></div></div>
+        <div class="row"><span class="av k">ש</span><div class="who"><b>שמעון כהנא</b><small><span class="area">4-ק</span>בעל התקיעות</small></div><div class="days"><b>4</b><small>יום</small></div></div>
+        <div class="row"><span class="av k">ב</span><div class="who"><b>בני כהן</b><small>מזדמן · בא עם הבן</small></div><div class="days"><b>165</b><small>יום</small></div></div>
+      </div>
+    </div></div>
+    <figcaption><b>A3 · רשימת הבחירה</b>תג קטן לפני הרמז. מי שאין לו אזור, בלי תג. הסדר לא משתנה (התור נשאר לפי זמן המתנה).</figcaption>
+  </figure>
+
+  <figure>
+    <div class="scroll"><div class="phone">
+      <div class="status"><span>21:40</span><span>●●● 64%</span></div>
+      <div class="appbar"><span class="ib" aria-hidden="true">→</span><div class="t"><h3>סידור מקומות</h3><small id="a-sub"></small></div></div>
+      <div class="body" style="gap:10px">
+        <div class="hall">
+          <div class="ark">ארון הקודש</div>
+          <div class="grid" id="g-assign"></div>
+        </div>
+        <div class="search"><span aria-hidden="true">⌕</span><span class="note">חיפוש שם…</span></div>
+        <div id="a-list"></div>
+        <div class="note">מי שכבר יושב באזור אחר מסומן בתג שלו. סימון כאן מעביר אותו.</div>
+      </div>
+    </div></div>
+    <figcaption><b>A4 · סידור מקומות (עוד ← סידור מקומות)</b>לשיבוץ מהיר: בוחרים אזור, ומסמנים את מי שיושב שם. המספר בכל תא = כמה אנשים שובצו בו. מתחילים מאנשים בלי אזור.</figcaption>
+  </figure>
+</div>
+
+<script>
+// Invented people (the app's demo set). area: [column 1-5, 'ק' | 'א'] or null.
+const PEOPLE = [
+  ['משה כ״ץ', 'k', 'ליד החלון', [1, 'ק'], 7], ['שמעון כהנא', 'k', 'בעל התקיעות', [4, 'ק'], 4],
+  ['אליהו כ״ץ', 'k', 'האח של משה', [2, 'א'], 18], ['רפאל אזולאי', 'k', 'ליד העמוד', [5, 'ק'], 14],
+  ['בני כהן', 'k', 'מזדמן', null, 165], ['יוסי לוי', 'l', 'משקפיים עגולות', [2, 'א'], 22],
+  ['צבי סגל', 'l', 'יושב מאחור', [3, 'א'], 9], ['דוד פרץ', 'y', 'שורה 1', [1, 'ק'], 30],
+  ['אריה גולן', 'y', 'מאחורי הבימה', [3, 'א'], 12], ['חיים ברק', 'y', 'ליד הדלת', [1, 'א'], 41],
+  ['יעקב מזרחי', 'y', '', [5, 'א'], 3], ['גדעון פז', 'y', '', null, 26], ['שאול רביב', 'y', 'אורח מירושלים', null, 60],
+];
+const HALF = { 'ק': 'קדימה', 'א': 'אחורה' };
+const h = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+// One grid builder: header row of columns, then קדימה and אחורה rows. opts: headers clickable, counts, onCell.
+function grid(el, { headers = false, isOn, onCell, onCol, onHalf, colOn, halfOn, label = (c, r) => [String(c), HALF[r]] }) {
+  el.replaceChildren();
+  el.append(h('span', 'ch'));
+  for (let c = 1; c <= 5; c++) {
+    const b = h(headers ? 'button' : 'span', 'ch' + (colOn?.(c) ? ' on' : ''), 'טור ' + c);
+    if (headers) { b.type = 'button'; b.onclick = () => onCol(c); }
+    el.append(b);
+  }
+  for (const r of ['ק', 'א']) {
+    const rh = h(headers ? 'button' : 'span', 'rh' + (halfOn?.(r) ? ' on' : ''), HALF[r]);
+    if (headers) { rh.type = 'button'; rh.onclick = () => onHalf(r); }
+    el.append(rh);
+    for (let c = 1; c <= 5; c++) {
+      const [main, sub] = label(c, r);
+      const b = h(onCell ? 'button' : 'div', 'cell' + (isOn?.(c, r) ? ' on' : ''));
+      b.append(main, h('small', '', sub));
+      if (onCell) { b.type = 'button'; b.onclick = () => onCell(c, r); b.setAttribute('aria-label', `טור ${c} ${HALF[r]}`); }
+      el.append(b);
+    }
+  }
+}
+
+// Sheets: the grid opens from below; tapping the dim background closes it.
+function sheet(name, open) { document.getElementById('sheet-' + name).hidden = !open; }
+for (const b of document.querySelectorAll('[data-open]')) b.addEventListener('click', (e) => {
+  if (e.target.classList.contains('x')) return; sheet(b.dataset.open, true); });
+for (const sc of document.querySelectorAll('.scrim')) sc.addEventListener('click', (e) => { if (e.target === sc) sc.hidden = true; });
+sheet('person', false);
+
+grid(document.getElementById('g-terms'), { label: (c, r) => [c + '-' + r, 'טור ' + c] });
+
+// A1 person card
+let mine = [4, 'ק'];
+const drawPerson = () => {
+  grid(document.getElementById('g-person'), {
+    isOn: (c, r) => mine && mine[0] === c && mine[1] === r,
+    onCell: (c, r) => { mine = [c, r]; drawPerson(); sheet('person', false); },
+    label: (c, r) => [String(c), HALF[r]],
+  });
+  const v = document.getElementById('p-val');
+  v.textContent = mine ? mine[0] + '-' + mine[1] : 'לא נבחר';
+  v.className = 'v' + (mine ? '' : ' none');
+};
+document.getElementById('p-clear').onclick = () => { mine = null; drawPerson(); sheet('person', false); };
+drawPerson();
+
+// A2 search: a filter is a set of columns x halves. Start: the rear half of column 2 and 3 → shown as column 3 rear.
+let fCol = null, fHalf = 'א';
+const match = (a) => a && (fCol === null || a[0] === fCol) && (fHalf === null || a[1] === fHalf);
+const drawSearch = () => {
+  grid(document.getElementById('g-search'), {
+    headers: true,
+    isOn: (c, r) => (fCol !== null || fHalf !== null) && (fCol === null || fCol === c) && (fHalf === null || fHalf === r),
+    colOn: (c) => fCol === c && fHalf === null, halfOn: (r) => fHalf === r && fCol === null,
+    onCell: (c, r) => { const same = fCol === c && fHalf === r; fCol = same ? null : c; fHalf = same ? null : r; drawSearch(); },
+    onCol: (c) => { const same = fCol === c && fHalf === null; fCol = same ? null : c; fHalf = null; drawSearch(); },
+    onHalf: (r) => { const same = fHalf === r && fCol === null; fHalf = same ? null : r; fCol = null; drawSearch(); },
+    label: (c, r) => [c + '-' + r, ''],
+  });
+  const any = fCol !== null || fHalf !== null;
+  const chip = document.getElementById('s-chip'); chip.replaceChildren();
+  chip.className = 'fchip' + (any ? ' sel' : '');
+  const short = !any ? 'הכל' : fCol && fHalf ? fCol + '-' + fHalf : fCol ? 'טור ' + fCol : HALF[fHalf];
+  chip.append('מקום: ' + short + ' ');
+  if (any) { const x = h('span', 'x', '✕'); x.onclick = () => { fCol = null; fHalf = null; drawSearch(); }; chip.append(x); }
+  else chip.append('▾');
+  const found = PEOPLE.filter((p) => p[1] === 'k' && (!any || match(p[3])));
+  document.getElementById('s-summary').textContent = !any ? 'כל הכהנים' :
+    `כהנים ב${fCol ? 'טור ' + fCol : ''}${fCol && fHalf ? ' · ' : ''}${fHalf ? (fCol ? HALF[fHalf] : { 'ק': 'חצי הקדמי', 'א': 'חצי האחורי' }[fHalf]) : ''}: ${found.length}`;
+  const list = document.getElementById('s-list'); list.replaceChildren();
+  for (const p of found) list.append(personRow(p));
+  if (!found.length) list.append(h('div', 'note', 'אין כהנים באזור הזה.'));
+};
+function personRow(p, extra) {
+  const row = h('div', 'row');
+  row.append(h('span', 'av ' + p[1], p[0][0]));
+  const who = h('div', 'who'); who.append(h('b', '', p[0]));
+  const small = h('small');
+  if (p[3]) small.append(h('span', 'area', p[3][0] + '-' + p[3][1]));
+  small.append(p[2] || '');
+  who.append(small); row.append(who);
+  if (extra) row.prepend(extra);
+  else { const d = h('div', 'days'); d.append(h('b', '', String(p[4])), h('small', '', 'יום')); row.append(d); }
+  return row;
+}
+document.getElementById('s-any').onclick = () => { fCol = null; fHalf = null; drawSearch(); };
+document.getElementById('s-done').onclick = () => sheet('search', false);
+drawSearch();
+
+// A4 assign: pick an area, tick the people sitting there.
+let pick = [3, 'א'];
+const drawAssign = () => {
+  const count = (c, r) => PEOPLE.filter((p) => p[3] && p[3][0] === c && p[3][1] === r).length;
+  grid(document.getElementById('g-assign'), {
+    isOn: (c, r) => pick[0] === c && pick[1] === r,
+    onCell: (c, r) => { pick = [c, r]; drawAssign(); },
+    label: (c, r) => [c + '-' + r, count(c, r) + ' אנשים'],
+  });
+  document.getElementById('a-sub').textContent = `משבץ ל: טור ${pick[0]} · ${HALF[pick[1]]}`;
+  const here = (p) => p[3] && p[3][0] === pick[0] && p[3][1] === pick[1];
+  const order = [...PEOPLE].sort((a, b) => Number(!!b.here) - Number(!!a.here) || Number(!!a[3]) - Number(!!b[3]));
+  const list = document.getElementById('a-list'); list.replaceChildren();
+  for (const p of order.filter(here).concat(order.filter((p) => !here(p)).slice(0, 5))) {
+    const cb = h('button', 'cb' + (here(p) ? ' on' : ''), here(p) ? '✓' : '');
+    cb.type = 'button'; cb.setAttribute('aria-label', 'שבץ את ' + p[0]);
+    cb.onclick = () => { p[3] = here(p) ? null : [pick[0], pick[1]]; drawAssign(); };
+    const row = personRow(p, cb); row.querySelector('.days')?.remove();
+    list.append(row);
+  }
+};
+drawAssign();
+</script>

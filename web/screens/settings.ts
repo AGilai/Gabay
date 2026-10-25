@@ -28,6 +28,7 @@ export function renderMore(ctx: Ctx): HTMLElement {
     appBar('עוד', ctx.store.demo ? 'מצב הדגמה: שום דבר לא נשמר' : null),
     h('main', { class: 'body menu', style: 'gap:0' },
       item('#history', 'history', 'היסטוריה'),
+      item('#seats', 'people', 'סידור מקומות'),
       item('#import', 'import', 'ייבוא מוואטסאפ'),
       item('#settings', 'settings', 'הגדרות וגיבוי', due ? 'הגיע הזמן לגבות' : undefined)),
     bottomNav('more', due));

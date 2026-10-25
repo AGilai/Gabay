@@ -21,8 +21,8 @@ discussed after this is approved. Mockup: `design/mockups/ux-screens.html` (publ
    Hebrew-name / father-name fields.
 8. **Nusach Sfard, Israel calendar.**
 9. **Starting data:** import the WhatsApp log the gabbai has kept so far (§7, S8).
-10. **Seating chart:** use the Excel chart for its **layout only**. Its names are the Shabbat seating
-    and don't apply to weekdays.
+10. **Seating:** (revised 2026-10-25) no seat map. Each person may have a rough area, 5 columns × front /
+    back (§11). The Excel chart's names are the Shabbat seating and don't apply to weekdays.
 
 ## 1. What the app is for
 
@@ -73,7 +73,7 @@ Quick add needs only the fields marked \*.
 - Regular / occasional (§8)
 - Stop suggesting: on / off
 - Yahrzeit dates (Hebrew date + for whom), which make him a חיוב on the right day
-- Preferred seat (phase 2 map; a free-text field for now)
+- Seat area (optional): one of 10, "3-ק" (§11)
 - History: his aliyot (date, slot)
 
 ## 5. Day types and number of aliyot (Israel calendar)
@@ -309,37 +309,33 @@ Portrait only. Design widths are 360 dp (Galaxy A, the smallest that must work),
 Banner 44 + control row 40 + 4 × 88 + chips 40 + gaps ≈ 530 dp, so it fits with no scrolling. With
 the phone's font size at "large" (1.15×), the chips row scrolls sideways first.
 
-## 11. Phase 2: seat map
+## 11. Seat areas (replaces the phase-2 seat map; built 2026-10-25)
 
-**Source:** the shul's Shabbat seating chart, an Excel sheet (screenshot in
-`Screenshot 2026-10-22 at 21.51.01.png`). **Only its layout is used.** The names are Shabbat seats
-and don't apply to weekdays. What it shows:
-- 5 blocks of seats: 2 side blocks, 2 centre blocks, and a front block around the **bimah** in the
-  middle. Row numbers 1–13 are in a column at the right.
-- Each cell is one seat (a coloured cell). Empty cells are aisles.
+The gabbai's decision: not the exact seat, only roughly where someone sits. The hall is **5 columns × 2
+halves = 10 areas**. Mockup: `design/mockups/seat-areas.html` (A1–A4).
 
-Plan: redraw the grid's **shape** once from the screenshot (there is no `.xlsx`), so the map keeps
-the exact blocks, rows and gaps. The text in the cells is ignored, and weekday seats are
-assigned in the app.
+| Term | Meaning | Short |
+|---|---|---|
+| טור | 1–5, from left to right when facing the ark (column 1 is the leftmost) | 1…5 |
+| קדימה | the half next to the ark | ק |
+| אחורה | the half next to the entrance | א |
+| אזור | one column and one half, one of 10 | `3-ק` |
 
-Mockup: `design/mockups/phase2-seat-map.html` (frames P2-1 to P2-3).
+Every grid draws ארון הקודש on top, so "left" is never in doubt. An area is optional (`Person.area`).
 
-- **Two levels.** The hall is about 26 seats wide, which is too wide for 48 dp seats on a phone. A
-  **mini-map** of the whole hall sits on top (one dot per seat, the bimah shaded, the chosen block
-  outlined). Under it, **the chosen block in large tiles** (52 dp high, the full width shared by the
-  block's 4–5 columns). Tap a block on the mini-map, or swipe, to change block.
-- **P2-1 · Choosing on the map:** a "רשימה | מפה" (list / map) switch on the choosing page, with the same
-  group tabs and the same "tap = into the slot". Seats of the chosen group are shaded by waiting time
-  (dark = waited longest), other groups are greyed, ✓ = already in today's reading. Unassigned seats are
-  dashed.
-- **P2-2 · Who is here today (optional):** opened from the main page before the reading. Tap seats to
-  mark the people present. The suggestion and the line put the people marked present first. Without
-  marks, the order works as in phase 1. The marks reset at the end of the day.
-- **P2-3 · Assigning seats (one time):** עוד → סידור מקומות. Tap a seat → search → "שבץ" (assign), or
-  "העבר" (move) when the person already has a seat. The person card shows his seat and "בחר במפה" (pick
-  on the map). Only people with a seat are on the map. Everyone else is reached by the list and search.
-- The layout is stored as data (blocks, rows, columns, bimah) drawn from the chart. No layout editor
-  in the app (YAGNI). If the hall changes, the data file is edited.
+- **A1 · Person card:** one row, "מקום בבית הכנסת: 3-ק" (or "לא נבחר"). A tap opens the 5 × 2 grid in a
+  bottom sheet. A tap on an area saves and closes; "בלי מקום" clears it.
+- **A2 · Search (S2b):** a "מקום: הכל ▾" button at the end of the filter chips. It opens the grid: a cell is
+  one area, "טור 3" the whole column, "קדימה" / "אחורה" the whole half; a second tap clears. After a choice
+  it reads "מקום: 3-א ✕"; ✕ clears without opening. Someone with no area never matches an area filter.
+  With no text, the list is everyone sitting there.
+- **A3 · Choosing list:** a small tag ("3-ק") before the hint. The order of the line does not change. The
+  main page shows no area, as it shows no hint.
+- **A4 · סידור מקומות** (עוד): pick an area on the grid (each cell shows how many sit there), then tick the
+  people sitting there. The list shows those in the area first, then people with no area, then the rest
+  with their tag. Ticking someone from another area moves him; unticking clears his area.
+
+The earlier phase-2 plan (a drawn hall seat by seat, "who is here today") is dropped.
 
 ## 11a. Torah text on the reading page (phase 1.1, built 2026-10-23)
 

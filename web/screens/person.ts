@@ -7,6 +7,8 @@ import { dayInfo } from '../../core/day.ts';
 import type { Group, Person, Reading, SlotRole, State } from '../../core/types.ts';
 import { GROUP_WORD, activeKey, findReading, keyText, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, h, snackbar } from '../ui.ts';
+import { areaTag } from '../../core/area.ts';
+import { pickAreaSheet } from '../area.ts';
 
 const REASONS = ['בר מצווה', 'חתן', 'אבי הבן', 'אבי הבת', 'הגומל', 'יארצייט'];
 // hebcal month numbers in the order of the Hebrew year.
@@ -64,7 +66,10 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
       groupSeg(p.group, (g) => update({ group: g })),
       field('שם לקריאה (כפי שנקרא)', p.callLine, (v) => update({ callLine: v || p.name })),
       field('רמז (פרטי)', p.hint, (v) => update({ hint: v })),
-      field('מקום ישיבה', p.seat, (v) => update({ seat: v })),
+      h('button', { type: 'button', class: 'pickf', onclick: () => pickAreaSheet(p.area, (area) => update({ area })) },
+        h('span', { class: 'lbl' }, 'מקום בבית הכנסת'),
+        h('span', { class: 'v' + (p.area ? '' : ' none') }, p.area ? areaTag(p.area) : 'לא נבחר'),
+        h('span', { class: 'open' }, 'בחר ▾')),
       h('label', { class: 'swrow' }, h('span', {}, 'קבוע'),
         h('input', { type: 'checkbox', class: 'sw', role: 'switch', checked: p.regular, onchange: () => update({ regular: !p.regular }) })),
       h('div', { class: 'stats' },

@@ -1,5 +1,6 @@
 import { daysBetween } from './dates.ts';
 import { yahrzeitThisWeek } from './day.ts';
+import { inArea, type AreaFilter } from './area.ts';
 import type { Group, ISODate, Person, Reading, State } from './types.ts';
 
 export interface Row { person: Person; last: ISODate | null; days: number | null; count12m: number; reason: string | null }
@@ -89,16 +90,17 @@ export type SearchField = 'all' | 'own' | 'father';
 
 // 'all' matches anywhere in the name, calling line or hint; 'own' and 'father' match from the start of a word.
 // No text: everyone in the group, by name.
-export function search(state: State, q: string, opts: { group?: Group | null; field?: SearchField } = {}): Person[] {
+export function search(state: State, q: string, opts: { group?: Group | null; field?: SearchField; area?: AreaFilter } = {}): Person[] {
   const needle = normalize(q);
   if (!needle) {
     const order: Group[] = ['K', 'L', 'Y'];
-    return state.people.filter((p) => !opts.group || p.group === opts.group)
+    return state.people.filter((p) => (!opts.group || p.group === opts.group) && (!opts.area || inArea(p.area, opts.area)))
       .sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group) || a.name.localeCompare(b.name, 'he'));
   }
   const field = opts.field ?? 'all';
   return state.people.filter((p) => {
     if (opts.group && p.group !== opts.group) return false;
+    if (opts.area && !inArea(p.area, opts.area)) return false;
     if (field === 'all') return [p.name, p.callLine, p.hint].some((f) => normalize(f).includes(needle));
     return (' ' + splitCallLine(p.callLine)[field]).includes(' ' + needle);
   });

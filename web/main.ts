@@ -15,6 +15,7 @@ import { renderImport } from './screens/importer.ts';
 import { applyTheme, renderMore, renderSettings } from './screens/settings.ts';
 import { loadTorah, renderTorah } from './screens/torah.ts';
 import { renderService } from './screens/service.ts';
+import { renderSeats } from './screens/seats.ts';
 
 const VERSION = '__VERSION__';
 const params = new URLSearchParams(location.search);
@@ -57,6 +58,9 @@ function render(): void {
       break;
     case 'history':
       view = renderHistory(ctx);
+      break;
+    case 'seats':
+      view = renderSeats(ctx);
       break;
     case 'import':
       view = renderImport(ctx);

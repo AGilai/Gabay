@@ -1,4 +1,5 @@
 // Shared data model. One State object holds everything; it is saved as one JSON record.
+import type { Area } from './area.ts';
 
 export type Group = 'K' | 'L' | 'Y';
 export type ISODate = string; // 'YYYY-MM-DD', local day
@@ -14,7 +15,8 @@ export interface Person {
   hint: string;          // private: choosing page and person card only
   regular: boolean;
   stopped: boolean;      // "stop suggesting": only search finds him
-  seat: string;
+  seat: string;          // unused (the first version's free text); the place is `area`
+  area?: Area | null;    // where he sits, roughly (core/area.ts)
   yahrzeits: Yahrzeit[];
   addedOn: ISODate;
   hiyuv: { date: ISODate; reason: string } | null;

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Seat areas: 5 columns × קדימה / אחורה ("3-ק"). Set on the person card or in עוד → סידור מקומות; shown on the
+  choosing list; a "מקום" filter in search.
 - Mi Sheberach for the sick, asked for out loud (no name chosen): a גבר · אישה · כמה חולים switch.
 - Sick list: add with name · בן / בת · mother's name; the word בן / בת picks the man's or the woman's blessing.
 - Yoledet (son): "וְאֶת בְּנָהּ שֶׁנּוֹלַד לָהּ".
