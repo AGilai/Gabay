@@ -1,4 +1,4 @@
-// S11 reading mode: the whole call-up as one scroll, from "ויעזור… כהן קרב, יעמוד" to "יעמדו המגביה
+// S11 reading mode: the whole call-up as one scroll, from "ותגלה… כהן קרב, יעמוד" to "יעמדו המגביה
 // והגולל". The gabbai's own words in full, the Torah text of each aliyah after its call, and the additions
 // (Mi Sheberach and the rest) as chips at the end, each opening its own screen. Nothing for the ציבור.
 import { render } from '../../core/prayers.ts';
@@ -88,6 +88,7 @@ export function renderService(ctx: Ctx, args: string[]): HTMLElement {
 
   const end = h('section', { class: 'sv' + (focus < 0 ? ' cur' : ''), id: 'sv-end' },
     h('div', { class: 'sec' }, 'סיום'),
+    h('a', { class: 'pickf fold', href: '#prayer/kaddish' }, h('span', { class: 'v' }, 'חצי קדיש'), h('span', { class: 'open' }, 'פתח ›')),
     h('div', { class: 'say' }, h('div', { class: 'who' }, 'גבאי'), h('div', { class: 'callname' }, CLOSING)));
   const chip = (kind: string, text: string, dot = false) => h('a', { class: 'chip' + (dot ? ' dot' : ''), href: '#prayer/' + kind }, text);
   const extras = h('section', { class: 'sv', id: 'sv-extra' },

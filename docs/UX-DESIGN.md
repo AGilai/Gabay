@@ -393,9 +393,11 @@ The whole call-up as one scroll, for the bimah. Mockup: `design/mockups/reading-
 
 - **Way in:** "▶ התחל קריאה" on the main page. **Way out:** "ראשי" at the top (the place is kept).
 - **One page:** for each aliyah, the gabbai's words in full (warm box), then that aliyah's Torah text. The first
-  box starts with "וְיַעֲזֹר וְיָגֵן… הַכֹּל הָבוּ גֹדֶל… כֹּהֵן קְרָב, יַעֲמֹד", the calling line, and "בָּרוּךְ
+  box starts with the weekday "וְתִגָּלֶה וְתֵרָאֶה… הַכֹּל הָבוּ גֹדֶל… כֹּהֵן קְרָב, יַעֲמֹד", the calling line, and "בָּרוּךְ
   שֶׁנָּתַן תּוֹרָה…". Then "יַעֲמֹד" + line for each oleh, and at the end "יַעַמְדוּ הַמַּגְבִּיהַּ וְהַגּוֹלֵל"
   (no picking of people). Nothing for the ציבור or the ש״ץ, and no oleh blessings (printed at the bimah).
+  Before it, a closed row "חצי קדיש ›" opens the half kaddish (נוסח ספרד; לְעֵלָּא וּלְעֵלָּא on 1–10 Tishrei) on its
+  own page, with the back arrow returning to the same place.
 - **Added to the call, in grey with a dotted underline** (the saved calling line never changes): הכהן / הלוי
   when the line lacks it; שני / שלישי / רביעי; "אֵין כָּאן כֹּהֵן, יַעֲמֹד … בִּמְקוֹם כֹּהֵן"; the Kohen again
   "… בִּמְקוֹם לֵוִי". Wording confirmed by the gabbai, 2026-10-24.

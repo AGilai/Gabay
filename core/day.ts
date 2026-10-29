@@ -21,6 +21,12 @@ function hdate(date: ISODate): any {
   return new hebcal.HDate(fromISODate(date));
 }
 
+// 1–10 Tishrei: half kaddish says לְעֵלָּא וּלְעֵלָּא.
+export function isTenDays(date: ISODate): boolean {
+  const hd = hdate(date);
+  return hd.getMonth() === hebcal.months.TISHREI && hd.getDate() <= 10;
+}
+
 function isChanukah(hd: any): boolean {
   const start = new hebcal.HDate(25, hebcal.months.KISLEV, hd.getFullYear());
   const n = hd.deltaDays(start);

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Reading mode opens with the weekday "וְתִגָּלֶה וְתֵרָאֶה…" (was the Shabbat "וְיַעֲזֹר").
+- Reading mode: a "חצי קדיש" row before המגביה והגולל opens the half kaddish on its own page.
 - Seat areas: 5 columns × קדימה / אחורה ("3-ק"). Set on the person card or in עוד → סידור מקומות; shown on the
   choosing list; a "מקום" filter in search.
 - Mi Sheberach for the sick, asked for out loud (no name chosen): a גבר · אישה · כמה חולים switch.

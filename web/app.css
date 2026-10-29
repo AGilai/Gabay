@@ -305,6 +305,7 @@ button.search{width:100%;border:0;font:inherit;font-size:16px;text-align:start;c
 .pickf .v{flex:1;font-size:16px;font-weight:700}
 .pickf .v.none{font-weight:400;color:var(--muted)}
 .pickf .open{color:var(--accent);font-weight:700;font-size:14px}
+.pickf.fold{text-decoration:none;min-height:48px;border-color:var(--line)}
 .chip .x{margin-inline-start:4px;font-weight:700}
 .seatrow{cursor:pointer;color:inherit;font:inherit}
 .scb{width:24px;height:24px;border-radius:6px;border:2px solid var(--muted);display:grid;place-items:center;flex:none;font-size:14px;font-weight:700}

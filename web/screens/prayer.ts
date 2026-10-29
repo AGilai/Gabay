@@ -1,14 +1,14 @@
 // S4: prayer text in large type, names filled in. Olim are named by their calling line.
 import { DONOR, render, sickBlessings, withoutNaming } from '../../core/prayers.ts';
-import { GOMEL, SIDDUR_CREDIT, TORAH_BLESSINGS, type Said } from '../../core/service.ts';
+import { GOMEL, SIDDUR_CREDIT, TORAH_BLESSINGS, halfKaddish, type Said } from '../../core/service.ts';
 import type { State } from '../../core/types.ts';
 import { currentKey, findReading, personById, type Ctx } from '../ctx.ts';
 import { appBar, h, icon } from '../ui.ts';
 
-export type PrayerKind = 'oleh' | 'sick' | 'barMitzvah' | 'yoledet' | 'azkara' | 'brachot' | 'gomel';
+export type PrayerKind = 'oleh' | 'sick' | 'barMitzvah' | 'yoledet' | 'azkara' | 'brachot' | 'gomel' | 'kaddish';
 const TITLE: Record<PrayerKind, string> = {
   oleh: 'מי שברך לעולה', sick: 'מי שברך לחולים', barMitzvah: 'מי שברך לבר מצווה', yoledet: 'מי שברך ליולדת', azkara: 'אזכרה',
-  brachot: 'ברכות התורה', gomel: 'ברכת הגומל',
+  brachot: 'ברכות התורה', gomel: 'ברכת הגומל', kaddish: 'חצי קדיש',
 };
 const SIZE_KEY = 'gabay.prayerSize';
 
@@ -23,6 +23,7 @@ let female = false;
 let sickBlank: 'm' | 'f' | 'many' = 'm'; // sick, no names chosen: whose wording
 let sickTogether = false; // several sick: one plural blessing instead of one per person
 const FIXED: Partial<Record<PrayerKind, Said[]>> = { brachot: TORAH_BLESSINGS, gomel: GOMEL };
+const fixedOf = (kind: PrayerKind, today: string): Said[] | undefined => (kind === 'kaddish' ? halfKaddish(today) : FIXED[kind]);
 
 function readSize(): number {
   try { return Number(localStorage.getItem(SIZE_KEY)) || 24; } catch { return 24; }
@@ -92,7 +93,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
           h('button', { class: sickTogether ? 'on' : '', onclick: () => { sickTogether = true; draw(); } }, 'כולם יחד')));
       }
       sub = `${state.sick.filter((s) => !sickOff.has(s.id)).length} שמות · נוסח ספרד`;
-    } else if (FIXED[kind]) {
+    } else if (fixedOf(kind, ctx.today)) {
       sub = 'נוסח ספרד';
     } else {
       picks.append(nameInput());
@@ -138,7 +139,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
   }
 
   function paint(names: { name?: string; names?: string }): void {
-    const fixed = FIXED[kind];
+    const fixed = fixedOf(kind, ctx.today);
     if (fixed) {
       para.replaceChildren(...fixed.flatMap((x) => [h('div', { class: 'who-says' }, x.who), h('p', { class: 'text' }, x.text)]));
       return;
@@ -153,7 +154,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
     reader.style.setProperty('--prayer-size', size + 'px');
   };
   draw();
-  reader.append(picks, para, h('div', { class: 'note' }, FIXED[kind] ? SIDDUR_CREDIT : 'נוסח ספרד (סידור תורת אמת). אפשר לשנות בהגדרות.'));
+  reader.append(picks, para, h('div', { class: 'note' }, kind === 'kaddish' ? 'נוסח ספרד' : FIXED[kind] ? SIDDUR_CREDIT : 'נוסח ספרד (סידור תורת אמת). אפשר לשנות בהגדרות.'));
   return h('div', { class: 'screen' },
     appBar(TITLE[kind], sub, { back: 'history', end: [
       h('button', { class: 'icon', 'aria-label': 'הקטן', onclick: () => resize(-2) }, 'A−'),

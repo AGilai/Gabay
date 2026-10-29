@@ -1,13 +1,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { CLOSING, OPENING, callFor } from '../core/service.ts';
+import { CLOSING, OPENING, callFor, halfKaddish } from '../core/service.ts';
 import { defaultPrayers, sickBlessings } from '../core/prayers.ts';
 import type { SickEntry } from '../core/types.ts';
 
 test('the Kohen is called after the opening, with הכהן added only when his line lacks it', () => {
   assert.deepEqual(callFor('K', 'גמליאל בן נריה הכהן'), { lead: 'כֹּהֵן קְרָב, יַעֲמֹד', line: 'גמליאל בן נריה הכהן', added: '' });
   assert.equal(callFor('K', 'גמליאל בן נריה').added, 'הכהן');
-  assert.ok(OPENING.startsWith('וְיַעֲזֹר וְיָגֵן'));
+  assert.ok(OPENING.startsWith('וְתִגָּלֶה וְתֵרָאֶה מַלְכוּתוֹ'));
   assert.ok(OPENING.includes('הַכֹּל הָבוּ גֹדֶל'));
   assert.equal(CLOSING, 'יַעַמְדוּ הַמַּגְבִּיהַּ וְהַגּוֹלֵל');
 });
@@ -68,4 +68,13 @@ test('with no names chosen, the switch picks the man\'s or the woman\'s blessing
 test('with no names chosen, several people asking at once get the plural blessing', () => {
   const p = defaultPrayers();
   assert.deepEqual(sickBlessings(p, [], false, 'many'), [{ template: p.sickPlural, name: '' }]);
+});
+
+test('half kaddish: נוסח ספרד, with לְעֵלָּא וּלְעֵלָּא in the ten days of repentance only', () => {
+  const plain = halfKaddish('2026-10-26').map((x) => x.text).join(' ');
+  assert.ok(plain.includes('וְיַצְמַח פֻּרְקָנֵהּ'));
+  assert.ok(plain.includes('לְעֵלָּא מִן כָּל'));
+  const teshuva = halfKaddish('2026-09-14').map((x) => x.text).join(' '); // צום גדליה
+  assert.ok(teshuva.includes('לְעֵלָּא וּלְעֵלָּא מִכָּל'));
+  assert.ok(!teshuva.includes('לְעֵלָּא מִן כָּל'));
 });
