@@ -240,7 +240,7 @@ export function done(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?:
 export function offerResume(ctx: Ctx, personId: string): void {
   const p = personById(ctx.store.get(), personId);
   if (!p?.stopped) return;
-  snackbar(`${p.name} מושהה. להחזיר להצעות?`, 'החזר', () => {
+  snackbar(`${p.name} מסומן "לא להציע". להחזיר להצעות?`, 'החזר', () => {
     const s = ctx.store.get();
     ctx.store.set({ ...s, people: s.people.map((x) => (x.id === personId ? { ...x, stopped: false } : x)) });
   });

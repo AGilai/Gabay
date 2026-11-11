@@ -56,7 +56,7 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
     h('input', { placeholder: 'למי (לאביו…)', oninput: (e: Event) => { yNote = (e.target as HTMLInputElement).value.trim(); } }),
     h('button', { class: 'btn tonal', type: 'button', onclick: () => update({ yahrzeits: [...p.yahrzeits, { day: yDay, month: yMonth, note: yNote }] }) }, 'הוסף'));
 
-  const sub = GROUP_WORD[p.group] + (p.deleted ? ' · נמחק' : p.stopped ? ' · מושהה' : ' · קבוע');
+  const sub = GROUP_WORD[p.group] + (p.deleted ? ' · נמחק' : p.stopped ? ' · לא להציע' : ' · קבוע');
   // Never called: removed for good. Called before: a soft delete, out of every list and search, while his past
   // aliyot keep his name. Either way, slots not yet done are emptied.
   const remove = () => confirmSheet(dates.length
@@ -77,7 +77,7 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
       h('p', { class: 'note', style: 'margin:0' }, 'כל שינוי נשמר מיד.'),
       p.deleted ? h('div', { class: 'paused' }, 'נמחק. לא מופיע ברשימות ובחיפוש.',
         h('button', { class: 'linkish', type: 'button', onclick: () => update({ deleted: undefined }) }, ' שחזר'))
-        : p.stopped ? h('div', { class: 'paused' }, 'מושהה, נמצא רק בחיפוש') : null,
+        : p.stopped ? h('div', { class: 'paused' }, 'לא להציע: לא בתור, נמצא רק בחיפוש') : null,
       field('שם (מוצג במסך הראשי)', p.name, (v) => v && update({ name: v })),
       groupSeg(p.group, (g) => update({ group: g })),
       field('שם לקריאה (כפי שנקרא)', p.callLine, (v) => update({ callLine: v || p.name })),

@@ -93,5 +93,5 @@ export function nowHHMM(): string {
 // bimah): is he in the line (קבוע), stopped, or deleted.
 export function personBadge(p: { stopped: boolean; deleted?: string }): HTMLElement {
   return p.deleted ? h('span', { class: 'pbadge del' }, 'נמחק')
-    : p.stopped ? h('span', { class: 'pbadge stop' }, 'מושהה') : h('span', { class: 'pbadge' }, 'קבוע');
+    : p.stopped ? h('span', { class: 'pbadge stop' }, 'לא להציע') : h('span', { class: 'pbadge' }, 'קבוע');
 }

@@ -15,7 +15,7 @@ discussed after this is approved. Mockup: `design/mockups/ux-screens.html` (publ
 5. **No one leaves the line by himself** (changed 2026-11-11: קבוע / מזדמן and the half-year drop-out are
    gone). The gabbai sees a long wait and presses "הפסק להציע" on the card. A stopped person is left out of
    the line but search still finds him; putting him in a slot asks "להחזיר להצעות?" Every name or calling line
-   carries a small badge, "קבוע" / "מושהה" / "נמחק", except in reading mode (the oleh may see it).
+   carries a small badge, "קבוע" / "לא להציע" / "נמחק", except in reading mode (the oleh may see it).
 6. **No grey-out.** Someone called recently simply sinks to the end of the line (Kohanim and Leviim
    are a small group and come up almost every week).
 7. **The calling line is one free-text line, written in full by the gabbai** ("נחמיה בן ברוך הכהן",
@@ -61,7 +61,7 @@ All UI is Hebrew and right to left.
 | חיוב | A person with an obligation today: yahrzeit, bar mitzvah, groom, new father, Gomel |
 | רמז | The gabbai's private hint for a person (choosing page and card only) |
 | שם לקריאה | The calling line, free text written by the gabbai |
-| מושהה | "Stop suggesting" is on: left out of the line, still found by search |
+| לא להציע | "הפסק להציע" is on: left out of the line, still found by search |
 
 ## 4. A person
 
@@ -205,7 +205,7 @@ only, no hint.
 
 - **Quick add:** name\*, group\* (already set from the tab), calling line, hint → "שמור והצב".
 - **Card:** every field from §4; "עלה לאחרונה לפני 47 יום · 9 עליות השנה"; the aliyot history; the
-  **"הפסק להציע"** button. When it is on, the card shows "מושהה, נמצא רק בחיפוש" (paused, found only
+  **"הפסק להציע"** button. When it is on, the card shows "לא להציע: לא בתור, נמצא רק בחיפוש" (found only
   by search) and the button reads "חזור להציע" (suggest again).
 - **"מחק את <name>"** at the bottom, after a confirm. Never called → removed for good. Called before → a soft
   delete: gone from every list and from search, while history keeps his name; his card says "נמחק" with
@@ -275,9 +275,9 @@ Inside each tab:
    first**. Never called = top, by the date he was added. Ties: fewer aliyot in the last 12 months
    first. Someone called last week is simply near the bottom.
 3. **No automatic drop-out.** (When this changed, a one-time cleanup marked everyone with no aliyah in 180 days
-   as מושהה, with a sheet to undo it.) A long absence keeps him high in the line; the gabbai stops him by hand
+   as "לא להציע", with a sheet to undo it.) A long absence keeps him high in the line; the gabbai stops him by hand
    ("הפסק להציע"). Stopped people appear only in search. When one is put in a slot, a snackbar asks
-   "<name> מושהה. להחזיר להצעות?" with "החזר".
+   "<name> מסומן \"לא להציע\". להחזיר להצעות?" with "החזר".
 
 The S1 one-tap suggestion is the first row of (1)+(2) that isn't already in a slot today and didn't go up
 today (in another minyan).

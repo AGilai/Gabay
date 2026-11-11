@@ -131,7 +131,7 @@ async function registerWorker(): Promise<void> {
     if (!reloaded) { reloaded = true; location.reload(); }
   });
 }
-// One time, after קבוע / מזדמן went away: who hasn't gone up in 180 days becomes מושהה, so the line isn't
+// One time, after קבוע / מזדמן went away: who hasn't gone up in 180 days becomes "לא להציע", so the line isn't
 // headed by people who stopped coming. The gabbai sees how many and can undo it.
 function cleanupOnce(): void {
   const s0 = store.get();
@@ -140,8 +140,8 @@ function cleanupOnce(): void {
   store.set({ ...state, settings: { ...state.settings, absentPausedOn: today } });
   if (!count) return;
   const s = sheet(h('div', { class: 'confirm' },
-    h('p', {}, (count === 1 ? 'אדם אחד שלא עלה יותר מ־180 יום סומן "מושהה". הוא לא יוצע, והחיפוש עדיין ימצא אותו.'
-      : `${count} אנשים שלא עלו יותר מ־180 יום סומנו "מושהה". הם לא יוצעו, והחיפוש עדיין ימצא אותם.`)),
+    h('p', {}, (count === 1 ? 'אדם אחד שלא עלה יותר מ־180 יום סומן "לא להציע". הוא לא יוצע, והחיפוש עדיין ימצא אותו.'
+      : `${count} אנשים שלא עלו יותר מ־180 יום סומנו "לא להציע". הם לא יוצעו, והחיפוש עדיין ימצא אותם.`)),
     h('div', { class: 'row-btns' },
       h('button', { class: 'btn tonal', onclick: () => {
         s.close();
