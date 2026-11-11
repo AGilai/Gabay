@@ -5,9 +5,8 @@ import type { Person, Reading, SlotRole, State } from '../../core/types.ts';
 import { daysBetween, newId } from '../../core/dates.ts';
 import { aliyotOf, search, suggest } from '../../core/queue.ts';
 import { GROUP_CLASS, GROUP_WORD, activeKey, currentKey, findReading, keyText, minyanim, personById, pickMinyan, sameKey, withPicked, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
-import { appBar, bottomNav, h, icon, nowHHMM, sheet, snackbar } from '../ui.ts';
+import { appBar, bottomNav, h, icon, nowHHMM, personBadge, sheet, snackbar } from '../ui.ts';
 import { torahFor } from './torah.ts';
-import { stopBadge } from '../area.ts';
 
 const SERVICE_WORD = { shacharit: 'שחרית', mincha: 'מנחה' };
 // Past days open locked; "תקן" unlocks one while the app is open.
@@ -135,12 +134,12 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
         sug ? h('button', {
           class: 'suggest',
           onclick: (e: Event) => { e.stopPropagation(); placeAt(ctx, r, sug.id, i); },
-        }, h('span', {}, 'הבא בתור:'), h('b', {}, sug.name), h('span', {}, last ? daysBetween(last, key.date) + ' יום' : 'עוד לא עלה')) : null);
+        }, h('span', {}, 'הבא בתור:'), h('b', {}, sug.name), personBadge(sug), h('span', {}, last ? daysBetween(last, key.date) + ' יום' : 'עוד לא עלה')) : null);
       return card;
     }
     // The calling line, as read out, is the big text; the name he is known by is small underneath
     // (never the hint: the screen may be seen by others).
-    const who = h('div', { class: 'who' }, h('div', { class: 'callname' }, p.callLine), h('div', { class: 'known' }, stopBadge(p), p.name));
+    const who = h('div', { class: 'who' }, h('div', { class: 'callname' }, p.callLine), h('div', { class: 'known' }, personBadge(p), p.name));
     if (locked) {
       return h('div', { class: 'slot' + (s.doneAt ? ' done' : '') }, lab, who,
         s.doneAt ? h('div', { class: 'donemark' }, icon('check', 20), 'עלה ' + s.doneAt) : h('div', {}));
@@ -257,7 +256,7 @@ function slotSheet(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?: s
   const chooseHash = `#choose/${g}/${i}` + (r.date === ctx.today ? '' : '/' + keyText(r));
   const torah = torahFor(r)?.aliyot[i];
   const sh = sheet(h('div', {},
-    h('div', { class: 'hdr' }, h('b', {}, p.callLine), h('small', {}, [p.name, ROLE_LABEL[s.role], s.doneAt ? 'עלה ' + s.doneAt : ''].filter(Boolean).join(' · '))),
+    h('div', { class: 'hdr' }, h('b', {}, p.callLine, ' ', personBadge(p)), h('small', {}, [p.name, ROLE_LABEL[s.role], s.doneAt ? 'עלה ' + s.doneAt : ''].filter(Boolean).join(' · '))),
     s.doneAt
       ? item('undo', 'בטל סימון', () => save(undoDone(r, i)))
       : item('check', 'סמן שעלה', () => done(ctx, r, i, save)),
@@ -291,7 +290,7 @@ function typeIn(ctx: Ctx, r: Reading, i: number, card: HTMLElement, lab: HTMLEle
   const draw = () => {
     const q = input.value.trim();
     list.replaceChildren(...(q ? [
-      ...matches(q).map((p) => h('button', { class: 'chip', onclick: () => save(ctx.store.get(), p) }, p.name)),
+      ...matches(q).map((p) => h('button', { class: 'chip', onclick: () => save(ctx.store.get(), p) }, p.name, personBadge(p))),
       h('button', { class: 'chip sel', onclick: () => addNew(q) }, `+ חדש: ${q}`),
     ] : []), h('button', { class: 'chip', onclick: () => { input.blur(); ctx.refresh(); } }, 'ביטול'));
   };

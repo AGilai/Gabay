@@ -7,9 +7,9 @@ import type { Group, Person, Reading } from '../../core/types.ts';
 import { aliyotOf } from '../../core/queue.ts';
 import { daysBetween } from '../../core/dates.ts';
 import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, activeKey, findReading, keyText, parseKey, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
-import { appBar, bottomNav, h, icon, snackbar } from '../ui.ts';
+import { appBar, bottomNav, h, icon, personBadge, snackbar } from '../ui.ts';
 import { ANYWHERE, filterText, isAnywhere, type AreaFilter } from '../../core/area.ts';
-import { areaBadge, filterAreaSheet, stopBadge } from '../area.ts';
+import { areaBadge, filterAreaSheet } from '../area.ts';
 import { offerResume } from './reading.ts';
 
 let query = '';
@@ -76,7 +76,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   const row = (p: Person, cls: string, small: Node | string, side: HTMLElement) =>
     pressable(h('div', { class: 'row ' + cls, role: 'button' },
       h('div', { class: 'av ' + GROUP_CLASS[p.group] }, p.name.trim()[0] ?? '?'),
-      h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, stopBadge(p), areaBadge(p.area), small)),
+      h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, personBadge(p), areaBadge(p.area), small)),
       side,
       // A visible way to the person card (holding the row still works too).
       h('button', { class: 'icon edit', 'aria-label': 'עריכת ' + p.name,

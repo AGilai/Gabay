@@ -56,7 +56,7 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
     h('input', { placeholder: 'למי (לאביו…)', oninput: (e: Event) => { yNote = (e.target as HTMLInputElement).value.trim(); } }),
     h('button', { class: 'btn tonal', type: 'button', onclick: () => update({ yahrzeits: [...p.yahrzeits, { day: yDay, month: yMonth, note: yNote }] }) }, 'הוסף'));
 
-  const sub = GROUP_WORD[p.group] + (p.deleted ? ' · נמחק' : p.stopped ? ' · מושהה' : '');
+  const sub = GROUP_WORD[p.group] + (p.deleted ? ' · נמחק' : p.stopped ? ' · מושהה' : ' · קבוע');
   // Never called: removed for good. Called before: a soft delete, out of every list and search, while his past
   // aliyot keep his name. Either way, slots not yet done are emptied.
   const remove = () => confirmSheet(dates.length

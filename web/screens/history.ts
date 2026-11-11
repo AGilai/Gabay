@@ -2,7 +2,7 @@
 import { dayInfo } from '../../core/day.ts';
 import { newReading } from '../../core/slots.ts';
 import { findReading, keyText, personById, withReading, type Ctx } from '../ctx.ts';
-import { appBar, bottomNav, h, snackbar } from '../ui.ts';
+import { appBar, bottomNav, h, personBadge, snackbar } from '../ui.ts';
 
 const PAGE = 60;
 let shown = PAGE;
@@ -28,12 +28,14 @@ function renderHistoryInner(ctx: Ctx): HTMLElement {
         h('button', { class: 'btn tonal', type: 'submit' }, 'פתח / הוסף קריאה')),
       ...readings.slice(0, shown).map((r) => {
         const info = dayInfo(r.date);
-        const names = r.slots.filter((s) => s.personId && s.doneAt && s.role !== 'K_FOR_L')
-          .map((s) => personById(state, s.personId)?.name ?? '?').join(' · ');
+        const names = r.slots.filter((s) => s.personId && s.doneAt && s.role !== 'K_FOR_L').flatMap((s, k) => {
+          const p = personById(state, s.personId);
+          return [k ? ' · ' : '', h('span', { class: 'nb' }, p?.name ?? '?', p ? personBadge(p) : '')];
+        });
         return h('a', { class: 'list-item', href: '#day/' + keyText(r) },
           h('div', { class: 'who' },
             h('b', {}, `${info.weekday} · ${info.hebrew}${r.service === 'mincha' ? ' · מנחה' : ''}${(r.minyan ?? 1) > 1 ? ' · מניין ' + r.minyan : ''}`),
-            h('small', {}, names || 'לא סומנו עולים')),
+            h('small', {}, ...(names.length ? names : ['לא סומנו עולים']))),
           h('span', { class: 'muted mono' }, r.date.slice(8) + '.' + r.date.slice(5, 7) + '.' + r.date.slice(2, 4)));
       }),
       readings.length > shown ? h('button', { class: 'btn tonal wide', onclick: () => { shown += PAGE; ctx.refresh(); } }, 'עוד') : null));

@@ -3,7 +3,7 @@ import { pieces, readingFor, scrollText, type TorahData, type TorahReading } fro
 import { ROLE_LABEL, focusIndex } from '../../core/slots.ts';
 import type { Reading } from '../../core/types.ts';
 import { activeKey, findReading, keyText, parseKey, type Ctx, type ReadingKey } from '../ctx.ts';
-import { appBar, h, icon } from '../ui.ts';
+import { appBar, h, icon, personBadge } from '../ui.ts';
 
 let data: TorahData | null = null;
 let loading: Promise<TorahData> | null = null;
@@ -99,7 +99,7 @@ export function renderTorah(ctx: Ctx, args: string[]): HTMLElement {
     write(SIZE_KEY, String(size));
     reader.style.setProperty('--torah-size', size + 'px');
   };
-  const who = r?.slots[current]?.personId ? state.people.find((p) => p.id === r!.slots[current].personId)?.name : null;
+  const who = r?.slots[current]?.personId ? state.people.find((p) => p.id === r!.slots[current].personId) ?? null : null;
 
   const view = h('div', { class: 'screen' },
     appBar(t.name, t.aliyot.length ? `${t.aliyot[0].label.split(' ')[0]} · ${t.aliyot.length} עליות` : null, { back: 'history', end: [
@@ -109,7 +109,7 @@ export function renderTorah(ctx: Ctx, args: string[]): HTMLElement {
     h('nav', { class: 'tabsA' }, ...tabs),
     h('div', { class: 'modes' },
       h('div', { class: 'segc', role: 'group', 'aria-label': 'תצוגה' }, mode('teamim', 'טעמים'), mode('scroll', 'כמו בספר')),
-      who ? h('span', { class: 'note' }, 'עכשיו: ' + who) : null),
+      who ? h('span', { class: 'note' }, 'עכשיו: ' + who.name, personBadge(who)) : null),
     reader, next);
   select(current, false);
   // Scroll to the aliyah now, and again once the Torah font has loaded and the text has its final height.

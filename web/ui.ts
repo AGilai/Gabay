@@ -88,3 +88,10 @@ export function nowHHMM(): string {
   const d = new Date();
   return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
 }
+
+// Every place a person's name or calling line is shown (not reading mode, which the oleh may see at the
+// bimah): is he in the line (קבוע), stopped, or deleted.
+export function personBadge(p: { stopped: boolean; deleted?: string }): HTMLElement {
+  return p.deleted ? h('span', { class: 'pbadge del' }, 'נמחק')
+    : p.stopped ? h('span', { class: 'pbadge stop' }, 'מושהה') : h('span', { class: 'pbadge' }, 'קבוע');
+}

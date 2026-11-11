@@ -3,7 +3,7 @@ import { DONOR, render, sickBlessings, withoutNaming } from '../../core/prayers.
 import { GOMEL, SIDDUR_CREDIT, TORAH_BLESSINGS, halfKaddish, type Said } from '../../core/service.ts';
 import type { State } from '../../core/types.ts';
 import { currentKey, findReading, personById, type Ctx } from '../ctx.ts';
-import { appBar, h, icon } from '../ui.ts';
+import { appBar, h, icon, personBadge } from '../ui.ts';
 
 export type PrayerKind = 'oleh' | 'sick' | 'barMitzvah' | 'yoledet' | 'azkara' | 'brachot' | 'gomel' | 'kaddish';
 const TITLE: Record<PrayerKind, string> = {
@@ -69,7 +69,7 @@ export function renderPrayer(ctx: Ctx, kindArg: string): HTMLElement {
       const done = olim.filter((x) => x.slot.doneAt).sort((a, b) => a.slot.doneAt!.localeCompare(b.slot.doneAt!));
       if (!olim.some((x) => x.p.id === olehId)) olehId = (done.at(-1) ?? olim[0])?.p.id ?? null;
       for (const x of olim) {
-        picks.append(h('button', { class: 'chip' + (x.p.id === olehId ? ' sel' : ''), onclick: () => { olehId = x.p.id; draw(); } }, x.p.name));
+        picks.append(h('button', { class: 'chip' + (x.p.id === olehId ? ' sel' : ''), onclick: () => { olehId = x.p.id; draw(); } }, x.p.name, personBadge(x.p)));
       }
       if (!olim.length) picks.append(h('span', { class: 'note' }, 'אין עולים בקריאה של היום. אפשר להקליד שם:'), nameInput());
       names = { name: olim.find((x) => x.p.id === olehId)?.p.callLine ?? typed };

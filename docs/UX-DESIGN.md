@@ -14,8 +14,8 @@ discussed after this is approved. Mockup: `design/mockups/ux-screens.html` (publ
    every slot is Israel (the first is "ישראל במקום כהן"). "אין לוי" is a switch next to it.
 5. **No one leaves the line by himself** (changed 2026-11-11: קבוע / מזדמן and the half-year drop-out are
    gone). The gabbai sees a long wait and presses "הפסק להציע" on the card. A stopped person is left out of
-   the line but search still finds him; putting him in a slot asks "להחזיר להצעות?" He carries a "מושהה"
-   badge wherever his row is shown.
+   the line but search still finds him; putting him in a slot asks "להחזיר להצעות?" Every name or calling line
+   carries a small badge, "קבוע" / "מושהה" / "נמחק", except in reading mode (the oleh may see it).
 6. **No grey-out.** Someone called recently simply sinks to the end of the line (Kohanim and Leviim
    are a small group and come up almost every week).
 7. **The calling line is one free-text line, written in full by the gabbai** ("נחמיה בן ברוך הכהן",
