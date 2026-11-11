@@ -9,7 +9,7 @@ import { daysBetween } from '../../core/dates.ts';
 import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, activeKey, findReading, keyText, parseKey, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, snackbar } from '../ui.ts';
 import { ANYWHERE, filterText, isAnywhere, type AreaFilter } from '../../core/area.ts';
-import { areaBadge, filterAreaSheet } from '../area.ts';
+import { areaBadge, filterAreaSheet, stopBadge } from '../area.ts';
 import { offerResume } from './reading.ts';
 
 let query = '';
@@ -76,7 +76,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   const row = (p: Person, cls: string, small: Node | string, side: HTMLElement) =>
     pressable(h('div', { class: 'row ' + cls, role: 'button' },
       h('div', { class: 'av ' + GROUP_CLASS[p.group] }, p.name.trim()[0] ?? '?'),
-      h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, areaBadge(p.area), small)),
+      h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, stopBadge(p), areaBadge(p.area), small)),
       side,
       // A visible way to the person card (holding the row still works too).
       h('button', { class: 'icon edit', 'aria-label': 'עריכת ' + p.name,
@@ -110,7 +110,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
       const found = search(state, query, { group: findGroup, field: findField, area: findArea });
       if (!found.length) list.append(h('div', { class: 'notice' }, 'לא נמצא. אפשר להוסיף אדם חדש.'));
       for (const p of found) {
-        const note = [GROUP_WORD[p.group], p.stopped ? 'מושהה' : '', p.hint].filter(Boolean).join(' · ');
+        const note = [GROUP_WORD[p.group], p.hint].filter(Boolean).join(' · ');
         const other = elsewhere(p.id);
         list.append(inSlot(p.id) ? row(p, 'inread', inTag(p.id), days(p.id))
           : other ? row(p, 'inread', other, days(p.id)) : row(p, '', note, days(p.id)));

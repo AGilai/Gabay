@@ -4,7 +4,7 @@ import { HALF_WORD, areaTag, type Area } from '../../core/area.ts';
 import { search } from '../../core/queue.ts';
 import type { Person } from '../../core/types.ts';
 import { GROUP_CLASS, type Ctx } from '../ctx.ts';
-import { areaBadge, areaGrid } from '../area.ts';
+import { areaBadge, areaGrid, stopBadge } from '../area.ts';
 import { appBar, bottomNav, h, icon } from '../ui.ts';
 
 let pick: Area = { col: 1, half: 'F' };
@@ -30,7 +30,7 @@ export function renderSeats(ctx: Ctx): HTMLElement {
         onclick: () => set(p, on ? null : { ...pick }) },
         h('span', { class: 'scb' }, on ? '✓' : ''),
         h('div', { class: 'av ' + GROUP_CLASS[p.group] }, p.name.trim()[0] ?? '?'),
-        h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, on ? null : areaBadge(p.area), p.hint)));
+        h('div', { class: 'who' }, h('b', {}, p.name), h('small', {}, stopBadge(p), on ? null : areaBadge(p.area), p.hint)));
     }));
     if (!people.length) list.append(h('div', { class: 'notice' }, 'לא נמצא.'));
   };

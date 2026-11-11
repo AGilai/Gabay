@@ -7,6 +7,7 @@ import { aliyotOf, search, suggest } from '../../core/queue.ts';
 import { GROUP_CLASS, GROUP_WORD, activeKey, currentKey, findReading, keyText, minyanim, personById, pickMinyan, sameKey, withPicked, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, nowHHMM, sheet, snackbar } from '../ui.ts';
 import { torahFor } from './torah.ts';
+import { stopBadge } from '../area.ts';
 
 const SERVICE_WORD = { shacharit: 'שחרית', mincha: 'מנחה' };
 // Past days open locked; "תקן" unlocks one while the app is open.
@@ -139,7 +140,7 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
     }
     // The calling line, as read out, is the big text; the name he is known by is small underneath
     // (never the hint: the screen may be seen by others).
-    const who = h('div', { class: 'who' }, h('div', { class: 'callname' }, p.callLine), h('div', { class: 'known' }, p.name));
+    const who = h('div', { class: 'who' }, h('div', { class: 'callname' }, p.callLine), h('div', { class: 'known' }, stopBadge(p), p.name));
     if (locked) {
       return h('div', { class: 'slot' + (s.doneAt ? ' done' : '') }, lab, who,
         s.doneAt ? h('div', { class: 'donemark' }, icon('check', 20), 'עלה ' + s.doneAt) : h('div', {}));

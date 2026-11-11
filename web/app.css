@@ -329,3 +329,4 @@ button.search{width:100%;border:0;font:inherit;font-size:16px;text-align:start;c
 .fin .h{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--done)}
 .slot .add.none{color:var(--muted);font-weight:600;font-size:16px}
 .btn.danger{color:var(--hiyuv)}
+.stoptag{display:inline-block;padding:0 7px;border-radius:10px;background:var(--kohen-bg);color:var(--kohen);font-size:12px;font-weight:700;line-height:20px;margin-inline-end:6px}

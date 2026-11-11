@@ -69,3 +69,8 @@ export function filterAreaSheet(current: AreaFilter, onChange: (f: AreaFilter) =
 }
 
 export const areaBadge = (a: Area | null | undefined): HTMLElement | null => (a ? h('span', { class: 'areatag' }, areaTag(a)) : null);
+
+// A person marked "stop suggesting", wherever his row is shown.
+export function stopBadge(p: { stopped: boolean }): HTMLElement | null {
+  return p.stopped ? h('span', { class: 'stoptag' }, 'מושהה') : null;
+}
