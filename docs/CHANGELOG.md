@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Person card: קבוע / מזדמן removed, and with it the half-year drop-out and the "להפוך לקבוע?" prompt.
+  "הפסק להציע" is the only flag; putting a stopped person in a slot asks "להחזיר להצעות?". New "מחק":
+  for good when he was never called, otherwise a soft delete that history still names.
 - Main page: arrows to the previous / next reading day, "חזרה להיום"; past days open locked ("תקן" to fix);
   a "הקריאה הסתיימה" card after the last oleh; a second minyan on the same day with a מניין 1 / מניין 2 switch.
 - Reading mode opens with the weekday "וְתִגָּלֶה וְתֵרָאֶה…" (was the Shabbat "וְיַעֲזֹר").

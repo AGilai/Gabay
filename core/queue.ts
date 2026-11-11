@@ -4,9 +4,7 @@ import { inArea, type AreaFilter } from './area.ts';
 import type { Group, ISODate, Person, Reading, State } from './types.ts';
 
 export interface Row { person: Person; last: ISODate | null; days: number | null; count12m: number; reason: string | null }
-export interface Queue { inReading: Row[]; hiyuv: Row[]; line: Row[]; inactive: Row[] }
-
-const NEW_PERSON_DAYS = 30;
+export interface Queue { inReading: Row[]; hiyuv: Row[]; line: Row[] }
 
 // Done slots only, dates ascending.
 export function aliyotOf(state: State): Map<string, ISODate[]> {
@@ -40,10 +38,10 @@ function byWait(a: Row, b: Row): number {
 export function buildQueue(state: State, group: Group, today: ISODate, reading: Reading | null): Queue {
   const aliyot = aliyotOf(state);
   const inToday = new Set(reading?.slots.map((s) => s.personId).filter(Boolean));
-  const q: Queue = { inReading: [], hiyuv: [], line: [], inactive: [] };
+  const q: Queue = { inReading: [], hiyuv: [], line: [] };
 
   for (const person of state.people) {
-    if (person.group !== group || person.stopped) continue;
+    if (person.group !== group || person.stopped || person.deleted) continue;
     const dates = aliyot.get(person.id) ?? [];
     const last = dates.length ? dates[dates.length - 1] : null;
     const row: Row = {
@@ -54,14 +52,10 @@ export function buildQueue(state: State, group: Group, today: ISODate, reading: 
     };
     if (inToday.has(person.id)) q.inReading.push(row);
     else if (row.reason) q.hiyuv.push(row);
-    else if (!person.regular && (last === null
-      ? daysBetween(person.addedOn, today) > NEW_PERSON_DAYS
-      : row.days! > state.settings.inactiveDays)) q.inactive.push(row);
     else q.line.push(row);
   }
   q.line.sort(byWait);
   q.hiyuv.sort(byWait);
-  q.inactive.sort(byWait);
   return q;
 }
 
@@ -95,21 +89,15 @@ export function search(state: State, q: string, opts: { group?: Group | null; fi
   const needle = normalize(q);
   if (!needle) {
     const order: Group[] = ['K', 'L', 'Y'];
-    return state.people.filter((p) => (!opts.group || p.group === opts.group) && (!opts.area || inArea(p.area, opts.area)))
+    return state.people.filter((p) => !p.deleted && (!opts.group || p.group === opts.group) && (!opts.area || inArea(p.area, opts.area)))
       .sort((a, b) => order.indexOf(a.group) - order.indexOf(b.group) || a.name.localeCompare(b.name, 'he'));
   }
   const field = opts.field ?? 'all';
   return state.people.filter((p) => {
+    if (p.deleted) return false;
     if (opts.group && p.group !== opts.group) return false;
     if (opts.area && !inArea(p.area, opts.area)) return false;
     if (field === 'all') return [p.name, p.callLine, p.hint].some((f) => normalize(f).includes(needle));
     return (' ' + splitCallLine(p.callLine)[field]).includes(' ' + needle);
   });
-}
-
-export function shouldOfferRegular(state: State, personId: string, today: ISODate): boolean {
-  const p = state.people.find((x) => x.id === personId);
-  if (!p || p.regular) return false;
-  const recent = (aliyotOf(state).get(personId) ?? []).filter((d) => daysBetween(d, today) <= 90);
-  return recent.length >= 3;
 }

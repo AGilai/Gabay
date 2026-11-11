@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aliyotOf, buildQueue, suggest, search, shouldOfferRegular, normalize, splitCallLine } from '../core/queue.ts';
+import { aliyotOf, buildQueue, suggest, search, normalize, splitCallLine } from '../core/queue.ts';
 import type { Person, Reading, SlotRole, State, Group } from '../core/types.ts';
 
 const TODAY = '2026-10-22';
@@ -30,26 +30,29 @@ test('the line: never called first, then longest wait; a recent one is last, not
   assert.equal(q.line[0].last, null);
 });
 
-test('only occasional people go inactive after the threshold; regulars stay', () => {
+test('no one drops out by himself: a long absence or a new card stays in the line', () => {
   const s = st(
-    [mk('D', { group: 'Y', regular: false }), mk('E', { group: 'Y', regular: true })],
-    [readingOn('2026-04-05', [['D', 'Y3']]), readingOn('2025-09-17', [['E', 'Y3']])],
+    [mk('D', { group: 'Y', regular: false }), mk('N', { group: 'Y', regular: false, addedOn: '2026-08-01' })],
+    [readingOn('2025-09-17', [['D', 'Y3']])],
   );
   const q = buildQueue(s, 'Y', TODAY, null);
-  assert.deepEqual(ids(q.inactive), ['D']);
-  assert.deepEqual(ids(q.line), ['E']);
-});
-
-test('an occasional person never called and added over 30 days ago is inactive', () => {
-  const q = buildQueue(st([mk('N', { regular: false, addedOn: '2026-08-01' })], []), 'K', TODAY, null);
-  assert.deepEqual(ids(q.inactive), ['N']);
+  assert.deepEqual(ids(q.line), ['N', 'D']);
+  assert.equal(suggest(s, 'Y', TODAY, null)?.id, 'N');
 });
 
 test('a stopped person is in no list, but search finds him', () => {
   const s = st([mk('F', { name: 'פנחס גולד', stopped: true })], []);
   const q = buildQueue(s, 'K', TODAY, null);
-  assert.equal(q.line.length + q.inactive.length + q.hiyuv.length + q.inReading.length, 0);
+  assert.equal(q.line.length + q.hiyuv.length + q.inReading.length, 0);
   assert.deepEqual(search(s, 'פנחס').map((p) => p.id), ['F']);
+});
+
+test('a deleted person is in no list and search does not find him', () => {
+  const s = st([mk('X', { name: 'פנחס גולד', deleted: '2026-10-20' })], []);
+  const q = buildQueue(s, 'K', TODAY, null);
+  assert.equal(q.line.length + q.hiyuv.length + q.inReading.length, 0);
+  assert.deepEqual(search(s, 'פנחס'), []);
+  assert.deepEqual(search(s, ''), []);
 });
 
 test('a hiyuv for today comes first, with its reason', () => {
@@ -102,13 +105,6 @@ test('search ignores titles and geresh styles', () => {
   assert.equal(normalize('  ר\' משה  "הכהן" '), 'משה הכהן');
 });
 
-test('offer "regular" after 3 aliyot in 90 days, only to occasional people', () => {
-  const r = [readingOn('2026-08-03', [['O', 'Y3']]), readingOn('2026-09-03', [['O', 'Y3']]), readingOn('2026-10-12', [['O', 'Y3']])];
-  assert.equal(shouldOfferRegular(st([mk('O', { group: 'Y', regular: false })], r), 'O', TODAY), true);
-  assert.equal(shouldOfferRegular(st([mk('O', { group: 'Y', regular: true })], r), 'O', TODAY), false);
-  assert.equal(shouldOfferRegular(st([mk('O', { group: 'Y', regular: false })], r.slice(1)), 'O', TODAY), false);
-});
-
 test('the calling line splits at the first "בן": the oleh\'s own name before it, the father\'s after', () => {
   assert.deepEqual(splitCallLine('יוסף חיים בן אליהו הכהן'), { own: 'יוסף חיים', father: 'אליהו' });
   assert.deepEqual(splitCallLine("הרב דוד בר' אלקנה"), { own: 'דוד', father: 'אלקנה' });
@@ -139,7 +135,7 @@ test('an empty search lists everyone in the chosen group, by name', () => {
 });
 
 test('the next-in-line suggestion skips someone who already went up today in another minyan', () => {
-  const people = [mk('k1', { group: 'K' }), mk('k2', { group: 'K', regular: false, addedOn: '2020-01-01' })];
+  const people = [mk('k1', { group: 'K' }), mk('k2', { group: 'K', stopped: true })];
   const s = st(people, [readingOn(TODAY, [['k1', 'K']])]);
   assert.equal(suggest(s, 'K', TODAY, null)?.id ?? null, null);
   assert.deepEqual(ids(buildQueue(s, 'K', TODAY, null).line), ['k1']); // still in the list, to pick by hand

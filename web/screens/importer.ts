@@ -123,8 +123,7 @@ function renderImportInner(ctx: Ctx): HTMLElement {
   return h('div', { class: 'screen' }, bar('סיכום'),
     h('main', { class: 'body', style: 'gap:16px;padding-top:12px' },
       h('div', { class: 'card' }, h('h2', {}, `ייבא ${people} אנשים, ${aliyot} עליות`),
-        h('p', { class: 'muted' }, `קבועים: ${preview.people.filter((p) => p.regular).length} (3 עליות ומעלה ב־12 חודשים).` +
-          (s.skipped.length ? ` ${s.skipped.length} שורות דולגו.` : '')),
+        s.skipped.length ? h('p', { class: 'muted' }, `${s.skipped.length} שורות דולגו.`) : null,
         h('button', { class: 'btn fill wide', onclick: doImport }, 'ייבא')),
       s.skipped.length ? h('details', { class: 'note' }, h('summary', {}, 'שורות שדולגו'), ...s.skipped.map((t) => h('div', {}, t))) : null,
       h('div', { class: 'row-btns' },

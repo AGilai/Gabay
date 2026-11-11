@@ -13,7 +13,7 @@ let query = '';
 export function renderSeats(ctx: Ctx): HTMLElement {
   const state = ctx.store.get();
   const here = (p: Person) => p.area?.col === pick.col && p.area.half === pick.half;
-  const count = (col: number, half: string) => state.people.filter((p) => p.area?.col === col && p.area.half === half).length;
+  const count = (col: number, half: string) => state.people.filter((p) => !p.deleted && p.area?.col === col && p.area.half === half).length;
   const set = (p: Person, area: Area | null) => {
     const s = ctx.store.get();
     ctx.store.set({ ...s, people: s.people.map((x) => (x.id === p.id ? { ...x, area } : x)) });
@@ -36,7 +36,8 @@ export function renderSeats(ctx: Ctx): HTMLElement {
   };
   fill();
 
-  const placed = state.people.filter((p) => p.area).length;
+  const live = state.people.filter((p) => !p.deleted);
+  const placed = live.filter((p) => p.area).length;
   const input = h('input', { type: 'search', placeholder: 'חיפוש שם…', value: query, 'aria-label': 'חיפוש',
     oninput: (e: Event) => { query = (e.target as HTMLInputElement).value; fill(); } });
   return h('div', { class: 'screen' },
@@ -47,7 +48,7 @@ export function renderSeats(ctx: Ctx): HTMLElement {
         onCell: (c, half) => { pick = { col: c, half }; ctx.refresh(); },
         sub: (c, half) => String(count(c, half)),
       }),
-      h('p', { class: 'note', style: 'margin:0' }, `${placed} מתוך ${state.people.length} שובצו. המספר בכל אזור: כמה יושבים בו.`),
+      h('p', { class: 'note', style: 'margin:0' }, `${placed} מתוך ${live.length} שובצו. המספר בכל אזור: כמה יושבים בו.`),
       h('label', { class: 'search' }, icon('search', 20), input),
       list),
     bottomNav('more'));

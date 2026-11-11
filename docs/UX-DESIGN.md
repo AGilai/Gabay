@@ -12,8 +12,9 @@ discussed after this is approved. Mockup: `design/mockups/ux-screens.html` (publ
    on the main page: Kohen → כהן slot, Levi → לוי slot, Israel → the first free Israel slot.
 4. **"אין כהן" is a switch on the main page.** When it is on, the Kohen and Levi slots are off and
    every slot is Israel (the first is "ישראל במקום כהן"). "אין לוי" is a switch next to it.
-5. **Regulars are never demoted automatically.** The person card has a "הפסק להציע" (stop suggesting)
-   button. A stopped person is left out of the line but search still finds him.
+5. **No one leaves the line by himself** (changed 2026-11-11: קבוע / מזדמן and the half-year drop-out are
+   gone). The gabbai sees a long wait and presses "הפסק להציע" on the card. A stopped person is left out of
+   the line but search still finds him; putting him in a slot asks "להחזיר להצעות?".
 6. **No grey-out.** Someone called recently simply sinks to the end of the line (Kohanim and Leviim
    are a small group and come up almost every week).
 7. **The calling line is one free-text line, written in full by the gabbai** ("נחמיה בן ברוך הכהן",
@@ -59,7 +60,6 @@ All UI is Hebrew and right to left.
 | חיוב | A person with an obligation today: yahrzeit, bar mitzvah, groom, new father, Gomel |
 | רמז | The gabbai's private hint for a person (choosing page and card only) |
 | שם לקריאה | The calling line, free text written by the gabbai |
-| קבוע / מזדמן | Regular / occasional attendee |
 | מושהה | "Stop suggesting" is on: left out of the line, still found by search |
 
 ## 4. A person
@@ -70,8 +70,8 @@ Quick add needs only the fields marked \*.
 - Group\*: כהן / לוי / ישראל
 - **שם לקריאה**: one free-text line, read out exactly as written, including הכהן / הלוי.
 - Hint (nickname, appearance, seat). Private: choosing page and card only.
-- Regular / occasional (§8)
 - Stop suggesting: on / off
+- Deleted (soft, §8): out of every list and search
 - Yahrzeit dates (Hebrew date + for whom), which make him a חיוב on the right day
 - Seat area (optional): one of 10, "3-ק" (§11)
 - History: his aliyot (date, slot)
@@ -154,7 +154,7 @@ Reached from the bottom bar (opens on the tab of the next empty slot) or by tapp
 - **Tabs:** כהנים · לויים · ישראלים, with counts. When "אין כהן" is on, the כהנים and לויים tabs are
   not offered for picking (they can still be browsed by search).
 - **Search** (sticky button): opens the search screen (S2b) with the cursor in the field. It finds stopped
-  and inactive people too.
+  people too (not deleted ones).
 - **List order** (§8): חיוב היום → the line, longest wait first. Each row shows the name · the hint
   · the days since his last aliyah. Someone called recently is just at the end. No grey-out.
 - **Tap a row → he goes straight to his place on S1** and S1 is shown:
@@ -167,7 +167,6 @@ Reached from the bottom bar (opens on the tab of the next empty slot) or by tapp
   picked twice. Their row keeps the days number and is marked by an accent edge and "✓ בקריאה · <slot>" (or
   "✓ עלה · <slot>"). Search marks them the same way.
 - **Long-press a row** → person card. **"+ אדם חדש"** → quick add.
-- The collapsed section "מזדמנים שלא נראו חצי שנה (n)" sits at the bottom.
 
 ### S2b · חיפוש (search, built 2026-10-25)
 
@@ -205,9 +204,11 @@ only, no hint.
 
 - **Quick add:** name\*, group\* (already set from the tab), calling line, hint → "שמור והצב".
 - **Card:** every field from §4; "עלה לאחרונה לפני 47 יום · 9 עליות השנה"; the aliyot history; the
-  regular / occasional switch; and the **"הפסק להציע"** button. When it is on, the card shows
-  "מושהה, נמצא רק בחיפוש" (paused, found only by search) and the button reads "חזור להציע"
-  (suggest again).
+  **"הפסק להציע"** button. When it is on, the card shows "מושהה, נמצא רק בחיפוש" (paused, found only
+  by search) and the button reads "חזור להציע" (suggest again).
+- **"מחק את <name>"** at the bottom, after a confirm. Never called → removed for good. Called before → a soft
+  delete: gone from every list and from search, while history keeps his name; his card says "נמחק" with
+  "שחזר". Either way he is taken out of slots not yet marked done.
 
 ### S6 · חולים (sick list)
 
@@ -250,8 +251,7 @@ Readings by date. Open one to fix it or to enter a past reading.
      or mostly Israel with some הכהן / הלוי lines (`שמעיה בן אלישע`: 4× / 2× הלוי, which may be two people).
      A missing הכהן / הלוי is treated as a slip (`נחמיה בן ברוך`: 61× הכהן, 3× without it) and asks nothing.
    - *Is this a hint?* A parenthesis that looks like a name (`(נעמה בת אביגיל)`). → Hint / Remove.
-4. "ייבא": people are created, regular when they had 3+ aliyot in the last **12 months**. The log is
-   sparse, so 90 days would mark only 4 people as regular. Their aliyot go
+4. "ייבא": people are created and their aliyot go
    into history, so the line is right from the first day.
 
 The display name defaults to the calling line without `הרב` / `הכהן` / `הלוי` ("נחמיה בן ברוך"). It never
@@ -259,7 +259,7 @@ comes from the parentheses, because a hint must not reach the main page. It can 
 
 ### S9 · הגדרות
 
-Prayer texts; the inactivity threshold for occasional people (default 6 months); theme; backup /
+Prayer texts; theme; backup /
 export.
 
 ## 8. The fairness order
@@ -270,16 +270,15 @@ seen".
 Inside each tab:
 
 1. **חיוב היום** first.
-2. **The line:** everyone who is not stopped and not inactive, by **days since his last aliyah, longest
+2. **The line:** everyone who is not stopped or deleted, by **days since his last aliyah, longest
    first**. Never called = top, by the date he was added. Ties: fewer aliyot in the last 12 months
    first. Someone called last week is simply near the bottom.
-3. **Inactive:** only **occasional** people whose last aliyah is over 6 months ago. They sit in the
-   collapsed section and are never suggested. One aliyah makes them active again.
-4. **Regulars are never inactive automatically.** The gabbai stops one by hand ("הפסק להציע").
-   Stopped people appear only in search.
-5. An occasional person with 3 aliyot in 90 days → one prompt "להפוך לקבוע?" (make him a regular?).
+3. **No automatic drop-out.** A long absence keeps him high in the line; the gabbai stops him by hand
+   ("הפסק להציע"). Stopped people appear only in search. When one is put in a slot, a snackbar asks
+   "<name> מושהה. להחזיר להצעות?" with "החזר".
 
-The S1 one-tap suggestion is the first row of (1)+(2) that isn't already in a slot today.
+The S1 one-tap suggestion is the first row of (1)+(2) that isn't already in a slot today and didn't go up
+today (in another minyan).
 
 ## 9. Key flows
 
@@ -291,7 +290,8 @@ the suggestion. "עלה ✓" after each aliyah.
 
 **A new face.** בחירה → ישראלים → "+ אדם חדש" → name, hint → "שמור והצב".
 
-**A regular moved away.** Card → "הפסק להציע". Months later he visits: search → tap → he is in.
+**Someone stopped coming.** The line shows him at 150 days → card → "הפסק להציע". Months later he visits:
+search → tap → he is in, and the app offers "להחזיר להצעות?".
 
 ## 10. Visual and interaction principles
 

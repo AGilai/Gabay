@@ -182,7 +182,7 @@ export function applyDraft(state: State, draft: Draft, answers: Answer[]): State
     const first = p.dates.map((d) => d.date).sort()[0];
     const callLine = callLineOf(p.dates, p.group);
     created.push({ id, name: displayName(callLine), group: p.group, callLine, hint: p.hints.join(' · '),
-      regular: p.regular, stopped: false, seat: '', yahrzeits: [], addedOn: first, hiyuv: null });
+      stopped: false, seat: '', yahrzeits: [], addedOn: first, hiyuv: null });
   }
 
   const sessions = new Map<string, { date: ISODate; service: 'shacharit' | 'mincha'; items: { id: string; group: Group; time: string }[] }>();

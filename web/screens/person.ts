@@ -6,7 +6,7 @@ import { ROLE_LABEL, groupOf, newReading, place } from '../../core/slots.ts';
 import { dayInfo } from '../../core/day.ts';
 import type { Group, Person, Reading, SlotRole, State } from '../../core/types.ts';
 import { GROUP_WORD, activeKey, findReading, keyText, parseKey, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
-import { appBar, h, snackbar } from '../ui.ts';
+import { appBar, confirmSheet, h, snackbar } from '../ui.ts';
 import { areaTag } from '../../core/area.ts';
 import { pickAreaSheet } from '../area.ts';
 
@@ -56,12 +56,28 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
     h('input', { placeholder: 'למי (לאביו…)', oninput: (e: Event) => { yNote = (e.target as HTMLInputElement).value.trim(); } }),
     h('button', { class: 'btn tonal', type: 'button', onclick: () => update({ yahrzeits: [...p.yahrzeits, { day: yDay, month: yMonth, note: yNote }] }) }, 'הוסף'));
 
-  const sub = GROUP_WORD[p.group] + ' · ' + (p.regular ? 'קבוע' : 'מזדמן') + (p.stopped ? ' · מושהה' : '');
+  const sub = GROUP_WORD[p.group] + (p.deleted ? ' · נמחק' : p.stopped ? ' · מושהה' : '');
+  // Never called: removed for good. Called before: a soft delete, out of every list and search, while his past
+  // aliyot keep his name. Either way, slots not yet done are emptied.
+  const remove = () => confirmSheet(dates.length
+    ? `למחוק את ${p.name}? הוא ייעלם מהרשימות ומהחיפוש. ${dates.length} העליות שלו יישארו בהיסטוריה.`
+    : `למחוק את ${p.name} לגמרי? הוא עוד לא עלה, אז לא יישאר ממנו כלום.`, 'מחק', () => {
+    const s = ctx.store.get();
+    ctx.store.set({
+      ...s,
+      people: dates.length ? s.people.map((x) => (x.id === id ? { ...x, deleted: ctx.today } : x)) : s.people.filter((x) => x.id !== id),
+      readings: s.readings.map((r) => (r.slots.some((x) => x.personId === id && !x.doneAt)
+        ? { ...r, slots: r.slots.map((x) => (x.personId === id && !x.doneAt ? { ...x, personId: null } : x)) } : r)),
+    }, `${p.name} נמחק`);
+    ctx.home();
+  });
   return h('div', { class: 'screen' },
     appBar(p.name, sub, { back: 'history' }),
     h('main', { class: 'body', style: 'gap:14px;padding-top:12px' },
       h('p', { class: 'note', style: 'margin:0' }, 'כל שינוי נשמר מיד.'),
-      p.stopped ? h('div', { class: 'paused' }, 'מושהה, נמצא רק בחיפוש') : null,
+      p.deleted ? h('div', { class: 'paused' }, 'נמחק. לא מופיע ברשימות ובחיפוש.',
+        h('button', { class: 'linkish', type: 'button', onclick: () => update({ deleted: undefined }) }, ' שחזר'))
+        : p.stopped ? h('div', { class: 'paused' }, 'מושהה, נמצא רק בחיפוש') : null,
       field('שם (מוצג במסך הראשי)', p.name, (v) => v && update({ name: v })),
       groupSeg(p.group, (g) => update({ group: g })),
       field('שם לקריאה (כפי שנקרא)', p.callLine, (v) => update({ callLine: v || p.name })),
@@ -70,8 +86,6 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
         h('span', { class: 'lbl' }, 'מקום בבית הכנסת'),
         h('span', { class: 'v' + (p.area ? '' : ' none') }, p.area ? areaTag(p.area) : 'לא נבחר'),
         h('span', { class: 'open' }, 'בחר ▾')),
-      h('label', { class: 'swrow' }, h('span', {}, 'קבוע'),
-        h('input', { type: 'checkbox', class: 'sw', role: 'switch', checked: p.regular, onchange: () => update({ regular: !p.regular }) })),
       h('div', { class: 'stats' },
         h('div', {}, h('b', {}, last ? String(daysBetween(last, ctx.today)) : '—'), h('small', {}, last ? 'ימים מאז שעלה' : 'עוד לא עלה')),
         h('div', {}, h('b', {}, String(yearCount)), h('small', {}, 'עליות השנה'))),
@@ -91,7 +105,8 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
         : h('div', { class: 'note' }, 'אין עליות רשומות'),
       h('div', { style: 'display:grid;gap:6px;padding-top:12px' },
         h('button', { class: 'btn out wide', type: 'button', onclick: () => update({ stopped: !p.stopped }) }, p.stopped ? 'חזור להציע' : 'הפסק להציע'),
-        h('span', { class: 'note' }, p.stopped ? 'יחזור לתור לפי זמן ההמתנה.' : 'לא יופיע בתור ולא יוצע. החיפוש עדיין ימצא אותו.'))));
+        h('span', { class: 'note' }, p.stopped ? 'יחזור לתור לפי זמן ההמתנה.' : 'לא יופיע בתור ולא יוצע. החיפוש עדיין ימצא אותו.'),
+        p.deleted ? null : h('button', { class: 'btn tonal wide danger', type: 'button', onclick: remove }, 'מחק את ' + p.name))));
 }
 
 export function renderNewPerson(ctx: Ctx, args: string[]): HTMLElement {
@@ -126,7 +141,7 @@ export function renderNewPerson(ctx: Ctx, args: string[]): HTMLElement {
   const submit = (e: Event) => {
     e.preventDefault();
     if (!name) return;
-    const p: Person = { id: newId(), name, group, callLine: callLine || name, hint, regular: false, stopped: false, seat: '',
+    const p: Person = { id: newId(), name, group, callLine: callLine || name, hint, stopped: false, seat: '',
       yahrzeits: [], addedOn: ctx.today, hiyuv: null };
     let s: State = { ...ctx.store.get(), people: [...ctx.store.get().people, p] };
     const t = targetSlot(group);

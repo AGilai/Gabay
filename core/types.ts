@@ -13,8 +13,9 @@ export interface Person {
   group: Group;
   callLine: string;      // read out exactly as written
   hint: string;          // private: choosing page and person card only
-  regular: boolean;
+  regular?: boolean;     // unused (the first version's קבוע / מזדמן); kept in saved data
   stopped: boolean;      // "stop suggesting": only search finds him
+  deleted?: ISODate;     // soft delete: gone from every list and from search; history still shows his name
   seat: string;          // unused (the first version's free text); the place is `area`
   area?: Area | null;    // where he sits, roughly (core/area.ts)
   yahrzeits: Yahrzeit[];
@@ -44,7 +45,8 @@ export interface Prayers {
 }
 
 export interface Settings {
-  inactiveDays: number; prayers: Prayers; lastBackupOn: ISODate | null;
+  inactiveDays: number; // unused (the first version's automatic drop-out)
+  prayers: Prayers; lastBackupOn: ISODate | null;
   olehInService?: boolean; // reading mode shows Mi Sheberach after each aliyah (default off)
 }
 

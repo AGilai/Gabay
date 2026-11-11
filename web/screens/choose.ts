@@ -10,12 +10,12 @@ import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, activeKey, findReading, keyText,
 import { appBar, bottomNav, h, icon, snackbar } from '../ui.ts';
 import { ANYWHERE, filterText, isAnywhere, type AreaFilter } from '../../core/area.ts';
 import { areaBadge, filterAreaSheet } from '../area.ts';
+import { offerResume } from './reading.ts';
 
 let query = '';
 let findGroup: Group | null = null;
 let findField: SearchField = 'all';
 let findArea: AreaFilter = ANYWHERE;
-let showInactive = false;
 
 const LONG_PRESS_MS = 500;
 
@@ -64,6 +64,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
     query = '';
     ctx.store.set(withReading(state, res.reading), replaced ? `הוחלף את ${replaced.name}` : undefined);
     ctx.home(backTo);
+    offerResume(ctx, p.id);
   };
 
   const days = (personId: string) => {
@@ -132,11 +133,6 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
     list.append(h('div', { class: 'sechead' }, 'בתור'));
     for (const x of q.line) list.append(queueRow(x));
     if (!q.line.length) list.append(h('div', { class: 'notice' }, 'אין אנשים בתור. הוסף אדם חדש.'));
-    if (q.inactive.length) {
-      list.append(h('button', { class: 'collapsed', onclick: () => { showInactive = !showInactive; fillList(); } },
-        h('span', {}, `מזדמנים שלא נראו חצי שנה (${q.inactive.length})`), h('span', {}, showInactive ? '▴' : '▾')));
-      if (showInactive) for (const x of q.inactive) list.append(queueRow(x));
-    }
   };
   if (!finding) fillList();
 

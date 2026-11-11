@@ -3,7 +3,7 @@ import { dayInfo, stepReadingDay } from '../../core/day.ts';
 import { ROLE_LABEL, clearSlot, focusIndex, groupOf, markDone, newReading, place, relayout, undoDone } from '../../core/slots.ts';
 import type { Person, Reading, SlotRole, State } from '../../core/types.ts';
 import { daysBetween, newId } from '../../core/dates.ts';
-import { aliyotOf, search, shouldOfferRegular, suggest } from '../../core/queue.ts';
+import { aliyotOf, search, suggest } from '../../core/queue.ts';
 import { GROUP_CLASS, GROUP_WORD, activeKey, currentKey, findReading, keyText, minyanim, personById, pickMinyan, sameKey, withPicked, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, nowHHMM, sheet, snackbar } from '../ui.ts';
 import { torahFor } from './torah.ts';
@@ -234,15 +234,16 @@ function placeAt(ctx: Ctx, r: Reading, personId: string, i: number): void {
 
 export function done(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?: string) => void): void {
   save(markDone(r, i, nowHHMM()));
-  const id = r.slots[i].personId!;
-  const state = ctx.store.get();
-  if (shouldOfferRegular(state, id, r.date)) {
-    const p = personById(state, id)!;
-    snackbar(`${p.name} עלה 3 פעמים ב־90 יום`, 'סמן כקבוע', () => {
-      const s = ctx.store.get();
-      ctx.store.set({ ...s, people: s.people.map((x) => (x.id === id ? { ...x, regular: true } : x)) });
-    });
-  }
+}
+
+// Someone marked "stop suggesting" was put in a slot (found by search): offer to put him back in the line.
+export function offerResume(ctx: Ctx, personId: string): void {
+  const p = personById(ctx.store.get(), personId);
+  if (!p?.stopped) return;
+  snackbar(`${p.name} מושהה. להחזיר להצעות?`, 'החזר', () => {
+    const s = ctx.store.get();
+    ctx.store.set({ ...s, people: s.people.map((x) => (x.id === personId ? { ...x, stopped: false } : x)) });
+  });
 }
 
 function slotSheet(ctx: Ctx, r: Reading, i: number, save: (r: Reading, label?: string) => void): void {
@@ -278,9 +279,10 @@ function typeIn(ctx: Ctx, r: Reading, i: number, card: HTMLElement, lab: HTMLEle
     if ('error' in res) return snackbar(res.error === 'already' ? `${p.name} כבר בקריאה` : 'לא ניתן להציב כאן');
     input.blur();
     ctx.store.set(withReading(s, res.reading), label);
+    offerResume(ctx, p.id);
   };
   const addNew = (name: string) => {
-    const p: Person = { id: newId(), name, group: g, callLine: name, hint: '', regular: false, stopped: false, seat: '',
+    const p: Person = { id: newId(), name, group: g, callLine: name, hint: '', stopped: false, seat: '',
       yahrzeits: [], addedOn: ctx.today, hiyuv: null };
     save({ ...ctx.store.get(), people: [...ctx.store.get().people, p] }, p, `${name} נוסף כאדם חדש`);
   };
