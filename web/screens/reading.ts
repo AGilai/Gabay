@@ -1,14 +1,16 @@
 // S1 (main page) and S3 (slot sheet). Never shows a person's hint.
-import { dayInfo } from '../../core/day.ts';
+import { dayInfo, stepReadingDay } from '../../core/day.ts';
 import { ROLE_LABEL, clearSlot, focusIndex, groupOf, markDone, newReading, place, relayout, undoDone } from '../../core/slots.ts';
 import type { Person, Reading, SlotRole, State } from '../../core/types.ts';
 import { daysBetween, newId } from '../../core/dates.ts';
 import { aliyotOf, search, shouldOfferRegular, suggest } from '../../core/queue.ts';
-import { GROUP_CLASS, GROUP_WORD, activeKey, currentKey, findReading, keyText, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
+import { GROUP_CLASS, GROUP_WORD, activeKey, currentKey, findReading, keyText, minyanim, personById, pickMinyan, sameKey, withPicked, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, nowHHMM, sheet, snackbar } from '../ui.ts';
 import { torahFor } from './torah.ts';
 
 const SERVICE_WORD = { shacharit: 'שחרית', mincha: 'מנחה' };
+// Past days open locked; "תקן" unlocks one while the app is open.
+const unlocked = new Set<string>();
 
 function tags(r: Reading, i: number, role: SlotRole): HTMLElement[] {
   const tag = (text: string, cls: string, crossed = false) => h('span', { class: `tag ${cls}${crossed ? ' x' : ''}` }, text);
@@ -23,31 +25,71 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
   const { store } = ctx;
   const state = store.get();
   const home = activeKey(state, ctx.today);
-  const key = keyArg ?? home;
+  let key = keyArg ?? home;
+  // A minyan that is gone (undone) falls back to the first.
+  if ((key.minyan ?? 1) > 1 && !findReading(state, key)) key = { date: key.date, service: key.service };
   const info = dayInfo(key.date);
   // The main page: today's reading, or the next one prepared ahead on a day without a reading.
   const isToday = sameKey(key, home);
   const ahead = isToday && key.date !== ctx.today;
+  const past = key.date < ctx.today;
+  const future = key.date > ctx.today;
+  const locked = past && !unlocked.has(keyText(key));
   const saved = findReading(state, key);
-  const r = saved ?? (info.reading ? newReading(key.date, key.service, info.defaultCount) : null);
+  const r = saved ?? (info.reading ? newReading(key.date, key.service, info.defaultCount, key.minyan) : null);
   const save = (next: Reading, label?: string, base: State = store.get()) => store.set(withReading(base, next), label);
 
-  const sub = [info.weekday, info.hebrew, info.parasha, key.service === 'mincha' ? SERVICE_WORD.mincha : null]
-    .filter(Boolean).join(' · ');
-  const bar = isToday
-    ? appBar(ahead ? 'הקריאה הבאה' : 'קריאת התורה', sub, { end: [
-      h('a', { class: 'icon', href: `#torah/${r ? Math.max(focusIndex(r), 0) : 0}/${keyText(key)}`, 'aria-label': 'הטקסט בתורה' }, icon('open')),
-      h('a', { class: 'icon', href: '#history', 'aria-label': 'היסטוריה' }, icon('cal'))] })
-    : appBar(key.date.split('-').reverse().join('.'), sub, { back: 'history' });
+  // The minyanim of the day (and on a fast day, mincha), as a switch when there is more than one.
+  const services: Reading['service'][] = info.hasMincha ? ['shacharit', 'mincha'] : [key.service];
+  const keys: ReadingKey[] = services.flatMap((service) =>
+    minyanim(state, { date: key.date, service }).map((minyan) => ({ date: key.date, service, minyan })));
+  const many = minyanim(state, key).length > 1;
+  const sub = [info.weekday, info.hebrew, info.parasha, key.service === 'mincha' ? SERVICE_WORD.mincha : null,
+    many ? 'מניין ' + (key.minyan ?? 1) : null].filter(Boolean).join(' · ');
+  const nextDay = stepReadingDay(ctx.today, 1, new Set(state.readings.map((x) => x.date)));
+  const title = key.date === ctx.today ? 'קריאת התורה' : past ? 'קריאה שעברה' : ahead || key.date === nextDay ? 'הקריאה הבאה' : 'קריאה עתידית';
+  const bar = appBar(title, sub, { end: [
+    h('a', { class: 'icon', href: `#torah/${r ? Math.max(focusIndex(r), 0) : 0}/${keyText(key)}`, 'aria-label': 'הטקסט בתורה' }, icon('open')),
+    h('a', { class: 'icon', href: '#history', 'aria-label': 'היסטוריה' }, icon('cal'))] });
+  const goKey = (k: ReadingKey) => {
+    pickMinyan(k);
+    if (k.date === home.date && k.service === home.service) {
+      if (location.hash === '' || location.hash === '#reading') ctx.refresh(); else ctx.replace('#reading');
+    } else ctx.replace('#day/' + keyText(k));
+  };
+  const goDay = (d: string) => goKey(d === home.date ? home : withPicked({ date: d, service: 'shacharit' }, store.get()));
+  const days = dayRow(ctx, key.date, home.date, goDay);
+  const addMinyan = () => {
+    const s0 = store.get();
+    const n = Math.max(...minyanim(s0, key)) + 1;
+    const k2 = { date: key.date, service: key.service, minyan: n };
+    store.set(withReading(s0, newReading(key.date, key.service, info.defaultCount, n)), `נפתח מניין ${n}`);
+    goKey(k2);
+  };
+  const doneMark = (k: ReadingKey) => { const x = findReading(state, k); return !!x && focusIndex(x) < 0; };
+  const seg = keys.length > 1
+    ? h('div', { class: 'mseg', role: 'group', 'aria-label': 'מניין' }, ...keys.map((k) => h('button', {
+      class: sameKey(k, key) ? 'on' : '', onclick: () => goKey(k) },
+      (services.length > 1 ? SERVICE_WORD[k.service] + ((k.minyan ?? 1) > 1 ? ' ' + k.minyan : '') : 'מניין ' + k.minyan),
+      doneMark(k) ? h('small', {}, ' ✓') : null)))
+    : null;
+  const lockNote = past
+    ? h('div', { class: 'pastnote' + (locked ? '' : ' open') },
+      h('span', {}, locked ? 'יום שעבר · נעול' : 'פתוח לתיקון'),
+      h('button', { class: 'btn out', onclick: () => { if (locked) unlocked.add(keyText(key)); else unlocked.delete(keyText(key)); ctx.refresh(); } },
+        locked ? 'תקן' : 'נעל'))
+    : null;
+  const moreMinyan = past ? null : h('button', { class: 'linkish', onclick: addMinyan }, '+ מניין נוסף');
 
   if (!r) {
-    return h('div', { class: 'screen' }, bar,
+    return h('div', { class: 'screen' }, bar, days,
       h('main', { class: 'body' },
-        h('div', { class: 'empty-day' }, h('b', {}, 'אין קריאה היום'),
+        seg,
+        h('div', { class: 'empty-day' }, h('b', {}, key.date === ctx.today ? 'אין קריאה היום' : 'אין קריאה ביום הזה'),
           h('span', {}, info.weekday + ' · ' + info.hebrew),
-          h('button', { class: 'btn tonal', onclick: () => save(newReading(key.date, key.service, 3)) }, 'פתח קריאה בכל זאת')),
+          h('button', { class: 'btn tonal', onclick: () => { unlocked.add(keyText(key)); save(newReading(key.date, key.service, 3)); } }, 'פתח קריאה בכל זאת')),
         prayerChips(state)),
-      isToday ? bottomNav('reading', backupDue(ctx)) : null);
+      bottomNav('reading', backupDue(ctx)));
   }
 
   const change = (c: { count?: 3 | 4; noKohen?: boolean; noLevi?: boolean }) => {
@@ -80,6 +122,7 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
       if (s.role === 'K_FOR_L') {
         return h('div', { class: 'slot empty' }, lab, h('div', { class: 'add muted' }, 'יתמלא מהכהן'));
       }
+      if (locked) return h('div', { class: 'slot empty' }, lab, h('div', { class: 'add none' }, 'לא נרשם'));
       const sug = firstEmptyOfGroup.has(i) ? suggest(state, g, key.date, r) : null;
       const last = sug ? aliyot.get(sug.id)?.at(-1) : undefined;
       const card: HTMLElement = h('div', {
@@ -97,13 +140,17 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
     // The calling line, as read out, is the big text; the name he is known by is small underneath
     // (never the hint: the screen may be seen by others).
     const who = h('div', { class: 'who' }, h('div', { class: 'callname' }, p.callLine), h('div', { class: 'known' }, p.name));
+    if (locked) {
+      return h('div', { class: 'slot' + (s.doneAt ? ' done' : '') }, lab, who,
+        s.doneAt ? h('div', { class: 'donemark' }, icon('check', 20), 'עלה ' + s.doneAt) : h('div', {}));
+    }
     if (s.doneAt) {
       return h('div', { class: 'slot done', role: 'button', onclick: () => slotSheet(ctx, r, i, save) },
         lab, who, h('div', { class: 'donemark' }, icon('check', 20), 'עלה ' + s.doneAt));
     }
     return h('div', { class: 'slot' + (i === focus ? ' next' : ''), role: 'button', onclick: () => slotSheet(ctx, r, i, save) },
       lab, who,
-      ahead ? h('div', {}) : h('button', {
+      future ? h('div', {}) : h('button', {
         class: 'btn ' + (i === focus ? 'fill' : 'tonal'),
         onclick: (e: Event) => { e.stopPropagation(); done(ctx, r, i, save); },
       }, icon('check', 20), 'עלה'));
@@ -123,18 +170,45 @@ export function renderReading(ctx: Ctx, keyArg?: ReadingKey): HTMLElement {
         `פתח קריאה היום (${today.weekday})`))
     : null;
 
-  return h('div', { class: 'screen' }, bar,
+  // After the last oleh today: on to the next reading, or another minyan.
+  const finished = saved && key.date === ctx.today && focusIndex(r) < 0
+    ? h('div', { class: 'fin' },
+      h('div', { class: 'h' }, icon('check', 22), `הקריאה הסתיימה · ${r.slots.filter((s) => s.doneAt).length} עלו`),
+      h('button', { class: 'btn fill wide', onclick: () => goDay(nextDay) },
+        `לקריאה הבאה · ${dayInfo(nextDay).weekday} ${dayInfo(nextDay).hebrew}`, icon('chl', 20)),
+      h('button', { class: 'btn tonal wide', onclick: addMinyan }, '+ מניין נוסף היום'))
+    : null;
+
+  return h('div', { class: 'screen' }, bar, days,
     h('main', { class: 'body' + (r.slots.length === 4 ? ' compact' : '') },
       aheadNote,
       banner,
-      h('div', { class: 'ctrl' },
+      seg,
+      lockNote,
+      locked ? null : h('div', { class: 'ctrl' },
         toggle('אין כהן', r.noKohen, { noKohen: !r.noKohen }),
         r.noKohen ? null : toggle('אין לוי', r.noLevi, { noLevi: !r.noLevi }),
-        h('a', { class: 'go', href: '#service/' + keyText(key) }, icon('play', 18), 'התחל קריאה')),
+        future ? null : h('a', { class: 'go', href: '#service/' + keyText(key) }, icon('play', 18), 'התחל קריאה')),
       ...slots,
-      r.slots.length === 4 ? null : h('div', { class: 'sechead' }, 'תפילות'),
+      finished,
+      finished ? null : moreMinyan,
+      r.slots.length === 4 || finished ? null : h('div', { class: 'sechead' }, 'תפילות'),
       prayerChips(state)),
-    isToday ? bottomNav('reading', backupDue(ctx)) : null);
+    bottomNav('reading', backupDue(ctx)));
+}
+
+// The day row under the title: → the previous day with a reading, ← the next one, and the way back to today.
+function dayRow(ctx: Ctx, date: string, homeDate: string, goDay: (d: string) => void): HTMLElement {
+  const opened = new Set(ctx.store.get().readings.map((x) => x.date));
+  const prev = stepReadingDay(date, -1, opened);
+  const next = stepReadingDay(date, 1, opened);
+  const short = (d: string) => dayInfo(d).hebrew.replace(/ ב(?=\S+$)/, ' ');
+  return h('nav', { class: 'dayrow', 'aria-label': 'ימים' },
+    h('button', { class: 'arr', 'aria-label': 'הקריאה הקודמת', onclick: () => goDay(prev) }, icon('chr', 18), short(prev)),
+    date === homeDate
+      ? h('div', { class: 'mid' }, date === ctx.today ? 'היום' : 'הקריאה הבאה')
+      : h('div', { class: 'mid' }, h('button', { class: 'today', onclick: () => goDay(homeDate) }, 'חזרה להיום')),
+    h('button', { class: 'arr', 'aria-label': 'הקריאה הבאה', onclick: () => goDay(next) }, short(next), icon('chl', 18)));
 }
 
 export function backupDue(ctx: Ctx): boolean {

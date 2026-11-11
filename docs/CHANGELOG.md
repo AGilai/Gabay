@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Main page: arrows to the previous / next reading day, "חזרה להיום"; past days open locked ("תקן" to fix);
+  a "הקריאה הסתיימה" card after the last oleh; a second minyan on the same day with a מניין 1 / מניין 2 switch.
 - Reading mode opens with the weekday "וְתִגָּלֶה וְתֵרָאֶה…" (was the Shabbat "וְיַעֲזֹר").
 - Reading mode: a "חצי קדיש" row before המגביה והגולל opens the half kaddish on its own page.
 - Seat areas: 5 columns × קדימה / אחורה ("3-ק"). Set on the person card or in עוד → סידור מקומות; shown on the

@@ -16,8 +16,9 @@ export function layout(count: number, noKohen: boolean, noLevi: boolean): SlotRo
 
 const empty = (role: SlotRole): Slot => ({ role, personId: null, doneAt: null });
 
-export function newReading(date: ISODate, service: 'shacharit' | 'mincha', count: 3 | 4): Reading {
-  return { date, service, count, noKohen: false, noLevi: false, source: 'app', slots: layout(count, false, false).map(empty) };
+export function newReading(date: ISODate, service: 'shacharit' | 'mincha', count: 3 | 4, minyan = 1): Reading {
+  return { date, service, ...(minyan > 1 ? { minyan } : {}), count, noKohen: false, noLevi: false, source: 'app',
+    slots: layout(count, false, false).map(empty) };
 }
 
 // The "Kohen in place of Levi" slot always holds the Kohen of slot 0 (until it is marked done).

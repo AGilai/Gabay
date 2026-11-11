@@ -1,0 +1,274 @@
+<title>Day Navigation Screens</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=Assistant:wght@400;600;700&display=swap">
+<style>
+/* Android phone frames at 1px = 1dp. Tokens copied from web/app.css. */
+:root{
+  --board:#e7ebf1; --screen:#fbfcfe; --surface:#ffffff; --surface2:#eef2f8;
+  --ink:#141c27; --muted:#5a6678; --line:#d5dce6;
+  --accent:#1d4c9f; --on-accent:#ffffff; --accent-bg:#dfe8f8;
+  --kohen:#9a6d07; --kohen-bg:#f7edd4; --levi:#0d7369; --levi-bg:#d7f0ec; --israel:#6141a8; --israel-bg:#ebe3f8;
+  --done:#2a7a40; --done-bg:#dcf0e1; --hiyuv:#b2541a; --hiyuv-bg:#fbe6d8; --past:#6b5a2e; --past-bg:#f3ecd9;
+  --f-display:"Frank Ruhl Libre","David","Times New Roman",serif;
+  --f-ui:"Assistant","Segoe UI",Roboto,Arial,sans-serif;
+  --pw:412px; --ph:860px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37; --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33; --accent-bg:#1c2b47; --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f; --hiyuv:#f2a06a; --hiyuv-bg:#3d2617;
+  --past:#e0c88a; --past-bg:#2f2817; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --board:#0b0f15; --screen:#11161e; --surface:#19202b; --surface2:#212a37; --ink:#e5eaf2; --muted:#98a4b6; --line:#2c3644;
+  --accent:#8fb1f2; --on-accent:#0c1a33; --accent-bg:#1c2b47; --kohen:#e5b84f; --kohen-bg:#3a2f14; --levi:#4fc6b8; --levi-bg:#133631;
+  --israel:#b9a1f2; --israel-bg:#2c2346; --done:#6bc985; --done-bg:#16321f; --hiyuv:#f2a06a; --hiyuv-bg:#3d2617;
+  --past:#e0c88a; --past-bg:#2f2817; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--board);color:var(--ink);font-family:var(--f-ui);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 48px}
+.intro{max-width:72ch;display:grid;gap:8px;margin-bottom:20px;direction:rtl}
+.intro h1{font-family:var(--f-display);font-size:28px;margin:0;text-wrap:balance}
+.intro p,td,ol.q li,figcaption{unicode-bidi:plaintext;text-align:start}
+.intro p{margin:0;color:var(--muted);line-height:1.55;font-size:15px}
+
+.terms{direction:rtl;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;max-width:960px;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;margin-bottom:32px}
+@media (max-width:760px){.terms{grid-template-columns:minmax(0,1fr)}}
+.terms h2{font-family:var(--f-display);font-size:22px;margin:0 0 10px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:start;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.04em}
+td b{font-family:var(--f-display);font-size:17px}
+ol.q{margin:0;padding-inline-start:20px;display:grid;gap:10px;font-size:15px;line-height:1.5}
+ol.q b{display:block}
+ol.q span{color:var(--muted)}
+
+.board{display:flex;flex-wrap:wrap;gap:32px 28px;align-items:flex-start}
+figure{margin:0;display:grid;gap:10px;max-width:100%}
+.scroll{overflow-x:auto;max-width:100%;padding-bottom:4px}
+figcaption{max-width:var(--pw);font-size:14px;line-height:1.5;color:var(--muted);direction:rtl}
+figcaption b{color:var(--ink);display:block;font-size:15px}
+.phone{width:var(--pw);height:var(--ph);background:var(--screen);border-radius:28px;outline:8px solid #1b1f26;
+  position:relative;overflow:hidden;display:flex;flex-direction:column;direction:rtl;margin:8px;font-size:16px}
+.status{height:24px;flex:none;display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-size:12px;font-weight:600;direction:ltr}
+.appbar{height:60px;flex:none;display:flex;align-items:center;gap:4px;padding:0 4px 0 4px}
+.appbar .t{flex:1;min-width:0;padding:0 12px}
+.appbar h3{margin:0;font-size:22px;font-weight:600;line-height:28px}
+.appbar small{font-size:13px;color:var(--muted)}
+.ib{width:44px;height:44px;border-radius:22px;display:grid;place-items:center;flex:none}
+.ib svg{width:22px;height:22px}
+.body{flex:1;min-height:0;overflow:hidden;padding:0 16px 12px;display:flex;flex-direction:column;gap:8px}
+
+/* the new day row */
+.days{flex:none;display:flex;align-items:center;gap:6px;margin:0 12px 6px;background:var(--surface2);border-radius:14px;padding:4px}
+.days .arr{height:40px;min-width:0;border-radius:10px;display:flex;align-items:center;gap:4px;padding:0 8px;font-size:13px;font-weight:600;color:var(--accent);flex:none}
+.days .arr svg{width:18px;height:18px;flex:none}
+.days .arr.off{color:var(--muted);opacity:.4}
+.days .mid{flex:1;min-width:0;text-align:center;font-size:14px;font-weight:700;line-height:1.2}
+.days .mid small{display:block;font-size:12px;font-weight:600;color:var(--muted)}
+.days .today{background:var(--accent);color:var(--on-accent);border-radius:10px;height:32px;padding:0 10px;font-size:13px;font-weight:700;display:inline-flex;align-items:center}
+
+.seg{flex:none;display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;height:40px}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;border-inline-start:1px solid var(--line);padding:0 6px;white-space:nowrap}
+.seg span:first-child{border:0}
+.seg span.on{background:var(--accent-bg);color:var(--accent);font-weight:700}
+.seg span small{font-weight:600;color:var(--done);margin-inline-start:4px}
+.seg span.add{flex:none;padding:0 14px;color:var(--accent)}
+
+.ctl{display:flex;justify-content:space-between;align-items:center;gap:8px;flex:none}
+.chip{height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--line);display:inline-flex;align-items:center;font-size:14px;font-weight:600;background:var(--surface)}
+.btn{height:40px;border-radius:20px;padding:0 16px;display:inline-flex;align-items:center;gap:6px;font-weight:700;font-size:14px;background:var(--accent);color:var(--on-accent)}
+.btn.tonal{background:var(--accent-bg);color:var(--accent)}
+.btn.out{background:none;border:1px solid var(--line);color:var(--ink)}
+.banner{background:var(--accent);color:var(--on-accent);border-radius:12px;padding:8px 14px;font-weight:700;font-size:14px;flex:none}
+
+.slot{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:9px 12px;display:grid;grid-template-columns:1fr auto;gap:0 10px;align-items:center;flex:none}
+.slot .lab{grid-column:1/-1;display:flex;gap:6px;align-items:center}
+.tag{height:20px;padding:0 8px;border-radius:10px;display:inline-flex;align-items:center;font-size:12px;font-weight:700}
+.tag.k{background:var(--kohen-bg);color:var(--kohen)} .tag.l{background:var(--levi-bg);color:var(--levi)} .tag.y{background:var(--israel-bg);color:var(--israel)}
+.slot .name{font-family:var(--f-display);font-size:21px;font-weight:700;line-height:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot small{grid-column:1;font-size:12px;color:var(--muted)}
+.slot.done{background:var(--done-bg);border-color:transparent}
+.slot .dm{color:var(--done);font-weight:700;font-size:13px;grid-row:2/4;grid-column:2}
+.slot.empty{border-style:dashed}
+.slot.empty .name{font-family:var(--f-ui);font-size:17px;color:var(--accent)}
+.slot.next{border:2px solid var(--accent)}
+.slot .go{grid-row:2/4;grid-column:2;height:36px;border-radius:18px;padding:0 12px;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--accent);color:var(--on-accent)}
+.slot .sug{grid-column:1/-1;margin-top:6px;border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
+.slot .sug b{font-family:var(--f-display);font-size:16px;color:var(--ink)}
+.locked .slot{opacity:.85}
+
+.fin{flex:none;background:var(--surface);border:2px solid var(--done);border-radius:16px;padding:12px;display:grid;gap:10px}
+.fin .h{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--done)}
+.fin .h svg{width:22px;height:22px}
+.fin .row{display:flex;gap:8px;flex-wrap:wrap}
+.fin .row .btn{flex:1;justify-content:center}
+
+.pastnote{flex:none;background:var(--past-bg);color:var(--past);border-radius:12px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:600}
+.pastnote .btn{height:34px;background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+
+.snack{position:absolute;left:12px;right:12px;bottom:92px;background:#232a35;color:#eef2f8;border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;font-size:14px}
+.snack b{color:#a9c4f7}
+.nav{height:76px;flex:none;background:var(--surface2);display:flex;justify-content:space-around;padding-top:10px;font-size:12px;font-weight:600;color:var(--muted);margin-top:auto}
+.nav span{display:grid;justify-items:center;gap:4px}
+.nav i{width:60px;height:30px;border-radius:15px;display:block;background:none}
+.nav .on{color:var(--ink)} .nav .on i{background:var(--accent)}
+.intag{font-size:12px;font-weight:700;color:var(--done)}
+.list{display:grid;gap:0;flex:none}
+.li{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding:10px 2px}
+.li b{font-family:var(--f-display);font-size:18px;display:block}
+.li small{font-size:12px;color:var(--muted)}
+.li.inread{box-shadow:inset -4px 0 0 var(--done);padding-inline-start:10px;opacity:.8}
+</style>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="prev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" transform="scale(-1,1) translate(-24,0)"/></symbol>
+  <symbol id="r" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="l" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 10h16M9 3v4M15 3v4" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="book" viewBox="0 0 24 24"><path d="M3 5h7a2 2 0 012 2v12a2 2 0 00-2-2H3zM21 5h-7a2 2 0 00-2 2v12a2 2 0 012-2h7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".15"/><path d="M7 12.5l3.2 3L17 9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="intro">
+  <h1>מעבר בין ימים, ומניין נוסף</h1>
+  <p>Design for review, before any code. A day row under the title on the main page: the arrows go to the previous or next day <b>with a reading</b> (Mon, Thu, Rosh Chodesh, fasts…), showing the date they lead to. When the last oleh is marked, a "הקריאה הסתיימה" card offers the next reading or another minyan today. A past day opens filled in and locked. Today and future days can have a second minyan, with a switch between them. Example: today is Wednesday, Rosh Chodesh Kislev (4 olim). Names are invented.</p>
+</header>
+
+<section class="terms">
+  <div>
+    <h2>מונחים</h2>
+    <table>
+      <tr><th>בממשק</th><th>מה זה</th></tr>
+      <tr><td><b>→ ל׳ חשוון</b></td><td>Previous day with a reading. In Hebrew, earlier is to the right.</td></tr>
+      <tr><td><b>ב׳ כסלו ←</b></td><td>Next day with a reading. Days without a reading are skipped.</td></tr>
+      <tr><td><b>היום</b></td><td>Shown in the middle of the row on any other day. One tap goes back to today.</td></tr>
+      <tr><td><b>הקריאה הסתיימה</b></td><td>The card after the last "עלה ✓".</td></tr>
+      <tr><td><b>+ מניין נוסף</b></td><td>Opens a second list for the same day. Today and future days only.</td></tr>
+      <tr><td><b>מניין 1 · מניין 2</b></td><td>Switch between the lists of the same day. "✓" shows the finished one.</td></tr>
+      <tr><td><b>קריאה שעברה · תקן</b></td><td>A past day is locked. "תקן" unlocks it to fix a mistake.</td></tr>
+    </table>
+  </div>
+  <div>
+    <h2>שאלות אליך</h2>
+    <ol class="q">
+      <li><b>Arrows skip days with no reading?</b><span>Recommended: yes. From Thursday, "הבא" goes straight to Monday. Sunday, Tuesday and so on are reached only through the calendar (היסטוריה).</span></li>
+      <li><b>Past day: locked, with "תקן" to edit?</b><span>Recommended: yes, so a stray tap doesn't change history. Today "היסטוריה" opens past days unlocked.</span></li>
+      <li><b>Second minyan and the turns:</b><span>An oleh in minyan 2 counts like any oleh (his days reset). Someone who already went up in minyan 1 today is marked "✓ עלה במניין 1" on the choosing page, as we do now for people in the reading.</span></li>
+      <li><b>The word:</b><span>"מניין 1 / מניין 2"? Or "מניין א׳ / ב׳", or by hour ("6:15 / 7:00")?</span></li>
+    </ol>
+  </div>
+</section>
+
+<div class="board">
+
+<!-- N1 -->
+<figure><div class="scroll"><div class="phone">
+  <div class="status"><span>7:42</span><span>●●●</span></div>
+  <div class="appbar"><div class="t"><h3>קריאת התורה</h3><small>יום רביעי · א׳ בכסלו · תולדות</small></div>
+    <span class="ib"><svg><use href="#book"/></svg></span><span class="ib"><svg><use href="#cal"/></svg></span></div>
+  <div class="days">
+    <span class="arr"><svg><use href="#r"/></svg>ל׳ חשוון</span>
+    <div class="mid">היום<small>ראש חודש</small></div>
+    <span class="arr">ב׳ כסלו<svg><use href="#l"/></svg></span>
+  </div>
+  <div class="body">
+    <div class="slot done"><div class="lab"><span class="tag k">כהן</span></div><div class="name">משה בן אברהם הכהן</div><span class="dm">✓ עלה 7:21</span><small>משה כ״ץ</small></div>
+    <div class="slot done"><div class="lab"><span class="tag l">לוי</span></div><div class="name">נחום בן שלמה הלוי</div><span class="dm">✓ עלה 7:24</span><small>נחום הלוי</small></div>
+    <div class="slot done"><div class="lab"><span class="tag y">שלישי</span></div><div class="name">דוד בן מנוח</div><span class="dm">✓ עלה 7:27</span><small>דוד פרץ</small></div>
+    <div class="slot done"><div class="lab"><span class="tag y">רביעי</span></div><div class="name">אריה ליב בן מנחם</div><span class="dm">✓ עלה 7:30</span><small>אריה גולן</small></div>
+    <div class="fin">
+      <div class="h"><svg><use href="#ok"/></svg>הקריאה הסתיימה · 4 עלו</div>
+      <div class="row">
+        <span class="btn">לקריאה הבאה · חמישי ב׳ כסלו ←</span>
+      </div>
+      <div class="row"><span class="btn tonal">+ מניין נוסף היום</span></div>
+    </div>
+  </div>
+  <div class="nav"><span class="on"><i></i>קריאה</span><span><i></i>בחירה</span><span><i></i>חולים</span><span><i></i>עוד</span></div>
+</div></div>
+<figcaption><b>N1 · Today, after the last oleh</b>The day row sits under the title on every day. Each arrow shows the date it goes to, so it's clear which way is earlier. When all olim are marked, the "הקריאה הסתיימה" card replaces the prayer chips (they're still in reading mode). "לקריאה הבאה" goes to Thursday. "+ מניין נוסף היום" opens a second list (N4).</figcaption></figure>
+
+<!-- N2 -->
+<figure><div class="scroll"><div class="phone locked">
+  <div class="status"><span>7:43</span><span>●●●</span></div>
+  <div class="appbar"><div class="t"><h3>קריאה שעברה</h3><small>יום שלישי · ל׳ בחשון · ראש חודש</small></div>
+    <span class="ib"><svg><use href="#book"/></svg></span><span class="ib"><svg><use href="#cal"/></svg></span></div>
+  <div class="days">
+    <span class="arr"><svg><use href="#r"/></svg>כ״ט חשוון</span>
+    <div class="mid"><span class="today">חזרה להיום</span></div>
+    <span class="arr">א׳ כסלו<svg><use href="#l"/></svg></span>
+  </div>
+  <div class="body">
+    <div class="pastnote"><span>🔒 נעול · יום שעבר</span><span class="btn">תקן</span></div>
+    <div class="slot done"><div class="lab"><span class="tag k">כהן</span></div><div class="name">שמעון בן מאיר הכהן</div><span class="dm">✓ 7:20</span><small>שמעון כהנא</small></div>
+    <div class="slot done"><div class="lab"><span class="tag l">לוי</span></div><div class="name">יוסף בן יעקב הלוי</div><span class="dm">✓ 7:23</span><small>יוסי לוי</small></div>
+    <div class="slot done"><div class="lab"><span class="tag y">שלישי</span></div><div class="name">נתנאל בן יוסף</div><span class="dm">✓ 7:26</span><small>נתנאל עזרא</small></div>
+    <div class="slot done"><div class="lab"><span class="tag y">רביעי</span></div><div class="name">חיים בן אליהו</div><span class="dm">✓ 7:29</span><small>חיים ברק</small></div>
+  </div>
+  <div class="nav"><span class="on"><i></i>קריאה</span><span><i></i>בחירה</span><span><i></i>חולים</span><span><i></i>עוד</span></div>
+</div></div>
+<figcaption><b>N2 · A past day: filled in, locked</b>"→" from today goes back to Tuesday. It opens with what was recorded. No אין כהן / אין לוי, no "התחל קריאה", no "+ מניין". Taps on a slot do nothing until "תקן". If that day had two minyanim, the switch (N4) shows here too, so you can look at both. "חזרה להיום" in the middle.</figcaption></figure>
+
+<!-- N3 -->
+<figure><div class="scroll"><div class="phone">
+  <div class="status"><span>7:44</span><span>●●●</span></div>
+  <div class="appbar"><div class="t"><h3>הקריאה הבאה</h3><small>יום חמישי · ב׳ בכסלו · תולדות</small></div>
+    <span class="ib"><svg><use href="#book"/></svg></span><span class="ib"><svg><use href="#cal"/></svg></span></div>
+  <div class="days">
+    <span class="arr"><svg><use href="#r"/></svg>א׳ כסלו</span>
+    <div class="mid"><span class="today">חזרה להיום</span></div>
+    <span class="arr">ו׳ כסלו<svg><use href="#l"/></svg></span>
+  </div>
+  <div class="body">
+    <div class="ctl"><span style="display:flex;gap:6px"><span class="chip">אין כהן</span><span class="chip">אין לוי</span></span><span class="btn tonal">+ מניין</span></div>
+    <div class="slot empty next"><div class="lab"><span class="tag k">כהן</span></div><div class="name">+ בחר כהן</div><div class="sug"><span>הבא בתור: <b>רפאל אזולאי</b></span><span>23 יום</span></div></div>
+    <div class="slot empty"><div class="lab"><span class="tag l">לוי</span></div><div class="name">+ בחר לוי</div><div class="sug"><span>הבא בתור: <b>עמרם לוי</b></span><span>17 יום</span></div></div>
+    <div class="slot"><div class="lab"><span class="tag y">שלישי</span></div><div class="name">אלון בן רפאל</div><small>אלון שגיא · חיוב: יארצייט</small></div>
+  </div>
+  <div class="nav"><span class="on"><i></i>קריאה</span><span><i></i>בחירה</span><span><i></i>חולים</span><span><i></i>עוד</span></div>
+</div></div>
+<figcaption><b>N3 · A future day: prepare ahead</b>The same page as today, open for editing. You can already put someone you promised (חיוב). There's no "עלה ✓" before the day comes. "+ מניין" is allowed here too. "←" keeps going forward: Monday ו׳ כסלו.</figcaption></figure>
+
+<!-- N4 -->
+<figure><div class="scroll"><div class="phone">
+  <div class="status"><span>8:31</span><span>●●●</span></div>
+  <div class="appbar"><div class="t"><h3>קריאת התורה</h3><small>יום רביעי · א׳ בכסלו · מניין 2</small></div>
+    <span class="ib"><svg><use href="#book"/></svg></span><span class="ib"><svg><use href="#cal"/></svg></span></div>
+  <div class="days">
+    <span class="arr"><svg><use href="#r"/></svg>ל׳ חשוון</span>
+    <div class="mid">היום<small>ראש חודש</small></div>
+    <span class="arr">ב׳ כסלו<svg><use href="#l"/></svg></span>
+  </div>
+  <div class="body">
+    <div class="seg"><span>מניין 1<small>✓</small></span><span class="on">מניין 2</span></div>
+    <div class="ctl"><span style="display:flex;gap:6px"><span class="chip">אין כהן</span><span class="chip">אין לוי</span></span><span class="btn">▶ התחל קריאה</span></div>
+    <div class="slot"><div class="lab"><span class="tag k">כהן</span></div><div class="name">אליהו בן אברהם הכהן</div><span class="go">עלה ✓</span><small>אליהו כ״ץ</small></div>
+    <div class="slot empty next"><div class="lab"><span class="tag l">לוי</span></div><div class="name">+ בחר לוי</div><div class="sug"><span>הבא בתור: <b>עמרם לוי</b></span><span>17 יום</span></div></div>
+    <div class="slot empty"><div class="lab"><span class="tag y">שלישי</span></div><div class="name">+ בחר ישראל</div><div class="sug"><span>הבא בתור: <b>מאיר טל</b></span><span>58 יום</span></div></div>
+    <div class="slot empty"><div class="lab"><span class="tag y">רביעי</span></div><div class="name">+ בחר ישראל</div></div>
+  </div>
+  <div class="snack"><span>נפתח מניין 2</span><b>בטל</b></div>
+  <div class="nav"><span class="on"><i></i>קריאה</span><span><i></i>בחירה</span><span><i></i>חולים</span><span><i></i>עוד</span></div>
+</div></div>
+<figcaption><b>N4 · Two minyanim on the same day</b>After "+ מניין נוסף", a switch appears above the slots: "מניין 1 ✓ | מניין 2". It opens on the new one, with the same number of olim (4 on Rosh Chodesh). The title line says which minyan. Reading mode, prayers and history all follow the minyan you picked. With one minyan the switch isn't shown. On a fast day the switch also holds מנחה.</figcaption></figure>
+
+<!-- N5 -->
+<figure><div class="scroll"><div class="phone">
+  <div class="status"><span>8:32</span><span>●●●</span></div>
+  <div class="appbar"><span class="ib"><svg><use href="#r"/></svg></span><div class="t"><h3>בחירת לוי</h3><small>מניין 2 · א׳ בכסלו</small></div></div>
+  <div class="body">
+    <div class="list">
+      <div class="li"><div><b>עמרם בן חיים הלוי</b><small>עמרם לוי</small></div><small>17 יום</small></div>
+      <div class="li"><div><b>צבי הירש בן דוד הלוי</b><small>צבי סגל</small></div><small>12 יום</small></div>
+      <div class="li inread"><div><b>נחום בן שלמה הלוי</b><small>נחום הלוי · <span class="intag">✓ עלה במניין 1</span></small></div><small>0 יום</small></div>
+      <div class="li"><div><b>יוסף בן יעקב הלוי</b><small>יוסי לוי</small></div><small>1 יום</small></div>
+    </div>
+  </div>
+  <div class="nav"><span><i></i>קריאה</span><span class="on"><i></i>בחירה</span><span><i></i>חולים</span><span><i></i>עוד</span></div>
+</div></div>
+<figcaption><b>N5 · Choosing for minyan 2</b>Whoever went up in minyan 1 today is marked "✓ עלה במניין 1", the same way people already in the reading are marked now. You can still pick him if he's the only one.</figcaption></figure>
+
+</div>

@@ -27,6 +27,7 @@ export interface Slot { role: SlotRole; personId: string | null; doneAt: string 
 export interface Reading {
   date: ISODate;
   service: 'shacharit' | 'mincha';
+  minyan?: number; // a second minyan on the same day is 2; absent = 1
   count: number;
   noKohen: boolean;
   noLevi: boolean;

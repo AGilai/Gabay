@@ -113,7 +113,21 @@ The app opens on S1.
 
 From top to bottom:
 
-1. **App bar:** "קריאת התורה" + weekday · Hebrew date · parasha.
+1. **App bar:** "קריאת התורה" + weekday · Hebrew date · parasha (· מניין 2 when the day has two).
+   Under it, the **day row** (built 2026-11-11, mockup `design/mockups/day-nav.html`): "→ <date>" goes to the
+   previous day with a reading (or one opened by hand), "<date> ←" to the next; days with no reading are skipped.
+   The middle says "היום", or is a "חזרה להיום" button. Other days: "קריאה שעברה", "הקריאה הבאה", "קריאה עתידית".
+   - **Past day:** opens with what was recorded, **locked** ("יום שעבר · נעול"): no toggles, no "התחל קריאה",
+     slots don't respond, empty ones say "לא נרשם". "תקן" unlocks it while the app is open ("נעל" locks it again).
+     No new minyan on a past day.
+   - **Future day:** editable, no "עלה ✓" and no "התחל קריאה" before the day.
+   - **Finished** (today, every oleh marked): a card "הקריאה הסתיימה · N עלו" with "לקריאה הבאה · <day>" and
+     "+ מניין נוסף היום".
+   - **Second minyan** ("+ מניין נוסף", today and future): its own list on the same day, with a switch
+     "מניין 1 ✓ | מניין 2" above the slots (on a fast day the switch also holds מנחה). The main page, the choosing
+     page, reading mode and the prayers follow the minyan picked. An aliyah in minyan 2 counts like any other.
+     On the choosing page someone from the other minyan is marked "✓ עלה במניין 1", and "הבא בתור" never
+     suggests someone who already went up today.
 2. **Banner** on special days (Rosh Chodesh etc.).
 3. **Control row:** toggle chips **אין כהן** and **אין לוי**, and on the other side, at the same height,
    **▶ התחל קריאה**, which opens reading mode (S11).

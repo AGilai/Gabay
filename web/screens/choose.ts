@@ -6,7 +6,7 @@ import { ROLE_LABEL, groupOf, newReading, place } from '../../core/slots.ts';
 import type { Group, Person, Reading } from '../../core/types.ts';
 import { aliyotOf } from '../../core/queue.ts';
 import { daysBetween } from '../../core/dates.ts';
-import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, activeKey, findReading, keyText, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
+import { GROUP_CLASS, GROUP_PLURAL, GROUP_WORD, activeKey, findReading, keyText, parseKey, personById, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, bottomNav, h, icon, snackbar } from '../ui.ts';
 import { ANYWHERE, filterText, isAnywhere, type AreaFilter } from '../../core/area.ts';
 import { areaBadge, filterAreaSheet } from '../area.ts';
@@ -36,13 +36,12 @@ function pressable(el: HTMLElement, onTap: () => void, onLong: () => void): HTML
 export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
   const state = ctx.store.get();
   const key: ReadingKey = (() => {
-    const k = args.find((a) => a.includes('.'));
-    if (k) { const [date, service] = k.split('.'); return { date, service: service as Reading['service'] }; }
-    return activeKey(state, ctx.today);
+    const k = args.map(parseKey).find(Boolean);
+    return k ?? activeKey(state, ctx.today);
   })();
   const isToday = sameKey(key, activeKey(state, ctx.today));
   const info = dayInfo(key.date);
-  const r = findReading(state, key) ?? (info.reading ? newReading(key.date, key.service, info.defaultCount) : null);
+  const r = findReading(state, key) ?? (info.reading ? newReading(key.date, key.service, info.defaultCount, key.minyan) : null);
   const slotArg = args[1] !== undefined && /^\d$/.test(args[1]) ? Number(args[1]) : null;
   const nextEmpty = r?.slots.find((s) => !s.personId && s.role !== 'K_FOR_L');
   const fallbackGroup: Group = nextEmpty ? groupOf(nextEmpty.role) : 'Y';
@@ -88,8 +87,20 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
     const s = inSlot(id)!;
     return h('span', { class: 'intag' }, icon('check', 14), (s.doneAt ? 'עלה · ' : 'בקריאה · ') + ROLE_LABEL[s.role]);
   };
-  const queueRow = (x: Row, cls = '') => row(x.person, cls,
-    x.reason ? h('span', { class: 'hytag' }, x.reason) : x.person.hint || (x.last ? '' : 'חדש'), days(x.person.id));
+  // Someone in another minyan of the same day is marked too (he may still be picked).
+  const others = state.readings.filter((x) => x.date === key.date && x.service === key.service && (x.minyan ?? 1) !== (key.minyan ?? 1));
+  const elsewhere = (id: string) => {
+    for (const x of others) {
+      const s = x.slots.find((s) => s.personId === id && s.role !== 'K_FOR_L');
+      if (s) return h('span', { class: 'intag' }, icon('check', 14), `${s.doneAt ? 'עלה' : 'בקריאה'} במניין ${x.minyan ?? 1}`);
+    }
+    return null;
+  };
+  const queueRow = (x: Row, cls = '') => {
+    const other = elsewhere(x.person.id);
+    return other ? row(x.person, cls + ' inread', other, days(x.person.id))
+      : row(x.person, cls, x.reason ? h('span', { class: 'hytag' }, x.reason) : x.person.hint || (x.last ? '' : 'חדש'), days(x.person.id));
+  };
 
   const list = h('div', { class: 'list' });
   const fillList = () => {
@@ -99,7 +110,9 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
       if (!found.length) list.append(h('div', { class: 'notice' }, 'לא נמצא. אפשר להוסיף אדם חדש.'));
       for (const p of found) {
         const note = [GROUP_WORD[p.group], p.stopped ? 'מושהה' : '', p.hint].filter(Boolean).join(' · ');
-        list.append(inSlot(p.id) ? row(p, 'inread', inTag(p.id), days(p.id)) : row(p, '', note, days(p.id)));
+        const other = elsewhere(p.id);
+        list.append(inSlot(p.id) ? row(p, 'inread', inTag(p.id), days(p.id))
+          : other ? row(p, 'inread', other, days(p.id)) : row(p, '', note, days(p.id)));
       }
       return;
     }
@@ -134,6 +147,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
       `${GROUP_PLURAL[g]} ${counts(g)}`)));
 
   const sub = slot !== null && r ? 'ל' + ROLE_LABEL[r.slots[slot].role] : 'נכנס ישר למקומו בקריאה';
+  const subM = (key.minyan ?? 1) > 1 || others.length ? `מניין ${key.minyan ?? 1} · ` : '';
   if (finding) {
     const input = h('input', {
       type: 'search', placeholder: 'חיפוש שם, שם לקריאה, רמז…', value: query, 'aria-label': 'חיפוש', enterkeyhint: 'search',
@@ -174,7 +188,7 @@ export function renderChoose(ctx: Ctx, args: string[]): HTMLElement {
     ctx.go(location.hash + '/find');
   };
   return h('div', { class: 'screen' },
-    appBar('בחירה', sub, isToday && slot === null ? {} : { back: backTo }),
+    appBar('בחירה', subM + sub, isToday && slot === null ? {} : { back: backTo }),
     tabs,
     h('main', { class: 'body', style: 'gap:0' }, h('button', { class: 'search', onclick: openFind }, icon('search', 20), h('span', {}, 'חיפוש שם, שם לקריאה, רמז…')), list, h('div', { class: 'pad-fab' })),
     h('a', { class: 'fab', href: `#new/${group}` + tail }, icon('plus'), 'אדם חדש'),

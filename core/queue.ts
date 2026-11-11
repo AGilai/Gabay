@@ -67,7 +67,8 @@ export function buildQueue(state: State, group: Group, today: ISODate, reading: 
 
 export function suggest(state: State, group: Group, today: ISODate, reading: Reading | null): Person | null {
   const q = buildQueue(state, group, today, reading);
-  return (q.hiyuv[0] ?? q.line[0])?.person ?? null;
+  // Not someone who already went up today (in another minyan); he can still be picked from the list.
+  return [...q.hiyuv, ...q.line].find((x) => x.last !== today)?.person ?? null;
 }
 
 const NIQQUD = /[֑-ׇ]/g;

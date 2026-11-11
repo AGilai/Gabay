@@ -5,7 +5,7 @@ import { aliyotOf } from '../../core/queue.ts';
 import { ROLE_LABEL, groupOf, newReading, place } from '../../core/slots.ts';
 import { dayInfo } from '../../core/day.ts';
 import type { Group, Person, Reading, SlotRole, State } from '../../core/types.ts';
-import { GROUP_WORD, activeKey, findReading, keyText, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
+import { GROUP_WORD, activeKey, findReading, keyText, parseKey, sameKey, withReading, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, h, snackbar } from '../ui.ts';
 import { areaTag } from '../../core/area.ts';
 import { pickAreaSheet } from '../area.ts';
@@ -97,14 +97,13 @@ export function renderPerson(ctx: Ctx, id: string): HTMLElement {
 export function renderNewPerson(ctx: Ctx, args: string[]): HTMLElement {
   const group0: Group = (['K', 'L', 'Y'] as Group[]).includes(args[0] as Group) ? (args[0] as Group) : 'Y';
   const slot = args[1] && /^\d$/.test(args[1]) ? Number(args[1]) : null;
-  const keyArg = args.find((a) => a.includes('.'));
-  const key: ReadingKey = keyArg ? { date: keyArg.split('.')[0], service: keyArg.split('.')[1] as Reading['service'] } : activeKey(ctx.store.get(), ctx.today);
+  const key: ReadingKey = args.map(parseKey).find(Boolean) ?? activeKey(ctx.store.get(), ctx.today);
   const backTo = sameKey(key, activeKey(ctx.store.get(), ctx.today)) ? '#reading' : '#day/' + keyText(key);
   let group = group0, name = '', callLine = '', hint = '';
 
   const state0 = ctx.store.get();
   const info = dayInfo(key.date);
-  const reading = findReading(state0, key) ?? (info.reading ? newReading(key.date, key.service, info.defaultCount) : null);
+  const reading = findReading(state0, key) ?? (info.reading ? newReading(key.date, key.service, info.defaultCount, key.minyan) : null);
   const targetSlot = (g: Group): number | null => {
     if (!reading) return null;
     if (slot !== null && reading.slots[slot] && groupOf(reading.slots[slot].role) === g) return slot;

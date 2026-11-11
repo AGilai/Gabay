@@ -32,7 +32,7 @@ function renderHistoryInner(ctx: Ctx): HTMLElement {
           .map((s) => personById(state, s.personId)?.name ?? '?').join(' · ');
         return h('a', { class: 'list-item', href: '#day/' + keyText(r) },
           h('div', { class: 'who' },
-            h('b', {}, `${info.weekday} · ${info.hebrew}${r.service === 'mincha' ? ' · מנחה' : ''}`),
+            h('b', {}, `${info.weekday} · ${info.hebrew}${r.service === 'mincha' ? ' · מנחה' : ''}${(r.minyan ?? 1) > 1 ? ' · מניין ' + r.minyan : ''}`),
             h('small', {}, names || 'לא סומנו עולים')),
           h('span', { class: 'muted mono' }, r.date.slice(8) + '.' + r.date.slice(5, 7) + '.' + r.date.slice(2, 4)));
       }),

@@ -2,7 +2,7 @@
 import { pieces, readingFor, scrollText, type TorahData, type TorahReading } from '../../core/torah.ts';
 import { ROLE_LABEL, focusIndex } from '../../core/slots.ts';
 import type { Reading } from '../../core/types.ts';
-import { activeKey, findReading, parseKey, type Ctx, type ReadingKey } from '../ctx.ts';
+import { activeKey, findReading, keyText, parseKey, type Ctx, type ReadingKey } from '../ctx.ts';
 import { appBar, h, icon } from '../ui.ts';
 
 let data: TorahData | null = null;
@@ -92,7 +92,7 @@ export function renderTorah(ctx: Ctx, args: string[]): HTMLElement {
 
   const mode = (m: 'teamim' | 'scroll', text: string) => h('button', {
     class: (m === 'scroll') === scroll ? 'on' : '', 'aria-pressed': String((m === 'scroll') === scroll),
-    onclick: () => { write(MODE_KEY, m); ctx.replace(`#torah/${current}/${key.date}.${key.service}`); ctx.refresh(); },
+    onclick: () => { write(MODE_KEY, m); ctx.replace(`#torah/${current}/${keyText(key)}`); ctx.refresh(); },
   }, text);
   const resize = (d: number) => {
     size = Math.min(40, Math.max(18, size + d));

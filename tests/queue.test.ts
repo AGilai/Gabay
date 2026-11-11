@@ -137,3 +137,10 @@ test('an empty search lists everyone in the chosen group, by name', () => {
   assert.deepEqual(search(s, '', { group: 'Y' }).map((p) => p.id), ['A', 'B']);
   assert.deepEqual(search(s, '  ').map((p) => p.id), ['K1', 'A', 'B']);
 });
+
+test('the next-in-line suggestion skips someone who already went up today in another minyan', () => {
+  const people = [mk('k1', { group: 'K' }), mk('k2', { group: 'K', regular: false, addedOn: '2020-01-01' })];
+  const s = st(people, [readingOn(TODAY, [['k1', 'K']])]);
+  assert.equal(suggest(s, 'K', TODAY, null)?.id ?? null, null);
+  assert.deepEqual(ids(buildQueue(s, 'K', TODAY, null).line), ['k1']); // still in the list, to pick by hand
+});

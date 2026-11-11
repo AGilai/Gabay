@@ -310,3 +310,21 @@ button.search{width:100%;border:0;font:inherit;font-size:16px;text-align:start;c
 .seatrow{cursor:pointer;color:inherit;font:inherit}
 .scb{width:24px;height:24px;border-radius:6px;border:2px solid var(--muted);display:grid;place-items:center;flex:none;font-size:14px;font-weight:700}
 .seatrow.on .scb{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+/* main page: day row, minyan switch, past day lock, finished card */
+.dayrow{flex:none;display:flex;align-items:center;gap:6px;margin:0 16px 8px;background:var(--surface2);border-radius:14px;padding:4px}
+.dayrow .arr{height:40px;border:0;background:none;border-radius:10px;display:flex;align-items:center;gap:2px;padding:0 6px;font-size:13px;font-weight:700;color:var(--accent);flex:none;white-space:nowrap}
+.dayrow .arr:active{background:var(--surface)}
+.dayrow .mid{flex:1;min-width:0;text-align:center;font-size:14px;font-weight:700}
+.dayrow .today{background:var(--accent);color:var(--on-accent);border:0;border-radius:10px;height:34px;padding:0 12px;font-size:13px;font-weight:700}
+.mseg{height:40px;display:flex;border:1px solid var(--line);border-radius:20px;overflow:hidden;flex:none}
+.mseg button{flex:1;border:0;background:none;font-weight:600;font-size:14px;border-left:1px solid var(--line);white-space:nowrap}
+.mseg button:last-child{border-left:0}
+.mseg button.on{background:var(--surface2);color:var(--accent);font-weight:700}
+.mseg small{color:var(--done);font-weight:700}
+.pastnote{flex:none;background:var(--hiyuv-bg);border-radius:12px;padding:6px 6px 6px 12px;padding-inline:12px 6px;display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:700}
+.pastnote.open{background:var(--surface2)}
+.pastnote .btn{height:36px;padding:0 14px;font-size:14px}
+.fin{flex:none;border:2px solid var(--done);border-radius:16px;padding:12px;display:grid;gap:8px;background:var(--surface)}
+.fin .h{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--done)}
+.slot .add.none{color:var(--muted);font-weight:600;font-size:16px}

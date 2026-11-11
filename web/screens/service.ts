@@ -24,7 +24,7 @@ export function renderService(ctx: Ctx, args: string[]): HTMLElement {
   const key = parseKey(args[0]) ?? activeKey(state, ctx.today);
   const kt = keyText(key);
   const info = dayInfo(key.date);
-  const r = findReading(state, key) ?? (info.reading ? newReading(key.date, key.service, info.defaultCount) : null);
+  const r = findReading(state, key) ?? (info.reading ? newReading(key.date, key.service, info.defaultCount, key.minyan) : null);
   const t = torahFor(key);
   if (!t) loadTorah().then(() => { if (torahFor(key)) ctx.refresh(); }, () => {});
   let size = Number(read(SIZE_KEY)) || 24;

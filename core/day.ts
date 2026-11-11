@@ -89,6 +89,16 @@ export function yahrzeitThisWeek(y: Yahrzeit, date: ISODate): boolean {
 
 // Today when today has a reading, else the next day that has one (at most a few days ahead,
 // e.g. Friday → Monday, or a three-day Yom Tov).
+// The day arrows on the main page: the previous / next day with a reading, or with one opened by hand.
+export function stepReadingDay(from: ISODate, dir: 1 | -1, opened: Set<ISODate>): ISODate {
+  let d = from;
+  for (let i = 0; i < 60; i++) {
+    d = addDays(d, dir);
+    if (opened.has(d) || dayInfo(d).reading) return d;
+  }
+  return addDays(from, dir);
+}
+
 export function nextReadingDate(from: ISODate): ISODate {
   let d = from;
   for (let i = 0; i < 30 && !dayInfo(d).reading; i++) d = addDays(d, 1);
