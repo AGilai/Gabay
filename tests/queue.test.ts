@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aliyotOf, buildQueue, suggest, search, normalize, splitCallLine } from '../core/queue.ts';
+import { aliyotOf, buildQueue, pauseAbsent, suggest, search, normalize, splitCallLine } from '../core/queue.ts';
 import type { Person, Reading, SlotRole, State, Group } from '../core/types.ts';
 
 const TODAY = '2026-10-22';
@@ -139,4 +139,14 @@ test('the next-in-line suggestion skips someone who already went up today in ano
   const s = st(people, [readingOn(TODAY, [['k1', 'K']])]);
   assert.equal(suggest(s, 'K', TODAY, null)?.id ?? null, null);
   assert.deepEqual(ids(buildQueue(s, 'K', TODAY, null).line), ['k1']); // still in the list, to pick by hand
+});
+
+test('one-time cleanup: over 180 days since the last aliyah (or a card that old, never called) becomes מושהה', () => {
+  const s = st([
+    mk('old', { group: 'Y' }), mk('recent', { group: 'Y' }), mk('newcard', { group: 'Y', addedOn: '2026-09-01' }),
+    mk('oldcard', { group: 'Y', addedOn: '2025-01-01' }), mk('gone', { group: 'Y', deleted: '2026-01-01' }),
+  ], [readingOn('2026-03-01', [['old', 'Y3']]), readingOn('2026-08-01', [['recent', 'Y3']])]);
+  const res = pauseAbsent(s, TODAY, 180);
+  assert.equal(res.count, 2);
+  assert.deepEqual(res.state.people.filter((p) => p.stopped).map((p) => p.id), ['old', 'oldcard']);
 });

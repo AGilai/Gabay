@@ -274,7 +274,8 @@ Inside each tab:
 2. **The line:** everyone who is not stopped or deleted, by **days since his last aliyah, longest
    first**. Never called = top, by the date he was added. Ties: fewer aliyot in the last 12 months
    first. Someone called last week is simply near the bottom.
-3. **No automatic drop-out.** A long absence keeps him high in the line; the gabbai stops him by hand
+3. **No automatic drop-out.** (When this changed, a one-time cleanup marked everyone with no aliyah in 180 days
+   as מושהה, with a sheet to undo it.) A long absence keeps him high in the line; the gabbai stops him by hand
    ("הפסק להציע"). Stopped people appear only in search. When one is put in a slot, a snackbar asks
    "<name> מושהה. להחזיר להצעות?" with "החזר".
 

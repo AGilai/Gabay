@@ -2,7 +2,8 @@
 import { toISODate } from '../core/dates.ts';
 import type { Ctx } from './ctx.ts';
 import { openStore, requestPersist } from './store.ts';
-import { snackbar } from './ui.ts';
+import { h, sheet, snackbar } from './ui.ts';
+import { pauseAbsent } from '../core/queue.ts';
 import { nav } from './nav.ts';
 import { renderReading } from './screens/reading.ts';
 import { renderChoose } from './screens/choose.ts';
@@ -130,6 +131,26 @@ async function registerWorker(): Promise<void> {
     if (!reloaded) { reloaded = true; location.reload(); }
   });
 }
+// One time, after קבוע / מזדמן went away: who hasn't gone up in 180 days becomes מושהה, so the line isn't
+// headed by people who stopped coming. The gabbai sees how many and can undo it.
+function cleanupOnce(): void {
+  const s0 = store.get();
+  if (store.demo || s0.settings.absentPausedOn) return;
+  const { state, count } = pauseAbsent(s0, today, 180);
+  store.set({ ...state, settings: { ...state.settings, absentPausedOn: today } });
+  if (!count) return;
+  const s = sheet(h('div', { class: 'confirm' },
+    h('p', {}, (count === 1 ? 'אדם אחד שלא עלה יותר מ־180 יום סומן "מושהה". הוא לא יוצע, והחיפוש עדיין ימצא אותו.'
+      : `${count} אנשים שלא עלו יותר מ־180 יום סומנו "מושהה". הם לא יוצעו, והחיפוש עדיין ימצא אותם.`)),
+    h('div', { class: 'row-btns' },
+      h('button', { class: 'btn tonal', onclick: () => {
+        s.close();
+        const now = store.get();
+        store.set({ ...now, people: now.people.map((p) => ({ ...p, stopped: s0.people.find((x) => x.id === p.id)?.stopped ?? p.stopped })) });
+      } }, 'בטל את הסימון'),
+      h('button', { class: 'btn fill', onclick: () => s.close() }, 'אישור'))));
+}
+
 store.subscribe((label) => {
   // Screens with open text fields re-render themselves; a store change must not steal focus.
   const a = document.activeElement;
@@ -137,6 +158,7 @@ store.subscribe((label) => {
   if (label) snackbar(label, 'בטל', () => store.undo());
 });
 render();
+cleanupOnce();
 keepAwake();
 // The verse references on the main page appear once the Torah data has loaded.
 loadTorah().then(() => { if (!(document.activeElement instanceof HTMLInputElement)) render(); }, () => {});

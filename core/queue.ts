@@ -59,6 +59,21 @@ export function buildQueue(state: State, group: Group, today: ISODate, reading: 
   return q;
 }
 
+// One-time cleanup (2026-11-11), when the automatic drop-out went away: anyone whose last aliyah is over
+// `days` ago, or never called and added that long ago, becomes "stop suggesting".
+export function pauseAbsent(state: State, today: ISODate, days: number): { state: State; count: number } {
+  const aliyot = aliyotOf(state);
+  let count = 0;
+  const people = state.people.map((p) => {
+    if (p.stopped || p.deleted) return p;
+    const since = aliyot.get(p.id)?.at(-1) ?? p.addedOn;
+    if (daysBetween(since, today) <= days) return p;
+    count++;
+    return { ...p, stopped: true };
+  });
+  return { state: { ...state, people }, count };
+}
+
 export function suggest(state: State, group: Group, today: ISODate, reading: Reading | null): Person | null {
   const q = buildQueue(state, group, today, reading);
   // Not someone who already went up today (in another minyan); he can still be picked from the list.

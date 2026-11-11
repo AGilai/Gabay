@@ -46,6 +46,7 @@ export interface Prayers {
 
 export interface Settings {
   inactiveDays: number; // unused (the first version's automatic drop-out)
+  absentPausedOn?: ISODate; // when the one-time cleanup (core/queue.ts pauseAbsent) ran
   prayers: Prayers; lastBackupOn: ISODate | null;
   olehInService?: boolean; // reading mode shows Mi Sheberach after each aliyah (default off)
 }

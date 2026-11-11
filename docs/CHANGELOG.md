@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- One time, on the first start of this version: anyone with no aliyah in 180 days (or a card that old, never
+  called) becomes מושהה. A sheet says how many, with "בטל את הסימון".
 - Person card: קבוע / מזדמן removed, and with it the half-year drop-out and the "להפוך לקבוע?" prompt.
   "הפסק להציע" is the only flag; putting a stopped person in a slot asks "להחזיר להצעות?". New "מחק":
   for good when he was never called, otherwise a soft delete that history still names.
